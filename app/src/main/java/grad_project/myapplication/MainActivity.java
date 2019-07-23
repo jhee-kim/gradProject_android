@@ -28,7 +28,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-// 테스트1@#@!$@$%!#
+// 테스트1@#@!$@$%!#22222222222222222
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     boolean is_login = false;
