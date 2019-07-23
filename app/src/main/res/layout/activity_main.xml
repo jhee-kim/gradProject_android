@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout android:id="@+id/layout_main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <!-- 메인 화면 레이아웃 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#D8EEFF" />
+
+        <RelativeLayout
+            android:id="@+id/title_main"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <RelativeLayout
+                android:id="@+id/bt_open_menu"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="5dp"
+                android:layout_centerVertical="true">
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/title_menu"
+                    android:scaleType="fitCenter"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/title_main"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="@font/m_gothic_normal"
+            android:textSize="14sp"/>
+
+        <ImageView
+            android:id="@+id/main_top_image"
+            android:layout_width="165dp"
+            android:layout_height="93dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/tv_name"
+            android:scaleType="fitCenter"
+            android:background="@drawable/logo"
+            android:layout_marginBottom="20dp"/>
+
+        <Button
+            android:id="@+id/bt_open_map"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/main_top_image"
+            android:onClick="onClick"
+            android:text="관람하기"/>
+
+        <Button
+            android:id="@+id/bt_certificate"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="15dp"
+            android:onClick="onClick"
+            android:text="확인증 발급"/>
+
+        <Button
+            android:id="@+id/bt_registration"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_above="@+id/bt_certificate"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="5dp"
+            android:onClick="onClick"
+            android:text="최초 등록"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/bt_open_map"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="40dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="센터 허가 완료"
+                    android:textSize="20sp"/>
+
+                <Switch
+                    android:id="@+id/sw_test"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp" />
+
+            </LinearLayout>
+    </RelativeLayout>
+
+
+    <!-- 슬라이드 메뉴 레이아웃 -->
+    <RelativeLayout
+        android:id="@+id/layout_slide"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:background="#ffffff"
+        android:layout_gravity="start" >
+
+        <!-- 슬라이드 메뉴 닫기 버튼 -->
+        <RelativeLayout
+            android:id="@+id/bt_close_menu"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_margin="10dp">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/close"
+                android:scaleType="fitCenter"/>
+
+        </RelativeLayout>
+
+        <!-- 로그아웃 버튼 -->
+        <RelativeLayout
+            android:id="@+id/bt_logout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="10dp">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/logout"
+                android:scaleType="fitCenter"/>
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/bt_personal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bt_close_menu"
+            android:layout_marginTop="0dp"
+            android:layout_marginStart="30dp"
+            android:textSize="24sp"
+            android:textAlignment="viewStart"
+            android:fontFamily="@font/m_gothic_bold"
+            android:textColor="@color/focusText"
+            android:background="@color/transparent"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/bt_personal"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- 관람 현황 확인 버튼 -->
+                <LinearLayout
+                    android:id="@+id/bt_viewtime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="5dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/stopwatch"/>
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="관람 현황"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+
+                <!-- 내 정보 버튼 -->
+                <LinearLayout
+                    android:id="@+id/bt_myinfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="5dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/profile"/>
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="내 정보"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+
+                <!-- 확인증 버튼 -->
+                <LinearLayout
+                    android:id="@+id/bt_certificate_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="5dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/stamp"/>
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="확인증"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- 최초 등록 버튼 -->
+                <LinearLayout
+                    android:id="@+id/bt_registration_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="5dp">
+
+                    <ImageView
+                        android:id="@+id/iv_registration"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/edit"/>
+
+                    <TextView
+                        android:id="@+id/tv_registration"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="최초 등록"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+
+                <!-- 홈페이지 버튼 -->
+                <LinearLayout
+                    android:id="@+id/bt_homepage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="5dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/homepage"/>
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="홈페이지"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+
+
+
+                <!-- 도움말 버튼 -->
+                <LinearLayout
+                    android:id="@+id/bt_information"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="5dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/information"/>
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="도움말"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+
+    <!--<Button-->
+        <!--android:id="@+id/bt_homepage"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="30dp"-->
+        <!--android:layout_marginStart="50dp"-->
+        <!--android:layout_marginEnd="50dp"-->
+        <!--android:onClick="onClick"-->
+        <!--android:enabled="true"-->
+        <!--android:text="홈페이지"/>-->
+
+    <!--<Button-->
+        <!--android:id="@+id/bt_normal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="50dp"-->
+        <!--android:layout_marginEnd="50dp"-->
+        <!--android:onClick="onClick"-->
+        <!--android:enabled="true"-->
+        <!--android:text="일반 관람"/>-->
+    <!--<Button-->
+        <!--android:id="@+id/bt_narr"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="50dp"-->
+        <!--android:layout_marginEnd="50dp"-->
+        <!--android:onClick="onClick"-->
+        <!--android:enabled="true"-->
+        <!--android:text="전시 해설"/>-->
+    <!--<Button-->
+        <!--android:id="@+id/bt_confirm"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="50dp"-->
+        <!--android:layout_marginEnd="50dp"-->
+        <!--android:onClick="onClick"-->
+        <!--android:enabled="true"-->
+        <!--android:text="확인증 발급"/>-->
+
+
+
+</android.support.v4.widget.DrawerLayout>

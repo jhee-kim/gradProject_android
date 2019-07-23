@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="transparent">#00000000</color>
+    <color name="hyperlink">#2196F3</color>
+    <color name="menubar">#0E4B69</color>
+    <color name="hintText">#888888</color>
+    <color name="focusText">#222222</color>
+    <color name="unfocusText">#707070</color>
+    <color name="disableButton">#E0E0E0</color>
+</resources>

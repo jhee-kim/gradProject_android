@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/title_registration"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <RelativeLayout
+            android:id="@+id/bt_back_layout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true" >
+
+            <ImageButton
+                android:id="@+id/bt_back"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/title_back"
+                android:scaleType="fitCenter"
+                android:onClick="onBack"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/bt_back_layout"
+            android:layout_marginStart="5dp"
+            android:layout_centerVertical="true"
+            android:text="정보 입력"
+            android:textSize="24sp"
+            android:fontFamily="@font/m_gothic_extrabold"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/menubar"
+        android:layout_below="@id/title_registration"></LinearLayout>
+    <!-- 기본 정보 입력 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_registration"
+        android:layout_marginTop="20dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <TextView
+            android:id="@+id/tv_personal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="개인정보"
+            android:textSize="24sp"
+            android:fontFamily="@font/m_gothic_bold"/>
+        <LinearLayout
+            android:id="@+id/layout_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_personal">
+
+            <EditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="이름"
+                android:textColorHint="@color/hintText"
+                android:textSize="20sp"
+                android:inputType="text"
+                android:fontFamily="@font/m_gothic_normal"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_serial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_name">
+
+            <EditText
+                android:id="@+id/et_serial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="군번(- 생략)"
+                android:textColorHint="@color/hintText"
+                android:textSize="20sp"
+                android:inputType="number"
+                android:fontFamily="@font/m_gothic_normal"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_serial">
+
+            <EditText
+                android:id="@+id/et_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="휴대폰(- 생략)"
+                android:textColorHint="@color/hintText"
+                android:textSize="20sp"
+                android:inputType="phone"
+                android:fontFamily="@font/m_gothic_normal"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layout_phone"
+            android:layout_marginTop="20dp"
+            android:text="관람 방법"
+            android:textSize="24sp"
+            android:fontFamily="@font/m_gothic_bold"/>
+
+        <RadioGroup
+            android:id="@+id/rg_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_type"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginTop="10dp">
+            <RadioButton
+                android:id="@+id/rb_normal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="일반 관람"
+                android:textSize="20sp"
+                android:fontFamily="@font/m_gothic_normal" />
+            <RadioButton
+                android:id="@+id/rb_narr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="전시 해설"
+                android:textSize="20sp"
+                android:fontFamily="@font/m_gothic_normal" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tv_addition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rg_type"
+            android:layout_marginTop="20dp"
+            android:text="추가 정보"
+            android:textSize="24sp"
+            android:fontFamily="@font/m_gothic_bold"/>
+
+        <RadioGroup
+            android:id="@+id/rg_class"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_addition"
+            android:weightSum="4"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <RadioButton
+                android:id="@+id/rb_army"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="육군"
+                android:textSize="20sp"
+                android:fontFamily="@font/m_gothic_normal" />
+            <RadioButton
+                android:id="@+id/rb_airforce"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="공군"
+                android:textSize="20sp"
+                android:fontFamily="@font/m_gothic_normal" />
+            <RadioButton
+                android:id="@+id/rb_navy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="해군"
+                android:textSize="20sp"
+                android:fontFamily="@font/m_gothic_normal" />
+            <RadioButton
+                android:id="@+id/rb_mc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="해병대"
+                android:textSize="20sp"
+                android:fontFamily="@font/m_gothic_normal" />
+            </RadioGroup>
+
+        <EditText
+            android:id="@+id/et_corps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rg_class"
+            android:hint="소속"
+            android:textColorHint="@color/hintText"
+            android:textSize="20sp"
+            android:inputType="text"
+            android:fontFamily="@font/m_gothic_normal" />
+
+        <EditText
+            android:id="@+id/et_destination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_corps"
+            android:hint="행선지"
+            android:textColorHint="@color/hintText"
+            android:textSize="20sp"
+            android:inputType="text"
+            android:fontFamily="@font/m_gothic_normal" />
+        <!-- 개인정보 수집 동의 -->
+        <TextView
+            android:id="@+id/tv_clause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_destination"
+            android:layout_marginTop="20dp"
+            android:text="약관 동의"
+            android:textSize="24sp"
+            android:fontFamily="@font/m_gothic_bold"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_clause"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="개인정보 수집 및 활용"
+                android:textSize="14sp"
+                android:textColor="@color/hyperlink"
+                android:fontFamily="@font/m_gothic_normal"
+                android:layout_gravity="center_vertical" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="에 동의하십니까?"
+                android:textSize="14sp"
+                android:fontFamily="@font/m_gothic_normal"
+                android:layout_gravity="center_vertical" />
+
+            <CheckBox
+                android:id="@+id/cb_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/bt_regist"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:onClick="onClick"
+        android:text="관람 등록"/>
+
+    <!--&lt;!&ndash; 구분 &ndash;&gt;-->
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="관람 방법"-->
+        <!--android:textSize="18sp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_marginStart="30dp"/>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_marginStart="30dp"-->
+        <!--android:layout_marginEnd="30dp">-->
+
+
+    <!--</LinearLayout>-->
+
+    <!--&lt;!&ndash; 이름 &ndash;&gt;-->
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_marginStart="30dp"-->
+        <!--android:layout_marginEnd="30dp">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="60sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="성함 : "-->
+            <!--android:textSize="18sp"/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/et_name"-->
+            <!--android:layout_width="180sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="15sp"-->
+            <!--android:singleLine="true">-->
+            <!--<requestFocus/>-->
+        <!--</EditText>-->
+
+    <!--</LinearLayout>-->
+
+    <!--&lt;!&ndash; 구분 &ndash;&gt;-->
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="구분"-->
+        <!--android:textSize="18sp"-->
+        <!--android:layout_marginStart="30dp"/>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_marginStart="30dp"-->
+        <!--android:layout_marginEnd="30dp">-->
+
+        <!--<RadioGroup-->
+            <!--android:id="@+id/rg_class"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:weightSum="4"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:layout_marginStart="10dp"-->
+            <!--android:layout_marginEnd="10dp">-->
+                <!--<RadioButton-->
+                    <!--android:id="@+id/rb_army"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="육군"-->
+                    <!--android:textSize="15sp" />-->
+                <!--<RadioButton-->
+                    <!--android:id="@+id/rb_airforce"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="공군"-->
+                    <!--android:textSize="15sp" />-->
+                <!--<RadioButton-->
+                    <!--android:id="@+id/rb_navy"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="해군"-->
+                    <!--android:textSize="15sp" />-->
+                <!--<RadioButton-->
+                    <!--android:id="@+id/rb_mc"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="해병대"-->
+                    <!--android:textSize="15sp" />-->
+        <!--</RadioGroup>-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_marginStart="30dp"-->
+        <!--android:layout_marginEnd="30dp">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="60sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="소속 : "-->
+            <!--android:textSize="18sp"/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/et_corps"-->
+            <!--android:layout_width="180sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="15sp"-->
+            <!--android:singleLine="true">-->
+        <!--</EditText>-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_marginStart="30dp"-->
+        <!--android:layout_marginEnd="30dp">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="60sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="군번 : "-->
+            <!--android:textSize="18sp"/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/et_serial"-->
+            <!--android:layout_width="180sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="15sp"-->
+            <!--android:singleLine="true"-->
+            <!--android:inputType="number">-->
+        <!--</EditText>-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_marginStart="30dp"-->
+        <!--android:layout_marginEnd="30dp">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="60sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="휴대폰 : "-->
+            <!--android:textSize="18sp"/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/et_phone"-->
+            <!--android:layout_width="180sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="15sp"-->
+            <!--android:singleLine="true"-->
+            <!--android:inputType="phone">-->
+        <!--</EditText>-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_marginStart="30dp"-->
+        <!--android:layout_marginEnd="30dp">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="60sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="행선지 : "-->
+            <!--android:textSize="18sp"/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/et_destination"-->
+            <!--android:layout_width="180sp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="15sp"-->
+            <!--android:singleLine="true">-->
+        <!--</EditText>-->
+
+    <!--</LinearLayout>-->
+
+
+
+    <!--&lt;!&ndash; 관람 등록 버튼 &ndash;&gt;-->
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+
+
+    <!--</LinearLayout>-->
+</RelativeLayout>

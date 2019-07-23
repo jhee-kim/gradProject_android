@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="phone_head">
+        <item>010</item>
+        <item>011</item>
+        <item>016</item>
+        <item>017</item>
+        <item>018</item>
+        <item>019</item>
+    </string-array>
+
+
+</resources>
