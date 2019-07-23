@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+// 깃 추가 테스트!
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     boolean is_login = false;
