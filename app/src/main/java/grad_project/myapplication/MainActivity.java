@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-// 테스트1@#@!$@$%!#2222222222222222243214123412341!
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     boolean is_login = false;
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
-
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
         bt_registration = findViewById(R.id.bt_registration);
@@ -317,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             } else {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                Intent intent = new Intent(MainActivity.this, NormalActivity.class);
                 startActivityForResult(intent, 0);
             }
         }
@@ -430,6 +428,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }
 

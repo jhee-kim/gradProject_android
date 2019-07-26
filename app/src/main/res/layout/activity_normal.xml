@@ -44,4 +44,20 @@
         android:layout_height="2dp"
         android:background="@color/menubar"
         android:layout_below="@id/title_normal"></LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/content_normal"
+        android:layout_marginTop="70dp">
+
+        <RelativeLayout
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 </RelativeLayout>

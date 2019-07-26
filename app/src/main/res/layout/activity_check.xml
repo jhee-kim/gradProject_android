@@ -40,7 +40,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/menubar"
-        android:layout_below="@id/title_login"></LinearLayout>
+        android:background="@color/menubar">
+        <!--android:layout_below="@id/title_login" >-->
+
+    </LinearLayout>
 
 </RelativeLayout>
