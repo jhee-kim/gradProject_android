@@ -14,7 +14,7 @@ import android.widget.Toast;
 public class LoginActivity extends AppCompatActivity {
     private boolean is_registered = false;
     private SharedPreferences infoData;
-    private String name, serial;
+    private String s_name, s_number;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +29,9 @@ public class LoginActivity extends AppCompatActivity {
 
         if (is_registered) {
             EditText et_name = findViewById(R.id.et_login_name);
-            EditText et_serial = findViewById(R.id.et_login_serial);
-            et_name.setText(name);
-            et_serial.setText(serial);
+            EditText et_number = findViewById(R.id.et_login_number);
+            et_name.setText(s_name);
+            et_number.setText(s_number);
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(false);
         }
@@ -56,13 +56,13 @@ public class LoginActivity extends AppCompatActivity {
         Button bt_registration = findViewById(R.id.bt_registration);
         if (v == bt_login) {
             EditText et_name = findViewById(R.id.et_login_name);
-            EditText et_serial = findViewById(R.id.et_login_serial);
+            EditText et_number = findViewById(R.id.et_login_number);
             String input_name = et_name.getText().toString();
-            String input_serial = et_serial.getText().toString();
-            if (input_name.equals("") || input_serial.equals("")) {
+            String input_number = et_number.getText().toString();
+            if (input_name.equals("") || input_number.equals("")) {
                 Toast.makeText(getApplicationContext(), "정보를 올바르게 입력하세요.", Toast.LENGTH_SHORT).show();
             }
-            else if (input_name.equals(name) && input_serial.equals(serial)) {
+            else if (input_name.equals(s_name) && input_number.equals(s_number)) {
                 Intent in_login = new Intent(LoginActivity.this, MainActivity.class);
                 setResult(RESULT_OK, in_login);
                 in_login.putExtra("LOGIN", true);
@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void loadInfo() {
         is_registered = infoData.getBoolean("IS_REGISTERED", false);
-        name = infoData.getString("NAME", "");
-        serial = infoData.getString("SERIAL", "");
+        s_name = infoData.getString("NAME", "");
+        s_number = infoData.getString("NUMBER", "");
     }
 }

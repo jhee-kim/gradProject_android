@@ -27,16 +27,16 @@ import static grad_project.myapplication.MainActivity.ADD_AUDIENCE;
 public class RegistActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     private String s_name = "";
-    private int i_class = -1;
-    private int i_type = -1;
-    private String s_corps = "";
-    private String s_serial = "";
+    private int i_division = -1;
+    private int i_participation = -1;
+    private String s_temper = "";
+    private String s_number = "";
     private String s_phone = "";
     private String s_destination = "";
     private boolean b_check = false;
-    EditText et_name, et_corps, et_serial, et_phone, et_destination;
+    EditText et_name, et_temper, et_number, et_phone, et_destination;
     CheckBox cb_check;
-    RadioGroup rg_type, rg_class;
+    RadioGroup rg_participation, rg_division;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +47,14 @@ public class RegistActivity extends AppCompatActivity {
         actionBar.hide();
 
         et_name = findViewById(R.id.et_name);
-        et_corps = findViewById(R.id.et_corps);
-        et_serial = findViewById(R.id.et_serial);
+        et_temper = findViewById(R.id.et_temper);
+        et_number = findViewById(R.id.et_number);
         et_phone = findViewById(R.id.et_phone);
         et_destination = findViewById(R.id.et_destination);
         cb_check = findViewById(R.id.cb_check);
 
-        rg_type = findViewById(R.id.rg_type);
-        rg_class = findViewById(R.id.rg_class);
+        rg_participation = findViewById(R.id.rg_participation);
+        rg_division = findViewById(R.id.rg_division);
 
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
@@ -75,50 +75,50 @@ public class RegistActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
-        int type_selected = rg_type.getCheckedRadioButtonId();
-        int class_selected = rg_class.getCheckedRadioButtonId();
+        int participation_selected = rg_participation.getCheckedRadioButtonId();
+        int division_selected = rg_division.getCheckedRadioButtonId();
 
         s_name = et_name.getText().toString().trim();
-        s_corps = et_corps.getText().toString().trim();
-        s_serial = et_serial.getText().toString().trim();
+        s_temper = et_temper.getText().toString().trim();
+        s_number = et_number.getText().toString().trim();
         s_phone = et_phone.getText().toString().trim();
         s_destination = et_destination.getText().toString().trim();
         b_check = cb_check.isChecked();
 
-        switch (type_selected) {
+        switch (participation_selected) {
             case R.id.rb_normal:
-                i_type = 0;
+                i_participation = 0;
                 break;
             case R.id.rb_narr:
-                i_type = 1;
+                i_participation = 1;
                 break;
             default:
-                i_type = -1;
+                i_participation = -1;
                 break;
         }
 
-        switch (class_selected) {
+        switch (division_selected) {
             case R.id.rb_army:
-                i_class = 0;
+                i_division = 0;
                 break;
             case R.id.rb_airforce:
-                i_class = 2;
+                i_division = 2;
                 break;
             case R.id.rb_navy:
-                i_class = 1;
+                i_division = 1;
                 break;
             case R.id.rb_mc:
-                i_class = 3;
+                i_division = 3;
                 break;
             default:
-                i_class = -1;
+                i_division = -1;
                 break;
         }
 
         Log.i("NAME", s_name);
-        Log.i("CLASS", Integer.toString(i_class));
-        Log.i("CORPS", s_corps);
-        Log.i("SERIAL", s_serial);
+        Log.i("DIVISION", Integer.toString(i_division));
+        Log.i("TEMPER", s_temper);
+        Log.i("NUMBER", s_number);
         Log.i("PHONE", s_phone);
 
         if (s_name.equals("")) {
@@ -127,9 +127,9 @@ public class RegistActivity extends AppCompatActivity {
 //
 //            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-        } else if (s_serial.equals("")) {
+        } else if (s_number.equals("")) {
             Toast.makeText(RegistActivity.this,"군번을 입력해주세요.", Toast.LENGTH_SHORT).show();
-            et_serial.requestFocus();
+            et_number.requestFocus();
 //
 //            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
@@ -139,19 +139,19 @@ public class RegistActivity extends AppCompatActivity {
 //
 //            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-        } else if (i_type == -1) {
+        } else if (i_participation == -1) {
             Toast.makeText(RegistActivity.this, "관람 방법을 선택해주세요.", Toast.LENGTH_SHORT).show();
-        } else if(i_class == -1) {
+        } else if(i_division == -1) {
             Toast.makeText(RegistActivity.this,"구분을 선택해주세요.", Toast.LENGTH_SHORT).show();
-        } else if (s_corps.equals("")) {
+        } else if (s_temper.equals("")) {
             Toast.makeText(RegistActivity.this,"소속 부대를 입력해주세요.", Toast.LENGTH_SHORT).show();
-            et_corps.requestFocus();
+            et_temper.requestFocus();
 //
 //            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         } else if (s_destination.equals("")) {
             Toast.makeText(RegistActivity.this,"소속 부대를 입력해주세요.", Toast.LENGTH_SHORT).show();
-            et_corps.requestFocus();
+            et_temper.requestFocus();
 //
 //            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
@@ -160,12 +160,12 @@ public class RegistActivity extends AppCompatActivity {
         } else {
             Intent intent = new Intent(RegistActivity.this, PopupRegistActivity.class);
             intent.putExtra("NAME", s_name);
-            intent.putExtra("SERIAL", s_serial);
+            intent.putExtra("NUMBER", s_number);
             intent.putExtra("PHONE", s_phone);
-            intent.putExtra("CLASS", i_class);
-            intent.putExtra("CORPS", s_corps);
+            intent.putExtra("DIVISION", i_division);
+            intent.putExtra("TEMPER", s_temper);
             intent.putExtra("DESTINATION", s_destination);
-            intent.putExtra("TYPE", i_type);
+            intent.putExtra("PARTICIPATION", i_participation);
             startActivityForResult(intent, 0);
         }
     }
@@ -177,41 +177,36 @@ public class RegistActivity extends AppCompatActivity {
         // 입력된 정보 최종 확인이 되었을 경우
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                registrationInfo();
+//                registrationInfo();
                 Toast.makeText(RegistActivity.this, "등록 완료되었습니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegistActivity.this, MainActivity.class);
                 intent.putExtra("H_NAME", s_name);
-                intent.putExtra("H_NUMBER", s_serial);
+                intent.putExtra("H_NUMBER", s_number);
                 intent.putExtra("H_PHONE", s_phone);
-                intent.putExtra("H_DIVISION", Integer.toString(i_class));
-                intent.putExtra("H_TEMPER", s_corps);
+                intent.putExtra("H_DIVISION", Integer.toString(i_division));
+                intent.putExtra("H_TEMPER", s_temper);
                 intent.putExtra("H_DESTINATION", s_destination);
-                intent.putExtra("H_PARTICIPATION", Integer.toString(i_type));
-
+                intent.putExtra("H_PARTICIPATION", Integer.toString(i_participation));
                 setResult(RESULT_OK, intent);
                 finish();
             }
         }
     }
 
-    private void registrationInfo() {
+//    private void registrationInfo() {
 //        SharedPreferences.Editor editor = infoData.edit();
 //
-//        editor.putInt("TYPE", i_type);
+//        editor.putInt("PARTICIPATION", i_participation);
 //        editor.putString("NAME", s_name);
-//        editor.putInt("CLASS", i_class);
-//        editor.putString("CORPS", s_corps);
-//        editor.putString("SERIAL", s_serial);
+//        editor.putInt("DIVISION", i_division);
+//        editor.putString("TEMPER", s_temper);
+//        editor.putString("NUMBER", s_number);
 //        editor.putString("PHONE", s_phone);
 //        editor.putString("DESTINATION", s_destination);
 //        editor.putBoolean("AGREE", b_check);
 //        editor.putBoolean("IS_REGISTERED", true);
 //        editor.putBoolean("AUTOLOGIN", false);
 //        editor.apply();
-
-//        Toast.makeText(RegistActivity.this,"개인 정보를 등록했습니다.", Toast.LENGTH_SHORT).show();
-
-
-    }
+//    }
 
 }

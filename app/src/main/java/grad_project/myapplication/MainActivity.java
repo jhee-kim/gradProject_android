@@ -28,13 +28,33 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/*
+***** 도움말 *****
+* (변수 접두어)
+*   - i : integer
+*   - s : string
+*   - h : 서버 통신으로 주고받는 값
+*   - bt : button
+*
+* (주요 변수)
+*   - name : 사용자 이름
+*   - number : 군번
+*   - participation : 참여 구분(0:일반관람 / 1:전시 해설)
+*   - division : 군종 구분(0:육군 / 1:해군 / 2:공군 / 3:해병대)
+*   - temper : 부대명
+*   - phone : 휴대폰 번호
+*   - destination : 행선지
+*
+*/
+
+
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     boolean is_login = false;
     boolean is_registered = false;
-    boolean auto_login;
-    String s_name, s_serial, s_phone, s_corps, s_destination;
-    int i_type, i_class;
+    boolean is_autoLogin;
+    String s_name, s_number, s_phone, s_temper, s_destination;
+    int i_participation, i_division;
     DrawerLayout drawerLayout;
     View slideView;
     Button bt_openMap, bt_registration, bt_certificate;
@@ -86,9 +106,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
-        auto_login = infoData.getBoolean("AUTOLOGIN", false);
+        is_autoLogin = infoData.getBoolean("AUTOLOGIN", false);
 
-        if (auto_login) {
+        if (is_autoLogin) {
             loadInfo();
             is_login = true;
         } else {
@@ -131,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
         resumeActivity();
     }
 
+    // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
         final ImageView iv_registration = findViewById(R.id.iv_registration);
         final TextView tv_registreation = findViewById(R.id.tv_registration);
@@ -145,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
             bt_registration.setEnabled(false);
             iv_registration.setEnabled(false);
             iv_registration.setColorFilter(Color.parseColor("#ffE0E0E0"), PorterDuff.Mode.SRC_IN);
-            auto_login = infoData.getBoolean("AUTOLOGIN", false);
+            is_autoLogin = infoData.getBoolean("AUTOLOGIN", false);
         } else {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(true);
@@ -249,9 +270,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-//        Log.d("IS_REGISTERED", Boolean.toString(is_registered));
-//        Log.d("IS_LOGIN", Boolean.toString(is_login));
     }
 
     @Override
@@ -262,15 +280,11 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 is_login = true;
-//                resumeActivity();
             }
         }
         // 최초 등록 완료했을 경우
         else if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-//                Log.d("등록완료", "새로고침");
-//                resumeActivity();
-
                 String h_name, h_number, h_participation, h_division, h_temper, h_phone, h_destination;
                 h_name = data.getExtras().getString("H_NAME");
                 h_number = data.getExtras().getString("H_NUMBER");
@@ -281,8 +295,8 @@ public class MainActivity extends AppCompatActivity {
                 h_destination = data.getExtras().getString("H_DESTINATION");
 
                 Log.i("NAME", h_name);
-                Log.i("CORPS", h_temper);
-                Log.i("SERIAL", h_number);
+                Log.i("TEMPER", h_temper);
+                Log.i("NUMBER", h_number);
                 Log.i("PHONE", h_phone);
 
                 InsertData task = new InsertData();
@@ -341,15 +355,14 @@ public class MainActivity extends AppCompatActivity {
     // 메뉴 내부에 있는 로그아웃 버튼
     public void onLogout(View v) {
         if (v == findViewById(R.id.bt_logout)) {
-//            Log.d("LOGOUT", "로그아웃 함수 진입");
             is_login = false;
 
             SharedPreferences.Editor editor = infoData.edit();
             editor.putBoolean("AUTOLOGIN", false);
             editor.apply();
 
-            final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.layout_main);
-            final View slideView = (View) findViewById(R.id.layout_slide);
+            final DrawerLayout drawerLayout = findViewById(R.id.layout_main);
+            final View slideView = findViewById(R.id.layout_slide);
             drawerLayout.closeDrawer(slideView);
 
             Toast.makeText(getApplicationContext(), "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
@@ -359,14 +372,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 저장된 값 가져오기
     private void loadInfo() {
-        i_type = infoData.getInt("TYPE", -1);
-        i_class = infoData.getInt("CLASS", -1);
+        i_participation = infoData.getInt("PARTICIPATION", -1);
+        i_division = infoData.getInt("DIVISION", -1);
         s_name = infoData.getString("NAME", "");
-        s_serial = infoData.getString("SERIAL", "");
+        s_number = infoData.getString("NUMBER", "");
         s_phone = infoData.getString("PHONE", "");
-        s_corps = infoData.getString("CORPS", "");
-
+        s_temper = infoData.getString("TEMPER", "");
     }
 
     /***** 서버 통신 *****/

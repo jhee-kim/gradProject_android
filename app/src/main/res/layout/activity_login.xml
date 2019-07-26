@@ -79,7 +79,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout_login_serial"
+            android:id="@+id/layout_login_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/layout_login_name"
@@ -94,7 +94,7 @@
                 android:textSize="20sp"
                 android:fontFamily="@font/m_gothic_bold" />
             <EditText
-                android:id="@+id/et_login_serial"
+                android:id="@+id/et_login_number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -107,7 +107,7 @@
             android:id="@+id/bt_login"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_below="@id/layout_login_serial"
+            android:layout_below="@id/layout_login_number"
             android:text="로그인"
             android:textSize="15sp"
             android:onClick="onClick"

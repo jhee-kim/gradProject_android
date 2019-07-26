@@ -78,13 +78,13 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout_serial"
+            android:id="@+id/layout_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/layout_name">
 
             <EditText
-                android:id="@+id/et_serial"
+                android:id="@+id/et_number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="군번(- 생략)"
@@ -98,7 +98,7 @@
             android:id="@+id/layout_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/layout_serial">
+            android:layout_below="@+id/layout_number">
 
             <EditText
                 android:id="@+id/et_phone"
@@ -113,7 +113,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tv_type"
+            android:id="@+id/tv_participation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/layout_phone"
@@ -123,10 +123,10 @@
             android:fontFamily="@font/m_gothic_bold"/>
 
         <RadioGroup
-            android:id="@+id/rg_type"
+            android:id="@+id/rg_participation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_type"
+            android:layout_below="@+id/tv_participation"
             android:orientation="horizontal"
             android:weightSum="2"
             android:layout_marginTop="10dp">
@@ -152,14 +152,14 @@
             android:id="@+id/tv_addition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/rg_type"
+            android:layout_below="@id/rg_participation"
             android:layout_marginTop="20dp"
             android:text="추가 정보"
             android:textSize="24sp"
             android:fontFamily="@font/m_gothic_bold"/>
 
         <RadioGroup
-            android:id="@+id/rg_class"
+            android:id="@+id/rg_division"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_addition"
@@ -201,10 +201,10 @@
             </RadioGroup>
 
         <EditText
-            android:id="@+id/et_corps"
+            android:id="@+id/et_temper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/rg_class"
+            android:layout_below="@id/rg_division"
             android:hint="소속"
             android:textColorHint="@color/hintText"
             android:textSize="20sp"
@@ -215,7 +215,7 @@
             android:id="@+id/et_destination"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/et_corps"
+            android:layout_below="@id/et_temper"
             android:hint="행선지"
             android:textColorHint="@color/hintText"
             android:textSize="20sp"
@@ -335,7 +335,7 @@
         <!--android:layout_marginEnd="30dp">-->
 
         <!--<RadioGroup-->
-            <!--android:id="@+id/rg_class"-->
+            <!--android:id="@+id/rg_division"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="match_parent"-->
             <!--android:weightSum="4"-->
@@ -387,7 +387,7 @@
             <!--android:textSize="18sp"/>-->
 
         <!--<EditText-->
-            <!--android:id="@+id/et_corps"-->
+            <!--android:id="@+id/et_temper"-->
             <!--android:layout_width="180sp"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:textSize="15sp"-->
@@ -410,7 +410,7 @@
             <!--android:textSize="18sp"/>-->
 
         <!--<EditText-->
-            <!--android:id="@+id/et_serial"-->
+            <!--android:id="@+id/et_number"-->
             <!--android:layout_width="180sp"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:textSize="15sp"-->
