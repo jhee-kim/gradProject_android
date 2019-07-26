@@ -65,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
     public static final String ADD_AUDIENCE = BASE_PATH + "add_audience.php";            //관람등록(성공 1, 실패 0 반환)
-    public static final String GET_AUDIENCE = BASE_PATH + "get_audience.php";             //로그인(JSON 형식) - ex) { "id": "1", "number": "11", "name": "a", "participation": "0", "division": "0", "temper": "temper", "phone": "00000000000", "destination": "거수지", "input_date": "2019-07-11 12:15:03", "start_date": null, "end_date": null }
+    public static final String GET_AUDIENCE = BASE_PATH + "get_audience.php";             //로그인(성공 1, 실패 0 반환)
+    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
     public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";            //관람등록시 전시해설 on/oof 여부(해설자 스케줄 확인)  - 미구현
     public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";          //각 전시관 별 개설 여부(JSON 형식) - ex) { "number": "1", "isOpen": "1" }
     public static final String GET_QR = BASE_PATH + "get_qr.php";                              //각 전시관 별 qr코드 파일 위치(JSON 형식) - ex) { "number": "1", "address": "http://35.221.108.183/QR/1.png" }

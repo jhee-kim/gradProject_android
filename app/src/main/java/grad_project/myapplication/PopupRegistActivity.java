@@ -31,15 +31,15 @@ public class PopupRegistActivity extends Activity {
         setContentView(R.layout.popup_regist);
 
         tv_name = findViewById(R.id.tv_name);
-        tv_number = findViewById(R.id.tv_number);
+        tv_number = findViewById(R.id.tv_name);
         tv_phone = findViewById(R.id.tv_phone);
-        tv_division = findViewById(R.id.tv_division);
-        tv_temper = findViewById(R.id.tv_temper);
-        tv_participation = findViewById(R.id.tv_participation);
+        tv_division = findViewById(R.id.tv_destination);
+//        tv_temper = findViewById(R.id.tv_temper);
+//        tv_participation = findViewById(R.id.tv_participa);
         tv_destination = findViewById(R.id.tv_destination);
-        tv_question = findViewById(R.id.tv_question);
+//        tv_question = findViewById(R.id.tv_question);
 
-        ll_buttons = findViewById(R.id.ll_buttons);
+//        ll_buttons = findViewById(R.id.ll_buttons);
         bt_apply = findViewById(R.id.bt_apply);
         bt_cancel = findViewById(R.id.bt_cancel);
 
