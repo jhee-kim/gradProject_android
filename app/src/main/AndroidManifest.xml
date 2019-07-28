@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="grad_project.myapplication">
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
 
     <application
@@ -13,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
+        android:fullBackupContent="false"
         android:theme="@style/AppTheme">
 
         <activity android:name=".LoginActivity">
@@ -22,6 +23,7 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -32,6 +34,8 @@
         <activity android:name=".ConfirmActivity">
         </activity>
         <activity android:name=".PersonalActivity">
+        </activity>
+        <activity android:name=".CheckActivity">
         </activity>
         <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog">
         </activity>

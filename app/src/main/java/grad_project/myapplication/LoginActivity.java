@@ -22,7 +22,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if (actionBar == null) {
+            throw new NullPointerException("Null ActionBar");
+        } else {
+            actionBar.hide();
+        }
 
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
         loadInfo();

@@ -32,14 +32,14 @@
             android:layout_toEndOf="@+id/bt_back_layout"
             android:layout_marginStart="5dp"
             android:layout_centerVertical="true"
-            android:text="개인정보"
+            android:text="@string/myinfo_str"
             android:textSize="24sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
 
     </RelativeLayout>
-    <LinearLayout
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="@color/menubar"
-        android:layout_below="@id/title_normal"></LinearLayout>
+        android:layout_below="@id/title_normal"/>
 </RelativeLayout>

@@ -32,14 +32,15 @@
             android:layout_toEndOf="@+id/bt_back_layout"
             android:layout_marginStart="5dp"
             android:layout_centerVertical="true"
-            android:text="센터 등록 안내"
+            android:text="@string/regist_info_str"
             android:textSize="24sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
 
     </RelativeLayout>
-    <LinearLayout
+
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="@color/menubar"
-        android:layout_below="@id/title_confirm"></LinearLayout>
+        android:layout_below="@id/title_confirm"/>
 </RelativeLayout>

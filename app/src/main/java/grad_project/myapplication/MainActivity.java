@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -80,7 +81,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if (actionBar == null) {
+            throw new NullPointerException("Null ActionBar");
+        } else {
+            actionBar.hide();
+        }
+
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
         bt_registration = findViewById(R.id.bt_registration);
@@ -107,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
-        is_autoLogin = infoData.getBoolean("AUTOLOGIN", false);
+        is_autoLogin = infoData.getBoolean("IS_AUTOLOGIN", false);
 
         if (is_autoLogin) {
             loadInfo();
@@ -124,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         bt_homepage = findViewById(R.id.bt_homepage);
         bt_information = findViewById(R.id.bt_information);
 
-        /***** 메뉴 버튼 온클릭리스너 설정 *****/
+        /* 메뉴 버튼 온클릭리스너 설정 */
         // 홈페이지 버튼
         bt_homepage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,19 +161,19 @@ public class MainActivity extends AppCompatActivity {
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
         final ImageView iv_registration = findViewById(R.id.iv_registration);
-        final TextView tv_registreation = findViewById(R.id.tv_registration);
+//        final TextView tv_registreation = findViewById(R.id.tv_registration);
 
         is_registered = infoData.getBoolean("IS_REGISTERED", false);
         loadInfo();
 
-        /***** 액티비티 화면 내용 설정 *****/
+        /* 액티비티 화면 내용 설정 */
         // 최초 등록 버튼 활성화 및 비활성화
         if (is_registered) {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(false);
             iv_registration.setEnabled(false);
             iv_registration.setColorFilter(Color.parseColor("#ffE0E0E0"), PorterDuff.Mode.SRC_IN);
-            is_autoLogin = infoData.getBoolean("AUTOLOGIN", false);
+            is_autoLogin = infoData.getBoolean("IS_AUTOLOGIN", false);
         } else {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(true);
@@ -221,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             bt_logout.setVisibility(View.INVISIBLE);
         }
 
-        /***** 메뉴 버튼 온클릭리스너 설정 *****/
+        /* 메뉴 버튼 온클릭리스너 설정 */
         // 최초 등록 버튼
         bt_registration_2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (is_login) {
-                    Intent intent = new Intent(MainActivity.this, NormalActivity.class);
+                    Intent intent = new Intent(MainActivity.this, CheckActivity.class);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -283,34 +289,13 @@ public class MainActivity extends AppCompatActivity {
                 is_login = true;
             }
         }
-        // 최초 등록 완료했을 경우
-        else if (requestCode == 1) {
+
+        // 최초 등록 완료했을 경우(자동 로그인 됨)
+        if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                String h_name, h_number, h_participation, h_division, h_temper, h_phone, h_destination;
-                h_name = data.getExtras().getString("H_NAME");
-                h_number = data.getExtras().getString("H_NUMBER");
-                h_participation = data.getExtras().getString("H_PARTICIPATION");
-                h_division = data.getExtras().getString("H_DIVISION");
-                h_temper = data.getExtras().getString("H_TEMPER");
-                h_phone = data.getExtras().getString("H_PHONE");
-                h_destination = data.getExtras().getString("H_DESTINATION");
-
-                Log.i("NAME", h_name);
-                Log.i("TEMPER", h_temper);
-                Log.i("NUMBER", h_number);
-                Log.i("PHONE", h_phone);
-
-                InsertData task = new InsertData();
-                task.execute(ADD_AUDIENCE, h_number, h_name, h_participation, h_division, h_temper, h_phone, h_destination);
+                is_login = true;
+//                resumeActivity();
             }
-        }
-        // 로그인 시도
-        else if (requestCode == 2) {
-            String h_name ,h_number;
-            h_name = data.getExtras().getString("H_NAME");
-            h_number = data.getExtras().getString("H_NUMBER");
-
-            InsertData task = new InsertData();
         }
     }
 
@@ -330,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             } else {
-                Intent intent = new Intent(MainActivity.this, NormalActivity.class);
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivityForResult(intent, 0);
             }
         }
@@ -359,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
             is_login = false;
 
             SharedPreferences.Editor editor = infoData.edit();
-            editor.putBoolean("AUTOLOGIN", false);
+            editor.putBoolean("IS_AUTOLOGIN", false);
             editor.apply();
 
             final DrawerLayout drawerLayout = findViewById(R.id.layout_main);
@@ -381,15 +366,21 @@ public class MainActivity extends AppCompatActivity {
         s_number = infoData.getString("NUMBER", "");
         s_phone = infoData.getString("PHONE", "");
         s_temper = infoData.getString("TEMPER", "");
+        s_destination = infoData.getString("DESTINATION", "");
     }
 
     /***** 서버 통신 *****/
-    public class InsertData extends AsyncTask<String, Void, String> {
+    public class GetData extends AsyncTask<String, Void, String> {
+        private WeakReference<MainActivity> activityReference;
         ProgressDialog progressDialog;
+
+        GetData(MainActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = ProgressDialog.show(MainActivity.this,
+            progressDialog = ProgressDialog.show(activityReference.get(),
                     "Please Wait", null, true, true);
         }
         @Override
@@ -400,14 +391,14 @@ public class MainActivity extends AppCompatActivity {
         }
         @Override
         protected String doInBackground(String... params) {
-            String serverURL = (String)params[0];
-            String number = (String)params[1];
-            String name = (String)params[2];
-            String participation = (String)params[3];
-            String division = (String)params[4];
-            String temper = (String)params[5];
-            String phone = (String)params[6];
-            String destination = (String)params[7];
+            String serverURL = params[0];
+            String number = params[1];
+            String name = params[2];
+            String participation = params[3];
+            String division = params[4];
+            String temper = params[5];
+            String phone = params[6];
+            String destination = params[7];
             String postParameters = "&number=" + number + "&name=" + name + "&participation=" + participation + "&division=" + division + "&temper=" + temper + "&phone=" + phone + "&destination=" + destination;
             try {
                 URL url = new URL(serverURL);
@@ -431,14 +422,14 @@ public class MainActivity extends AppCompatActivity {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 StringBuilder sb = new StringBuilder();
-                String line = null;
+                String line;
                 while((line = bufferedReader.readLine()) != null){
                     sb.append(line);
                 }
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return new String("Error: " + e.getMessage());
+                return "Error: " + e.getMessage();
             }
         }
     }

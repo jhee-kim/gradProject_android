@@ -33,16 +33,16 @@
             android:layout_toEndOf="@+id/bt_back_layout"
             android:layout_marginStart="5dp"
             android:layout_centerVertical="true"
-            android:text="로그인"
+            android:text="@string/login_str"
             android:textSize="24sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
     </RelativeLayout>
 
-    <LinearLayout
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="@color/menubar"
-        android:layout_below="@id/title_login"></LinearLayout>
+        android:layout_below="@id/title_login"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -63,17 +63,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="이름"
+                android:text="@string/name_str"
                 android:textSize="20sp"
                 android:fontFamily="@font/m_gothic_bold"/>
 
             <EditText
+                android:hint="@string/name_hint_str"
                 android:id="@+id/et_login_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_gravity="center_vertical"
                 android:textSize="16sp"
+                android:inputType="text"
                 android:fontFamily="@font/m_gothic_normal" />
 
         </LinearLayout>
@@ -90,16 +92,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="군번"
+                android:text="@string/number_str"
                 android:textSize="20sp"
                 android:fontFamily="@font/m_gothic_bold" />
             <EditText
+                android:hint="@string/number_hint_str"
                 android:id="@+id/et_login_number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_gravity="center_vertical"
                 android:textSize="16sp"
+                android:inputType="number"
                 android:fontFamily="@font/m_gothic_normal" />
 
         </LinearLayout>
@@ -108,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_below="@id/layout_login_number"
-            android:text="로그인"
+            android:text="@string/login_str"
             android:textSize="15sp"
             android:onClick="onClick"
             android:layout_marginStart="40dp"
@@ -120,7 +124,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_below="@id/bt_login"
-            android:text="최초 등록"
+            android:text="@string/registration_str"
             android:textSize="15sp"
             android:onClick="onClick"
             android:layout_marginStart="40dp"

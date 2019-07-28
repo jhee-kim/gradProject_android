@@ -19,10 +19,9 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import static grad_project.myapplication.MainActivity.ADD_AUDIENCE;
 
 public class RegistActivity extends AppCompatActivity {
     private SharedPreferences infoData;
@@ -33,10 +32,13 @@ public class RegistActivity extends AppCompatActivity {
     private String s_number = "";
     private String s_phone = "";
     private String s_destination = "";
-    private boolean b_check = false;
     EditText et_name, et_temper, et_number, et_phone, et_destination;
     CheckBox cb_check;
     RadioGroup rg_participation, rg_division;
+
+    /***** php 통신 *****/
+    private static final String BASE_PATH = "http://35.221.108.183/android/";
+    public static final String ADD_AUDIENCE = BASE_PATH + "add_audience.php";            //관람등록(성공 1, 실패 0 반환)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,11 @@ public class RegistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_regist);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if (actionBar == null) {
+            throw new NullPointerException("Null ActionBar");
+        } else {
+            actionBar.hide();
+        }
 
         et_name = findViewById(R.id.et_name);
         et_temper = findViewById(R.id.et_temper);
@@ -83,7 +89,7 @@ public class RegistActivity extends AppCompatActivity {
         s_number = et_number.getText().toString().trim();
         s_phone = et_phone.getText().toString().trim();
         s_destination = et_destination.getText().toString().trim();
-        b_check = cb_check.isChecked();
+        boolean b_check = cb_check.isChecked();
 
         switch (participation_selected) {
             case R.id.rb_normal:
@@ -101,11 +107,11 @@ public class RegistActivity extends AppCompatActivity {
             case R.id.rb_army:
                 i_division = 0;
                 break;
-            case R.id.rb_airforce:
-                i_division = 2;
-                break;
             case R.id.rb_navy:
                 i_division = 1;
+                break;
+            case R.id.rb_airforce:
+                i_division = 2;
                 break;
             case R.id.rb_mc:
                 i_division = 3;
@@ -124,21 +130,12 @@ public class RegistActivity extends AppCompatActivity {
         if (s_name.equals("")) {
             Toast.makeText(RegistActivity.this,"이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_name.requestFocus();
-//
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         } else if (s_number.equals("")) {
             Toast.makeText(RegistActivity.this,"군번을 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_number.requestFocus();
-//
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         } else if (s_phone.equals("")) {
             Toast.makeText(RegistActivity.this,"휴대폰 번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_phone.requestFocus();
-//
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         } else if (i_participation == -1) {
             Toast.makeText(RegistActivity.this, "관람 방법을 선택해주세요.", Toast.LENGTH_SHORT).show();
         } else if(i_division == -1) {
@@ -146,15 +143,9 @@ public class RegistActivity extends AppCompatActivity {
         } else if (s_temper.equals("")) {
             Toast.makeText(RegistActivity.this,"소속 부대를 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_temper.requestFocus();
-//
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         } else if (s_destination.equals("")) {
-            Toast.makeText(RegistActivity.this,"소속 부대를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistActivity.this,"행선지를 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_temper.requestFocus();
-//
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         } else if (!b_check) {
             Toast.makeText(RegistActivity.this,"개인정보 수집 활용에 동의해주세요.", Toast.LENGTH_SHORT).show();
         } else {
@@ -177,36 +168,95 @@ public class RegistActivity extends AppCompatActivity {
         // 입력된 정보 최종 확인이 되었을 경우
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-//                registrationInfo();
+                registrationInfo();
                 Toast.makeText(RegistActivity.this, "등록 완료되었습니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegistActivity.this, MainActivity.class);
-                intent.putExtra("H_NAME", s_name);
-                intent.putExtra("H_NUMBER", s_number);
-                intent.putExtra("H_PHONE", s_phone);
-                intent.putExtra("H_DIVISION", Integer.toString(i_division));
-                intent.putExtra("H_TEMPER", s_temper);
-                intent.putExtra("H_DESTINATION", s_destination);
-                intent.putExtra("H_PARTICIPATION", Integer.toString(i_participation));
                 setResult(RESULT_OK, intent);
                 finish();
             }
         }
     }
 
-//    private void registrationInfo() {
-//        SharedPreferences.Editor editor = infoData.edit();
-//
-//        editor.putInt("PARTICIPATION", i_participation);
-//        editor.putString("NAME", s_name);
-//        editor.putInt("DIVISION", i_division);
-//        editor.putString("TEMPER", s_temper);
-//        editor.putString("NUMBER", s_number);
-//        editor.putString("PHONE", s_phone);
-//        editor.putString("DESTINATION", s_destination);
-//        editor.putBoolean("AGREE", b_check);
-//        editor.putBoolean("IS_REGISTERED", true);
-//        editor.putBoolean("AUTOLOGIN", false);
-//        editor.apply();
-//    }
+    private void registrationInfo() {
+        SharedPreferences.Editor editor = infoData.edit();
+        editor.putBoolean("IS_REGISTERED", true);
+        editor.putBoolean("IS_AUTOLOGIN", true);
+        editor.putInt("DIVISION", i_division);
+        editor.putInt("PARTICIPATION", i_participation);
+        editor.putString("NUMBER", s_number);
+        editor.putString("NAME", s_name);
+        editor.putString("PHONE", s_phone);
+        editor.putString("DESTINATION", s_destination);
+        editor.putString("TEMPER", s_temper);
+        editor.apply();
 
+        InsertData task = new InsertData(this);
+        task.execute(ADD_AUDIENCE, s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination);
+    }
+
+
+    /***** 서버 통신 *****/
+    public static class InsertData extends AsyncTask<String, Void, String> {
+        private WeakReference<RegistActivity> activityReference;
+        ProgressDialog progressDialog;
+
+        InsertData(RegistActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activityReference.get(),
+                    "Please Wait", null, true, true);
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+            /*출력값*/
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            String serverURL = params[0];
+            String number = params[1];
+            String name = params[2];
+            String participation = params[3];
+            String division = params[4];
+            String temper = params[5];
+            String phone = params[6];
+            String destination = params[7];
+            String postParameters = "&number=" + number + "&name=" + name + "&participation=" + participation + "&division=" + division + "&temper=" + temper + "&phone=" + phone + "&destination=" + destination;
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+                bufferedReader.close();
+                return sb.toString();
+            } catch (Exception e) {
+                return "Error: " + e.getMessage();
+            }
+        }
+    }
 }

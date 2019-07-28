@@ -11,8 +11,13 @@ public class HelpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
+
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if (actionBar == null) {
+            throw new NullPointerException("Null ActionBar");
+        } else {
+            actionBar.hide();
+        }
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
         bt_back_layout.setOnClickListener(new View.OnClickListener() {

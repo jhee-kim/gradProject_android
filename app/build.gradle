@@ -6,8 +6,8 @@ android {
         applicationId "grad_project.i815"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 4
-        versionName "0.10"
+        versionCode 5
+        versionName "0.21"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

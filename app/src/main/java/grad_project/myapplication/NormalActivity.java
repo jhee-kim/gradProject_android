@@ -21,10 +21,14 @@ public class NormalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_normal);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if (actionBar == null) {
+            throw new NullPointerException("Null ActionBar");
+        } else {
+            actionBar.hide();
+        }
 
         MapView mapView = new MapView(this);
-        ViewGroup mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+        ViewGroup mapViewContainer = findViewById(R.id.map_view);
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.782444, 127.223135), 1, true);
         mapViewContainer.addView(mapView);
 

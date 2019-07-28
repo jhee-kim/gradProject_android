@@ -69,7 +69,7 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/main_top_image"
             android:onClick="onClick"
-            android:text="관람하기"/>
+            android:text="@string/start_str"/>
 
         <Button
             android:id="@+id/bt_certificate"
@@ -80,7 +80,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="15dp"
             android:onClick="onClick"
-            android:text="확인증 발급"/>
+            android:text="@string/certificate_str"/>
 
         <Button
             android:id="@+id/bt_registration"
@@ -91,7 +91,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="5dp"
             android:onClick="onClick"
-            android:text="최초 등록"/>
+            android:text="@string/registration_str"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -127,7 +127,7 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:background="#ffffff"
-        android:layout_gravity="start" >
+        android:layout_gravity="start">
 
         <!-- 슬라이드 메뉴 닫기 버튼 -->
         <RelativeLayout
@@ -164,6 +164,7 @@
                 android:scaleType="fitCenter"/>
         </RelativeLayout>
 
+        <!-- 이름 표시되는 곳 -->
         <Button
             android:id="@+id/bt_personal"
             android:layout_width="match_parent"
@@ -210,7 +211,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:text="관람 현황"
+                        android:text="@string/check_str"
                         android:textAlignment="center"/>
                 </LinearLayout>
 
@@ -234,7 +235,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:text="내 정보"
+                        android:text="@string/myinfo_str"
                         android:textAlignment="center"/>
                 </LinearLayout>
 
@@ -258,12 +259,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:text="확인증"
+                        android:text="@string/certificate_str"
                         android:textAlignment="center"/>
                 </LinearLayout>
 
             </LinearLayout>
-
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -292,7 +292,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:text="최초 등록"
+                        android:text="@string/registration_str"
                         android:textAlignment="center"/>
                 </LinearLayout>
 
@@ -316,11 +316,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:text="홈페이지"
+                        android:text="@string/homepage_str"
                         android:textAlignment="center"/>
                 </LinearLayout>
-
-
 
                 <!-- 도움말 버튼 -->
                 <LinearLayout
@@ -342,55 +340,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:text="도움말"
+                        android:text="@string/help_str"
                         android:textAlignment="center"/>
                 </LinearLayout>
-
             </LinearLayout>
-
         </LinearLayout>
     </RelativeLayout>
-
-
-    <!--<Button-->
-        <!--android:id="@+id/bt_homepage"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="30dp"-->
-        <!--android:layout_marginStart="50dp"-->
-        <!--android:layout_marginEnd="50dp"-->
-        <!--android:onClick="onClick"-->
-        <!--android:enabled="true"-->
-        <!--android:text="홈페이지"/>-->
-
-    <!--<Button-->
-        <!--android:id="@+id/bt_normal"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="50dp"-->
-        <!--android:layout_marginEnd="50dp"-->
-        <!--android:onClick="onClick"-->
-        <!--android:enabled="true"-->
-        <!--android:text="일반 관람"/>-->
-    <!--<Button-->
-        <!--android:id="@+id/bt_narr"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="50dp"-->
-        <!--android:layout_marginEnd="50dp"-->
-        <!--android:onClick="onClick"-->
-        <!--android:enabled="true"-->
-        <!--android:text="전시 해설"/>-->
-    <!--<Button-->
-        <!--android:id="@+id/bt_confirm"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="50dp"-->
-        <!--android:layout_marginEnd="50dp"-->
-        <!--android:onClick="onClick"-->
-        <!--android:enabled="true"-->
-        <!--android:text="확인증 발급"/>-->
-
-
-
 </android.support.v4.widget.DrawerLayout>
