@@ -17,9 +17,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -54,26 +56,27 @@ public class MainActivity extends AppCompatActivity {
     boolean is_login = false;
     boolean is_registered = false;
     boolean is_autoLogin;
-    String s_name, s_number, s_phone, s_temper, s_destination;
-    int i_participation, i_division;
+    String s_id, s_name, s_number;
     DrawerLayout drawerLayout;
     View slideView;
     Button bt_openMap, bt_registration, bt_certificate;
     RelativeLayout bt_openMenu, bt_closeMenu;
     LinearLayout bt_viewtime, bt_myinfo, bt_certificate_2, bt_registration_2, bt_homepage, bt_information;
+    private boolean is_start = false;
+//    private boolean is_finish = false;    // 차후 구현 예정
+    private String[][] exhibitionState = new String[6][2];      // 전시관 오픈 여부(1 : open, 0 : close)
+    private String[][] exhibitionQrCode = new String[6][2];     // 전시관 QR코드 URL
+//    String[][] exhibitionRssId = new String[6][2];    // 차후 구현 예정
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
-    public static final String ADD_AUDIENCE = BASE_PATH + "add_audience.php";            //관람등록(성공 1, 실패 0 반환)
-    public static final String GET_AUDIENCE = BASE_PATH + "get_audience.php";             //로그인(성공 1, 실패 0 반환)
     public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
-    public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";            //관람등록시 전시해설 on/oof 여부(해설자 스케줄 확인)  - 미구현
+//    public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";            //관람등록시 전시해설 on/oof 여부(해설자 스케줄 확인)  - 미구현
     public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";          //각 전시관 별 개설 여부(JSON 형식) - ex) { "number": "1", "isOpen": "1" }
     public static final String GET_QR = BASE_PATH + "get_qr.php";                              //각 전시관 별 qr코드 파일 위치(JSON 형식) - ex) { "number": "1", "address": "http://35.221.108.183/QR/1.png" }
-    public static final String GET_RSSID = BASE_PATH + "get_mac.php";                        //각 전시관 별 RSSI(JSON 형식) - ex) { "number": "1", "mac": "00:70:69:47:2F:30" }
-    public static final String UPDATE_AUDIENCE = BASE_PATH + "update_audience.php";    //전시 종료(성공 1, 실패 0 반환)
-
+//    public static final String GET_RSSID = BASE_PATH + "get_mac.php";                        //각 전시관 별 RSSI(JSON 형식) - ex) { "number": "1", "mac": "00:70:69:47:2F:30" }
+//    public static final String UPDATE_AUDIENCE = BASE_PATH + "update_audience.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        getExhibitionData();
+        getStartState();
         resumeActivity();
     }
 
@@ -158,29 +163,74 @@ public class MainActivity extends AppCompatActivity {
         resumeActivity();
     }
 
+    /* DB-서버 통신 파트 */
+    // DB에서 데이터 새로 받아오는 메소드
+    public void getStartState() {
+        // 관람 시작 여부
+        GetIsStartTask startTask = new GetIsStartTask(this);
+        try {
+            String result = startTask.execute(GET_ISSTART, s_id).get();
+            is_start = result.equals("1");
+            Log.d("ISSTART", Boolean.toString(is_start));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    // DB 전시관 및 전시해설 데이터 받아오기
+    public void getExhibitionData() {
+        // 전시관 오픈 여부
+        GetExhibitionTask task = new GetExhibitionTask(this);
+        try {
+            String result = task.execute(GET_EXHIBITION).get();
+            JSONObject jResult = new JSONObject(result);
+            JSONArray jArray = jResult.getJSONArray("result");
+            for (int i = 0; i < jArray.length(); i++) {
+                JSONObject jObject = jArray.getJSONObject(i);
+                exhibitionState[i][0] = jObject.getString("number");
+                exhibitionState[i][1] = jObject.getString("isOpen");
+
+                Log.d("EXHIBITION", exhibitionState[i][0] + " : " + exhibitionState[i][1]);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        // 전시관 QR코드
+        GetExhibitionQrTask qrTask = new GetExhibitionQrTask(this);
+        try {
+            String result = qrTask.execute(GET_QR).get();
+            JSONObject jResult = new JSONObject(result);
+            JSONArray jArray = jResult.getJSONArray("result");
+            for (int i = 0; i < jArray.length(); i++) {
+                JSONObject jObject = jArray.getJSONObject(i);
+                exhibitionQrCode[i][0] = jObject.getString("number");
+                exhibitionQrCode[i][1] = jObject.getString("address");
+
+                Log.d("EXHIBITION_QRCODE", exhibitionQrCode[i][0] + " : " + exhibitionQrCode[i][1]);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
         final ImageView iv_registration = findViewById(R.id.iv_registration);
-//        final TextView tv_registreation = findViewById(R.id.tv_registration);
-
-        is_registered = infoData.getBoolean("IS_REGISTERED", false);
         loadInfo();
-
         /* 액티비티 화면 내용 설정 */
         // 최초 등록 버튼 활성화 및 비활성화
-        if (is_registered) {
+        if (is_login) {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(false);
             iv_registration.setEnabled(false);
             iv_registration.setColorFilter(Color.parseColor("#ffE0E0E0"), PorterDuff.Mode.SRC_IN);
-            is_autoLogin = infoData.getBoolean("IS_AUTOLOGIN", false);
         } else {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(true);
             iv_registration.setEnabled(true);
             iv_registration.setColorFilter(null);
         }
-
         // 로그인 상태에 따른 화면 내용 표시
         if (is_login) {
             // 메뉴 맨 위에 표시되는 사용자 이름 설정
@@ -232,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
         bt_registration_2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!is_registered) {
+                if (!is_login) {
                     Intent intent = new Intent(MainActivity.this, RegistActivity.class);
                     startActivityForResult(intent, 1);
                 }
@@ -294,20 +344,17 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 is_login = true;
-//                resumeActivity();
             }
         }
     }
 
     // 메인 화면 버튼
     public void onClick(View v) {
-        Switch sw_permit = findViewById(R.id.sw_test);
-        boolean is_permitted = sw_permit.isChecked();
-
         // 관람하기 버튼
         if (v == bt_openMap) {
+            getStartState();
             if (is_login) {
-                if (is_permitted) {
+                if (is_start) {
                     Intent intent = new Intent(MainActivity.this, NormalActivity.class);
                     startActivity(intent);
                 } else {
@@ -353,28 +400,25 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(getApplicationContext(), "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
 
-            resumeActivity();
+//            resumeActivity();
             onRestart();
         }
     }
 
     // 저장된 값 가져오기
     private void loadInfo() {
-        i_participation = infoData.getInt("PARTICIPATION", -1);
-        i_division = infoData.getInt("DIVISION", -1);
-        s_name = infoData.getString("NAME", "");
+        s_id = infoData.getString("ID", "");
         s_number = infoData.getString("NUMBER", "");
-        s_phone = infoData.getString("PHONE", "");
-        s_temper = infoData.getString("TEMPER", "");
-        s_destination = infoData.getString("DESTINATION", "");
+        s_name = infoData.getString("NAME", "");
     }
 
     /***** 서버 통신 *****/
-    public class GetData extends AsyncTask<String, Void, String> {
+    // 관람 시작 여부 받아오는 부분
+    public static class GetIsStartTask extends AsyncTask<String, Void, String> {
         private WeakReference<MainActivity> activityReference;
         ProgressDialog progressDialog;
 
-        GetData(MainActivity context) {
+        GetIsStartTask(MainActivity context) {
             activityReference = new WeakReference<>(context);
         }
         @Override
@@ -392,14 +436,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String serverURL = params[0];
-            String number = params[1];
-            String name = params[2];
-            String participation = params[3];
-            String division = params[4];
-            String temper = params[5];
-            String phone = params[6];
-            String destination = params[7];
-            String postParameters = "&number=" + number + "&name=" + name + "&participation=" + participation + "&division=" + division + "&temper=" + temper + "&phone=" + phone + "&destination=" + destination;
+            String id = params[1];
+            String postParameters = "&id=" + id;
             try {
                 URL url = new URL(serverURL);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -411,6 +449,169 @@ public class MainActivity extends AppCompatActivity {
                 outputStream.write(postParameters.getBytes("UTF-8"));
                 outputStream.flush();
                 outputStream.close();
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+                bufferedReader.close();
+                return sb.toString();
+            } catch (Exception e) {
+                return "Error: " + e.getMessage();
+            }
+        }
+    }
+/*  차후 구현 예정  // 관람 종료 여부 받아오는 부분
+    public static class PutFinishTask extends AsyncTask<String, Void, String> {
+        private WeakReference<MainActivity> activityReference;
+        ProgressDialog progressDialog;
+
+        PutFinishTask(MainActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activityReference.get(),
+                    "Please Wait", null, true, true);
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            String serverURL = params[0];
+            String id = params[1];
+            String postParameters = "&id=" + id;
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+                bufferedReader.close();
+                return sb.toString();
+            } catch (Exception e) {
+                return "Error: " + e.getMessage();
+            }
+        }
+    }
+*/
+    // 전시관 오픈 여부 받아오는 부분
+    public static class GetExhibitionTask extends AsyncTask<String, Void, String> {
+        private WeakReference<MainActivity> activityReference;
+        ProgressDialog progressDialog;
+
+        GetExhibitionTask(MainActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activityReference.get(),
+                    "Please Wait", null, true, true);
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+            /*출력값*/
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            String serverURL = params[0];
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+                bufferedReader.close();
+                return sb.toString();
+            } catch (Exception e) {
+                return "Error: " + e.getMessage();
+            }
+        }
+    }
+
+    // 전시관 QR코드 정보 받아오는 부분
+    public static class GetExhibitionQrTask extends AsyncTask<String, Void, String> {
+        private WeakReference<MainActivity> activityReference;
+        ProgressDialog progressDialog;
+
+        GetExhibitionQrTask(MainActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activityReference.get(),
+                    "Please Wait", null, true, true);
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+            /*출력값*/
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            String serverURL = params[0];
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
                 int responseStatusCode = httpURLConnection.getResponseCode();
                 InputStream inputStream;
                 if(responseStatusCode == HttpURLConnection.HTTP_OK) {

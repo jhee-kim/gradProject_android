@@ -93,30 +93,6 @@
             android:onClick="onClick"
             android:text="@string/registration_str"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@+id/bt_open_map"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="40dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="센터 허가 완료"
-                    android:textSize="20sp"/>
-
-                <Switch
-                    android:id="@+id/sw_test"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="10dp" />
-
-            </LinearLayout>
     </RelativeLayout>
 
 
@@ -174,6 +150,7 @@
             android:layout_marginStart="30dp"
             android:textSize="24sp"
             android:textAlignment="viewStart"
+            android:textAllCaps="false"
             android:fontFamily="@font/m_gothic_bold"
             android:textColor="@color/focusText"
             android:background="@color/transparent"/>
