@@ -28,7 +28,8 @@ public class NormalActivity extends AppCompatActivity {
         }
 
         MapView mapView = new MapView(this);
-        ViewGroup mapViewContainer = findViewById(R.id.map_view);
+        
+        //ViewGroup mapViewContainer = findViewById(R.id.map_view);
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.782444, 127.223135), 1, true);
         mapViewContainer.addView(mapView);
 
