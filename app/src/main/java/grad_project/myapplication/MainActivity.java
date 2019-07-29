@@ -315,7 +315,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             } else {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                //Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                Intent intent = new Intent(MainActivity.this, NormalActivity.class);
                 startActivityForResult(intent, 0);
             }
         }

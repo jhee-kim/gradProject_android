@@ -40,11 +40,11 @@
         </activity>
         <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog">
         </activity>
-        <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.CustomTheme">
+        <activity android:name=".PopupMapActivity" android:theme="@android:style/Theme.Dialog">
         </activity>
 
         <!-- 교체 필요 <meta-data android:name="com.kakao.sdk.AppKey" android:value="509e94461de7391ad3fe72324d4714e3"/> -->
-        <meta-data android:name="com.kakao.sdk.AppKey" android:value="63c2eeea64bff757d4f3fbb253f2ff59"/>
+        <meta-data android:name="com.kakao.sdk.AppKey" android:value="509e94461de7391ad3fe72324d4714e3"/>
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
     </application>
 
