@@ -1,9 +1,11 @@
 package grad_project.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -14,10 +16,13 @@ import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
 public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener {
+    private SharedPreferences infoData;
+    private boolean[] isCheckQrArr = new boolean[6];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_normal);
+        infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
         ActionBar actionBar = getSupportActionBar();
 
@@ -40,6 +45,28 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Intent intent = getIntent();
+        int result = intent.getIntExtra("finish_exhibition_num", -1);
+        if(result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
+            SharedPreferences.Editor editor = infoData.edit();  //해당 전시관에 대한 정보를 공유변수에 저장
+            editor.putBoolean("IS_CHECK_" + result, true);
+            editor.apply();
+        }
+        loadInfo();
+    }
+
+    // 저장된 값 가져오기
+    private void loadInfo() {
+        for(int i = 0 ; i < 6 ; i++) {
+            int num = i + 1;
+            isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);    //true 없으면 false로
+            Log.d(num + "전시관 QR체크여부 : ", isCheckQrArr[i] + "");
+        }
     }
 
     public void setMuseMarkers(MapView mapView){
