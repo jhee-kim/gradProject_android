@@ -96,6 +96,19 @@ public class MainActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
         bt_registration = findViewById(R.id.bt_registration);
@@ -122,14 +135,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
-        is_autoLogin = infoData.getBoolean("IS_AUTOLOGIN", false);
-
-        if (is_autoLogin) {
-            loadInfo();
-            is_login = true;
-        } else {
-            is_login = false;
-        }
 
         // 메뉴 버튼 id 불러오기
         bt_viewtime = findViewById(R.id.bt_viewtime);
@@ -157,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         getExhibitionData();
-        getStartState();
         resumeActivity();
     }
 
@@ -192,11 +196,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Exhibition", result);
             JSONObject jResult = new JSONObject(result);
             JSONArray jArray = jResult.getJSONArray("result");
+            Log.d("ARRAY LENGTH", Integer.toString(jArray.length()));
             for (int i = 0; i < jArray.length(); i++) {
                 JSONObject jObject = jArray.getJSONObject(i);
                 exhibitionState[i] = jObject.getString("isOpen");
 
-                Log.d("EXHIBITION", exhibitionState[i]);
+                Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -222,6 +227,12 @@ public class MainActivity extends AppCompatActivity {
     public void resumeActivity() {
         final ImageView iv_registration = findViewById(R.id.iv_registration);
         loadInfo();
+
+        if (is_autoLogin) {
+            is_login = true;
+        } else {
+            is_login = false;
+        }
         /* 액티비티 화면 내용 설정 */
         // 최초 등록 버튼 활성화 및 비활성화
         if (is_login) {
@@ -229,14 +240,7 @@ public class MainActivity extends AppCompatActivity {
             bt_registration.setEnabled(false);
             iv_registration.setEnabled(false);
             iv_registration.setColorFilter(Color.parseColor("#ffE0E0E0"), PorterDuff.Mode.SRC_IN);
-        } else {
-            Button bt_registration = findViewById(R.id.bt_registration);
-            bt_registration.setEnabled(true);
-            iv_registration.setEnabled(true);
-            iv_registration.setColorFilter(null);
-        }
-        // 로그인 상태에 따른 화면 내용 표시
-        if (is_login) {
+
             // 메뉴 맨 위에 표시되는 사용자 이름 설정
             Button bt_personal = findViewById(R.id.bt_personal);
             String msg_slide = s_name + " 님 >";
@@ -263,6 +267,11 @@ public class MainActivity extends AppCompatActivity {
             bt_logout.setEnabled(true);
             bt_logout.setVisibility(View.VISIBLE);
         } else {
+            Button bt_registration = findViewById(R.id.bt_registration);
+            bt_registration.setEnabled(true);
+            iv_registration.setEnabled(true);
+            iv_registration.setColorFilter(null);
+
             // 메뉴 맨 위에 표시되는 사용자 이름 설정
             Button bt_personal = findViewById(R.id.bt_personal);
             bt_personal.setText("로그인해주세요 >");
@@ -280,6 +289,8 @@ public class MainActivity extends AppCompatActivity {
             bt_logout.setEnabled(false);
             bt_logout.setVisibility(View.INVISIBLE);
         }
+
+        Log.d("STATE", Boolean.toString(is_start));
 
         /* 메뉴 버튼 온클릭리스너 설정 */
         // 최초 등록 버튼
@@ -395,6 +406,8 @@ public class MainActivity extends AppCompatActivity {
     public void onLogout(View v) {
         if (v == findViewById(R.id.bt_logout)) {
             is_login = false;
+            is_start = false;
+            is_autoLogin = false;
 
             SharedPreferences.Editor editor = infoData.edit();
             editor.clear();
@@ -414,6 +427,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 저장된 값 가져오기
     private void loadInfo() {
+        is_autoLogin = infoData.getBoolean("IS_AUTOLOGIN", false);
         s_id = infoData.getString("ID", "");
         s_name = infoData.getString("NAME", "");
     }
