@@ -3,6 +3,9 @@ package grad_project.myapplication;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
@@ -11,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +34,8 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /*
 ***** 도움말 *****
@@ -56,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     boolean is_login = false;
     boolean is_registered = false;
     boolean is_autoLogin;
-    String s_id, s_name, s_number;
+    String s_id, s_name;
     DrawerLayout drawerLayout;
     View slideView;
     Button bt_openMap, bt_registration, bt_certificate;
@@ -64,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout bt_viewtime, bt_myinfo, bt_certificate_2, bt_registration_2, bt_homepage, bt_information;
     private boolean is_start = false;
 //    private boolean is_finish = false;    // 차후 구현 예정
-    private String[][] exhibitionState = new String[6][2];      // 전시관 오픈 여부(1 : open, 0 : close)
-    private String[][] exhibitionQrCode = new String[6][2];     // 전시관 QR코드 URL
-//    String[][] exhibitionRssId = new String[6][2];    // 차후 구현 예정
+    private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
+    private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
+//    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -164,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /* DB-서버 통신 파트 */
-    // DB에서 데이터 새로 받아오는 메소드
+    // 관람 시작이 되었는지 여부 받아오는 메소드
     public void getStartState() {
         // 관람 시작 여부
         GetIsStartTask startTask = new GetIsStartTask(this);
@@ -175,7 +181,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     // DB 전시관 및 전시해설 데이터 받아오기
@@ -184,14 +189,14 @@ public class MainActivity extends AppCompatActivity {
         GetExhibitionTask task = new GetExhibitionTask(this);
         try {
             String result = task.execute(GET_EXHIBITION).get();
+            Log.d("Exhibition", result);
             JSONObject jResult = new JSONObject(result);
             JSONArray jArray = jResult.getJSONArray("result");
             for (int i = 0; i < jArray.length(); i++) {
                 JSONObject jObject = jArray.getJSONObject(i);
-                exhibitionState[i][0] = jObject.getString("number");
-                exhibitionState[i][1] = jObject.getString("isOpen");
+                exhibitionState[i] = jObject.getString("isOpen");
 
-                Log.d("EXHIBITION", exhibitionState[i][0] + " : " + exhibitionState[i][1]);
+                Log.d("EXHIBITION", exhibitionState[i]);
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -205,10 +210,9 @@ public class MainActivity extends AppCompatActivity {
             JSONArray jArray = jResult.getJSONArray("result");
             for (int i = 0; i < jArray.length(); i++) {
                 JSONObject jObject = jArray.getJSONObject(i);
-                exhibitionQrCode[i][0] = jObject.getString("number");
-                exhibitionQrCode[i][1] = jObject.getString("address");
+                exhibitionQrCode[i] = jObject.getString("address");
 
-                Log.d("EXHIBITION_QRCODE", exhibitionQrCode[i][0] + " : " + exhibitionQrCode[i][1]);
+                Log.d("EXHIBITION_QRCODE", exhibitionQrCode[i]);
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -337,6 +341,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 is_login = true;
+                Log.d("LOGIN COMPLETE", s_id);
+
             }
         }
 
@@ -409,7 +415,6 @@ public class MainActivity extends AppCompatActivity {
     // 저장된 값 가져오기
     private void loadInfo() {
         s_id = infoData.getString("ID", "");
-        s_number = infoData.getString("NUMBER", "");
         s_name = infoData.getString("NAME", "");
     }
 
