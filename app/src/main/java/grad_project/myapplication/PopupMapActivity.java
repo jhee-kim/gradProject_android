@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -95,6 +96,7 @@ public class PopupMapActivity extends Activity {
         params.y = 800;
 
         //getWindow().setGravity(Gravity.BOTTOM);
+        //getWindow().setGravity(Gravity);
         getWindow().setLayout((int)(width*0.95), (int)(height * 0.2));
     }
 
