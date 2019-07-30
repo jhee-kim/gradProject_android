@@ -10,4 +10,5 @@
     <color name="focusText">#222222</color>
     <color name="unfocusText">#707070</color>
     <color name="disableButton">#E0E0E0</color>
+    <color name="timeColor">#78468c</color>
 </resources>

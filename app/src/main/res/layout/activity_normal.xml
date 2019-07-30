@@ -37,6 +37,15 @@
             android:textSize="24sp"
             android:fontFamily="@font/m_gothic_extrabold" />
 
+        <Button
+            android:id="@+id/TimeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginLeft="160dp"
+            android:text="Time"
+            android:background="@drawable/round_button"
+            android:onClick="timeOn"/>
+
     </RelativeLayout>
 
     <ImageView

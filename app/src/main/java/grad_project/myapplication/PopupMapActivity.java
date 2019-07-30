@@ -72,7 +72,7 @@ public class PopupMapActivity extends Activity {
                 Mus_Title = "제6전시관 새나라세우기";
                 Mus_Sub = "";
                 break;
-            case 6:
+            case 7:
                 Mus_Title = "제7전시관 없음";
                 Mus_Sub = "";
                 break;
