@@ -3,18 +3,14 @@ package grad_project.myapplication;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,8 +30,6 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /*
 ***** 도움말 *****
@@ -373,6 +367,7 @@ public class MainActivity extends AppCompatActivity {
             if (is_login) {
                 if (is_start) {
                     Intent intent = new Intent(MainActivity.this, NormalActivity.class);
+                    intent.putExtra("MuseumState",exhibitionState);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(MainActivity.this, HelpActivity.class);

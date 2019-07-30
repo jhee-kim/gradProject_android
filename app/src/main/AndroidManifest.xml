@@ -40,6 +40,11 @@
         <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog">
         </activity>
         <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.CustomTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <!-- 교체 필요 <meta-data android:name="com.kakao.sdk.AppKey" android:value="509e94461de7391ad3fe72324d4714e3"/> -->

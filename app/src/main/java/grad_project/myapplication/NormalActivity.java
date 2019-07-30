@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -78,6 +79,9 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
 
+        Intent intent = getIntent();
+        String[] exhibitState = intent.getStringArrayExtra("MuseumState");
+
         /*
         MapPOIItem[] markerSet = new MapPOIItem[7];
         MapPoint[] makerPointSet = new MapPoint[7];
@@ -91,17 +95,17 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         markerSet[0].setItemName("제1전시관");
         markerSet[0].setTag(0);
         markerSet[1].setItemName("제2전시관");
-        markerSet[1].setTag(0);
+        markerSet[1].setTag(1);
         markerSet[2].setItemName("제3전시관");
-        markerSet[2].setTag(0);
+        markerSet[2].setTag(2);
         markerSet[3].setItemName("제4전시관");
-        markerSet[3].setTag(0);
+        markerSet[3].setTag(3);
         markerSet[4].setItemName("제5전시관");
-        markerSet[4].setTag(0);
+        markerSet[4].setTag(4);
         markerSet[5].setItemName("제6전시관");
-        markerSet[5].setTag(0);
+        markerSet[5].setTag(5);
         markerSet[6].setItemName("제7전시관");
-        markerSet[6].setTag(0);
+        markerSet[6].setTag(6);
 
         //마커 위치 및 액션
         makerPointSet[0] = MapPoint.mapPointWithGeoCoord(36.783323, 127.221605);
@@ -145,22 +149,25 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
         MapPOIItem marker1 = new MapPOIItem();
         marker1.setItemName("제1전시관");        //눌렀을때 말풍선
-        marker1.setTag(0);
+        marker1.setTag(1);
 
         MapPoint mapPoint1 = MapPoint.mapPointWithGeoCoord(36.783323, 127.221605);
         marker1.setMapPoint(mapPoint1);
         // 기본으로 제공하는 BluePin 마커 모양.
-        marker1.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        if(exhibitState[0].equals("1"))
+            marker1.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        else if(exhibitState[0].equals("0"))
+            marker1.setMarkerType((MapPOIItem.MarkerType.YellowPin));
         // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker1.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker1.setShowCalloutBalloonOnTouch(false);
         //mapView.setImage
-        marker1.getMapPoint();
+        //marker1.getMapPoint();
 
         //onPOIItemSelected(mapView, marker1);
         //onCalloutBalloonOfPOIItemTouched(mapView, marker1);
 
-        //MapCircle mapCircle = new MapCircle(mapPoint1,5, Color.RED, Color.RED); 마커 중심으로 반경 설정
+        //MapCircle mapCircle = new MapCircle(mapPoint1,5, Color.RED, Color.RED); //마커 중심으로 반경 설정
         //mapView.addCircle(mapCircle);
 
         /*이미지 생성
@@ -173,12 +180,16 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
         MapPOIItem marker2 = new MapPOIItem();
         marker2.setItemName("제2전시관");
-        marker2.setTag(1);
+        marker2.setTag(2);
 
         MapPoint mapPoint2 = MapPoint.mapPointWithGeoCoord(36.783710, 127.221090);
         marker2.setMapPoint(mapPoint2);
         // 기본으로 제공하는 BluePin 마커 모양.
-        marker2.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        //marker2.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        if(exhibitState[1].equals("1"))
+            marker2.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        else if(exhibitState[1].equals("0"))
+            marker2.setMarkerType((MapPOIItem.MarkerType.YellowPin));
         // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker2.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker2.setShowCalloutBalloonOnTouch(false);
@@ -186,60 +197,76 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
         MapPOIItem marker3 = new MapPOIItem();
         marker3.setItemName("제3전시관");        //눌렀을때 말풍선
-        marker3.setTag(2);
+        marker3.setTag(3);
 
         MapPoint mapPoint3 = MapPoint.mapPointWithGeoCoord(36.784381, 127.220875);
         marker3.setMapPoint(mapPoint3);
         // 기본으로 제공하는 BluePin 마커 모양.
-        marker3.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        //marker3.setMarkerType(MapPOIItem.MarkerType.BluePin);
         // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker3.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker3.setShowCalloutBalloonOnTouch(false);
 
+        if(exhibitState[2].equals("1"))
+            marker3.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        else if(exhibitState[2].equals("0"))
+            marker3.setMarkerType((MapPOIItem.MarkerType.YellowPin));
+
+
+
         MapPOIItem marker4 = new MapPOIItem();
         marker4.setItemName("제4전시관");        //눌렀을때 말풍선
-        marker4.setTag(3);
+        marker4.setTag(4);
 
         MapPoint mapPoint4 = MapPoint.mapPointWithGeoCoord(36.784888, 127.220961);
         marker4.setMapPoint(mapPoint4);
         // 기본으로 제공하는 BluePin 마커 모양.
-        marker4.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        if(exhibitState[3].equals("1"))
+            marker4.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        else if(exhibitState[3].equals("0"))
+            marker4.setMarkerType((MapPOIItem.MarkerType.YellowPin));
         // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker4.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker4.setShowCalloutBalloonOnTouch(false);
 
         MapPOIItem marker5 = new MapPOIItem();
         marker5.setItemName("제5전시관");        //눌렀을때 말풍선
-        marker5.setTag(4);
+        marker5.setTag(5);
 
         MapPoint mapPoint5 = MapPoint.mapPointWithGeoCoord(36.785034, 127.221573);
         marker5.setMapPoint(mapPoint5);
         // 기본으로 제공하는 BluePin 마커 모양.
-        marker5.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        if(exhibitState[4].equals("1"))
+            marker5.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        else if(exhibitState[4].equals("0"))
+            marker5.setMarkerType((MapPOIItem.MarkerType.YellowPin));
         // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker5.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker5.setShowCalloutBalloonOnTouch(false);
 
         MapPOIItem marker6 = new MapPOIItem();
         marker6.setItemName("제6전시관");        //눌렀을때 말풍선
-        marker6.setTag(5);
+        marker6.setTag(6);
 
         MapPoint mapPoint6 = MapPoint.mapPointWithGeoCoord(36.784982, 127.222463);
         marker6.setMapPoint(mapPoint6);
         // 기본으로 제공하는 BluePin 마커 모양.
-        marker6.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        if(exhibitState[5].equals("1"))
+            marker5.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        else if(exhibitState[5].equals("0"))
+            marker5.setMarkerType((MapPOIItem.MarkerType.YellowPin));
         // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker6.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker6.setShowCalloutBalloonOnTouch(false);
 
         MapPOIItem marker7 = new MapPOIItem();
         marker7.setItemName("제7전시관");        //눌렀을때 말풍선
-        marker7.setTag(6);
+        marker7.setTag(7);
 
         MapPoint mapPoint7 = MapPoint.mapPointWithGeoCoord(36.784630, 127.223815);
         marker7.setMapPoint(mapPoint7);
         // 기본으로 제공하는 BluePin 마커 모양.
-        marker7.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        marker7.setMarkerType((MapPOIItem.MarkerType.BluePin));
         // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker7.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker7.setShowCalloutBalloonOnTouch(false);
@@ -281,6 +308,10 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     @Override
     public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
 
+    }
+
+    public void timeOn(View view) {
+        Toast.makeText(getApplicationContext(), "QR연결 요구", Toast.LENGTH_SHORT).show();
     }
 
 }
