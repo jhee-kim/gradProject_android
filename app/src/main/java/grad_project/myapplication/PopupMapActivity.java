@@ -48,27 +48,27 @@ public class PopupMapActivity extends Activity {
         QR_Button = findViewById(R.id.QRbutton);
 
         switch (TagNumCheck) {
-            case 0:
+            case 1:
                 Mus_Title = "제1전시관 겨레의뿌리";
                 Mus_Sub = "";
                 break;
-            case 1:
+            case 2:
                 Mus_Title = "제2전시관 교체중";
                 Mus_Sub = "";
                 break;
-            case 2:
+            case 3:
                 Mus_Title = "제3전시관 겨레의함성";
                 Mus_Sub = "";
                 break;
-            case 3:
+            case 4:
                 Mus_Title = "제4전시관 평화누리";
                 Mus_Sub = "";
                 break;
-            case 4:
+            case 5:
                 Mus_Title = "제5전시관 나라되찾기";
                 Mus_Sub = "";
                 break;
-            case 5:
+            case 6:
                 Mus_Title = "제6전시관 새나라세우기";
                 Mus_Sub = "";
                 break;
