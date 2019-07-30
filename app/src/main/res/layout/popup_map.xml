@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="-20dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        app:srcCompat="@drawable/edit" />
+
+    <Button
+        android:id="@+id/QRbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="300dp"
+        android:layout_marginTop="110dp"
+        android:background="#673AB7"
+        android:onClick="QRClick"
+        android:text="QR" />
+
+    <EditText
+        android:id="@+id/museumTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="15"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="140dp"
+        android:inputType="text"
+        android:background="@null"
+        android:textSize="20sp"
+        android:text="건물이름" />
+
+    <EditText
+        android:id="@+id/museumSub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="15"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="140dp"
+        android:inputType="text"
+        android:background="@null"
+        android:textSize="12sp"
+        android:text="시간" />
+</RelativeLayout>
