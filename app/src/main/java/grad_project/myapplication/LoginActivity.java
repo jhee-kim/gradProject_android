@@ -14,9 +14,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,16 +21,15 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     private boolean is_correct = false;
-    private ArrayList<String> personalData = new ArrayList<>(8);  // [0]:id, [1]:number, [2]:name, [3]:participation, [4]:division, [5]:temper, [6]:phone, [7]:destination
+    private String s_id;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
-    public static final String GET_AUDIENCE = BASE_PATH + "get_audience.php";             //로그인(성공 id, 실패 0 반환)
+    public static final String GET_ID = BASE_PATH + "login.php";             //로그인(성공 id, 실패 0 반환)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,27 +74,14 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 LoginTask task = new LoginTask(this);
                 try {
-                    String result = task.execute(GET_AUDIENCE, input_number, input_name).get();
+                    String result = task.execute(GET_ID, input_number, input_name).get();
+                    Log.d("LOGIN RESULT", result);
                     if(result.equals("0")) {
                         is_correct = false;
                     } else {
                         try {
-                            personalData.clear();
-                            JSONObject jResult = new JSONObject(result);
-                            JSONArray jArray = jResult.getJSONArray("result");
-                            JSONObject jObject = jArray.getJSONObject(0);
-                            personalData.add(jObject.getString("id"));
-                            personalData.add(jObject.getString("number"));
-                            personalData.add(jObject.getString("name"));
-                            personalData.add(jObject.getString("participation"));
-                            personalData.add(jObject.getString("division"));
-                            personalData.add(jObject.getString("temper"));
-                            personalData.add(jObject.getString("phone"));
-                            personalData.add(jObject.getString("destination"));
+                            s_id = result;
                             is_correct = true;
-                            for (int i = 0; i < 8; i++) {
-                                Log.d("EXHIBITION", personalData.get(i));
-                            }
                         } catch(Exception e) {
                             e.printStackTrace();
                         }
@@ -112,14 +95,8 @@ public class LoginActivity extends AppCompatActivity {
                     setResult(RESULT_OK, in_login);
                     SharedPreferences.Editor editor = infoData.edit();
                     editor.putBoolean("IS_AUTOLOGIN", true);
-                    editor.putString("ID", personalData.get(0));
-                    editor.putString("NUMBER", personalData.get(1));
-                    editor.putString("NAME", personalData.get(2));
-                    editor.putString("PARTICIPATION", personalData.get(3));
-                    editor.putString("DIVISION", personalData.get(4));
-                    editor.putString("TEMPER", personalData.get(5));
-                    editor.putString("PHONE", personalData.get(6));
-                    editor.putString("DESTINATION", personalData.get(7));
+                    editor.putString("ID", s_id);
+                    editor.putString("NAME", input_name);
                     editor.apply();
                     Toast.makeText(LoginActivity.this, "로그인 되었습니다.", Toast.LENGTH_SHORT).show();
                     finish();
