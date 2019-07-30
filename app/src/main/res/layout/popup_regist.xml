@@ -151,16 +151,22 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_question"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="@string/question_popup_str"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            android:fontFamily="@font/m_gothic_bold"
-            android:textColor="@color/focusText" />
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp">
+            <TextView
+                android:id="@+id/tv_question"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/question_popup_str"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:fontFamily="@font/m_gothic_bold"
+                android:textColor="@color/focusText" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -169,24 +175,31 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
-        android:layout_below="@+id/layout_text">
+        android:layout_below="@+id/layout_text"
+        android:background="@color/disableButton">
 
         <Button
             android:id="@+id/bt_cancel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#FAC9C6"
+            android:background="@color/transparent"
             android:text="@string/cancel_str"
-            android:onClick="onClick"/>
+            android:textColor="@color/disableText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
         <Button
             android:id="@+id/bt_apply"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#91CFFF"
+            android:background="@color/transparent"
             android:text="@string/apply_str"
-            android:onClick="onClick"/>
+            android:textColor="@color/disableText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
     </LinearLayout>
 
 

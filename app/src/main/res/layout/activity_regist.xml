@@ -69,13 +69,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_personal"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
+            android:layout_margin="5dp"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="@string/name_str"
                 android:textSize="18sp"
                 android:fontFamily="@font/m_gothic_bold"/>
@@ -84,10 +84,14 @@
                 android:id="@+id/et_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
                 android:hint="@string/name_hint_str"
                 android:textColorHint="@color/hintText"
                 android:textSize="16sp"
                 android:inputType="text"
+                android:background="@drawable/custom_edittext"
                 android:fontFamily="@font/m_gothic_normal"/>
         </LinearLayout>
 
@@ -96,24 +100,48 @@
             android:id="@+id/layout_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
+            android:layout_margin="5dp"
             android:layout_below="@+id/layout_name">
 
             <TextView
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
                 android:text="@string/number_str"
                 android:textSize="18sp"
                 android:fontFamily="@font/m_gothic_bold"/>
+            <Spinner
+                android:id="@+id/sp_number_0"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
+                android:spinnerMode="dropdown"
+                android:entries="@array/number_head"
+                android:textSize="16sp"
+                android:background="@drawable/spinner_background"
+                android:fontFamily="@font/m_gothic_normal"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/hyphen"
+                android:textSize="18sp"
+                android:fontFamily="@font/m_gothic_bold"/>
             <EditText
-                android:id="@+id/et_number"
+                android:id="@+id/et_number_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/number_hint_str"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
                 android:textColorHint="@color/hintText"
                 android:textSize="16sp"
                 android:inputType="number"
+                android:maxLength="8"
+                android:background="@drawable/custom_edittext"
                 android:fontFamily="@font/m_gothic_normal"/>
         </LinearLayout>
 
@@ -122,23 +150,69 @@
             android:id="@+id/layout_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
+            android:layout_margin="5dp"
             android:layout_below="@+id/layout_number">
             <TextView
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
                 android:text="@string/phone_str"
                 android:textSize="18sp"
                 android:fontFamily="@font/m_gothic_bold"/>
+            <Spinner
+                android:id="@+id/sp_phone_0"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
+                android:spinnerMode="dropdown"
+                android:entries="@array/phone_head"
+                android:textSize="16sp"
+                android:background="@drawable/spinner_background"
+                android:fontFamily="@font/m_gothic_normal"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/hyphen"
+                android:textSize="18sp"
+                android:fontFamily="@font/m_gothic_bold"/>
             <EditText
-                android:id="@+id/et_phone"
+                android:id="@+id/et_phone_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/phone_hint_str"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
                 android:textColorHint="@color/hintText"
                 android:textSize="16sp"
                 android:inputType="phone"
+                android:maxLength="4"
+                android:background="@drawable/custom_edittext"
+                android:fontFamily="@font/m_gothic_normal"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/hyphen"
+                android:textSize="18sp"
+                android:fontFamily="@font/m_gothic_bold"/>
+            <EditText
+                android:id="@+id/et_phone_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
+                android:textColorHint="@color/hintText"
+                android:textSize="16sp"
+                android:inputType="phone"
+                android:maxLength="4"
+                android:background="@drawable/custom_edittext"
                 android:fontFamily="@font/m_gothic_normal"/>
 
         </LinearLayout>
@@ -193,87 +267,106 @@
             android:textSize="20sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
 
-        <!-- 소속 부대 선택 -->
-        <TextView
-            android:id="@+id/tv_temper"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_addition"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:text="@string/temper_str"
-            android:textSize="18sp"
-            android:fontFamily="@font/m_gothic_bold"/>
 
-        <RadioGroup
-            android:id="@+id/rg_division"
+        <LinearLayout
+            android:id="@+id/layout_division"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_temper"
-            android:weightSum="4"
-            android:orientation="horizontal"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp">
-            <RadioButton
-                android:id="@+id/rb_army"
-                android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            android:layout_below="@id/tv_addition">
+            <!-- 소속 부대 선택 -->
+            <TextView
+                android:id="@+id/tv_temper"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/army_str"
-                android:textSize="16sp"
-                android:fontFamily="@font/m_gothic_normal" />
-            <RadioButton
-                android:id="@+id/rb_navy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/navy_str"
-                android:textSize="16sp"
-                android:fontFamily="@font/m_gothic_normal" />
-            <RadioButton
-                android:id="@+id/rb_airforce"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/airforce_str"
-                android:textSize="16sp"
-                android:fontFamily="@font/m_gothic_normal" />
-            <RadioButton
-                android:id="@+id/rb_mc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/mc_str"
-                android:textSize="16sp"
-                android:fontFamily="@font/m_gothic_normal" />
-            </RadioGroup>
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"
+                android:text="@string/temper_str"
+                android:textSize="18sp"
+                android:fontFamily="@font/m_gothic_bold"/>
+
+        <Spinner
+            android:id="@+id/sp_division"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_gravity="center_vertical"
+            android:spinnerMode="dropdown"
+            android:entries="@array/division_head"
+            android:textSize="16sp"
+            android:background="@drawable/spinner_background"
+            android:fontFamily="@font/m_gothic_normal"/>
+        <!--<RadioGroup-->
+            <!--android:id="@+id/rg_division"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@id/tv_temper"-->
+            <!--android:weightSum="4"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:layout_marginStart="10dp"-->
+            <!--android:layout_marginEnd="10dp">-->
+            <!--<RadioButton-->
+                <!--android:id="@+id/rb_army"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/army_str"-->
+                <!--android:textSize="16sp"-->
+                <!--android:fontFamily="@font/m_gothic_normal" />-->
+            <!--<RadioButton-->
+                <!--android:id="@+id/rb_navy"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/navy_str"-->
+                <!--android:textSize="16sp"-->
+                <!--android:fontFamily="@font/m_gothic_normal" />-->
+            <!--<RadioButton-->
+                <!--android:id="@+id/rb_airforce"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/airforce_str"-->
+                <!--android:textSize="16sp"-->
+                <!--android:fontFamily="@font/m_gothic_normal" />-->
+            <!--<RadioButton-->
+                <!--android:id="@+id/rb_mc"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="@string/mc_str"-->
+                <!--android:textSize="16sp"-->
+                <!--android:fontFamily="@font/m_gothic_normal" />-->
+            <!--</RadioGroup>-->
 
         <!-- 자세한 소속 부대 입력-->
         <EditText
             android:id="@+id/et_temper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/rg_division"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_gravity="center_vertical"
             android:hint="@string/temper_hint_str"
             android:textColorHint="@color/hintText"
             android:textSize="16sp"
             android:inputType="text"
+            android:background="@drawable/custom_edittext"
             android:fontFamily="@font/m_gothic_normal" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/layout_destination"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_below="@id/et_temper">
+            android:layout_margin="5dp"
+            android:layout_below="@id/layout_division">
             <TextView
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="@string/destination_str"
                 android:textSize="18sp"
                 android:fontFamily="@font/m_gothic_bold"/>
@@ -281,11 +374,14 @@
                 android:id="@+id/et_destination"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
                 android:hint="@string/destination_hint_str"
                 android:textColorHint="@color/hintText"
                 android:textSize="16sp"
                 android:inputType="text"
+                android:background="@drawable/custom_edittext"
                 android:fontFamily="@font/m_gothic_normal" />
         </LinearLayout>
 
@@ -342,5 +438,10 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:onClick="onClick"
-        android:text="@string/registration_apply_str"/>
+        android:text="@string/registration_apply_str"
+        android:textSize="18sp"
+        android:textColor="@color/focusText"
+        android:fontFamily="@font/m_gothic_bold"
+        android:background="@drawable/custom_button"
+        style="?android:attr/borderlessButtonStyle"/>
 </RelativeLayout>
