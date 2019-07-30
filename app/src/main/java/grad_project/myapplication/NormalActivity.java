@@ -171,24 +171,13 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         marker6.setMapPoint(mapPoint6);
         // 기본으로 제공하는 BluePin 마커 모양.
         if(exhibitState[5].equals("1"))
-            marker5.setMarkerType(MapPOIItem.MarkerType.BluePin);
+            marker6.setMarkerType(MapPOIItem.MarkerType.BluePin);
         else if(exhibitState[5].equals("0"))
-            marker5.setMarkerType((MapPOIItem.MarkerType.YellowPin));
+            marker6.setMarkerType((MapPOIItem.MarkerType.YellowPin));
         // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker6.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker6.setShowCalloutBalloonOnTouch(false);
 
-        MapPOIItem marker7 = new MapPOIItem();
-        marker7.setItemName("제7전시관");        //눌렀을때 말풍선
-        marker7.setTag(7);
-
-        MapPoint mapPoint7 = MapPoint.mapPointWithGeoCoord(36.784630, 127.223815);
-        marker7.setMapPoint(mapPoint7);
-        // 기본으로 제공하는 BluePin 마커 모양.
-        marker7.setMarkerType((MapPOIItem.MarkerType.BluePin));
-        // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-        marker7.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
-        marker7.setShowCalloutBalloonOnTouch(false);
 
         mapView.addPOIItem(marker1);
         mapView.addPOIItem(marker2);
@@ -196,7 +185,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         mapView.addPOIItem(marker4);
         mapView.addPOIItem(marker5);
         mapView.addPOIItem(marker6);
-        mapView.addPOIItem(marker7);
     }
 
     public void onBack(View v) {

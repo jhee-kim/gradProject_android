@@ -90,7 +90,7 @@ public class PopupMapActivity extends Activity {
         int width = dm.widthPixels;
         int height = dm.heightPixels;
         WindowManager.LayoutParams params = this.getWindow().getAttributes();
-        params.y = 800;
+        params.y = (int)(height/3);
 
         //getWindow().setGravity(Gravity.BOTTOM);
         //getWindow().setGravity(Gravity);
