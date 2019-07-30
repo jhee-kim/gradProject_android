@@ -391,6 +391,7 @@ public class MainActivity extends AppCompatActivity {
             is_login = false;
 
             SharedPreferences.Editor editor = infoData.edit();
+            editor.clear();
             editor.putBoolean("IS_AUTOLOGIN", false);
             editor.apply();
 
