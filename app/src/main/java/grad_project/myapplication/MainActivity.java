@@ -196,11 +196,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Exhibition", result);
             JSONObject jResult = new JSONObject(result);
             JSONArray jArray = jResult.getJSONArray("result");
+            Log.d("ARRAY LENGTH", Integer.toString(jArray.length()));
             for (int i = 0; i < jArray.length(); i++) {
                 JSONObject jObject = jArray.getJSONObject(i);
                 exhibitionState[i] = jObject.getString("isOpen");
 
-                Log.d("EXHIBITION", exhibitionState[i]);
+                Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
             }
         } catch(Exception e) {
             e.printStackTrace();
