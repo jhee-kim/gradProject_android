@@ -179,15 +179,7 @@ public class RegistActivity extends AppCompatActivity {
 
     private void registrationInfo() {
         SharedPreferences.Editor editor = infoData.edit();
-        editor.putBoolean("IS_REGISTERED", true);
         editor.putBoolean("IS_AUTOLOGIN", true);
-        editor.putInt("DIVISION", i_division);
-        editor.putInt("PARTICIPATION", i_participation);
-        editor.putString("NUMBER", s_number);
-        editor.putString("NAME", s_name);
-        editor.putString("PHONE", s_phone);
-        editor.putString("DESTINATION", s_destination);
-        editor.putString("TEMPER", s_temper);
         editor.apply();
 
         InsertData task = new InsertData(this);
