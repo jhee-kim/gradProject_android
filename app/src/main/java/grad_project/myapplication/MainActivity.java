@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         GetIsStartTask startTask = new GetIsStartTask(this);
         try {
             String result = startTask.execute(GET_ISSTART, s_id).get();
-            is_start = result.equals("1");
+            is_start = !result.equals("0");
             Log.d("ISSTART", Boolean.toString(is_start));
         } catch (Exception e) {
             e.printStackTrace();
@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
         } catch(Exception e) {
             e.printStackTrace();
         }
+        editor.apply();
     }
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
@@ -408,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
             if (is_login) {
                 if (is_start) {
                     Intent intent = new Intent(MainActivity.this, NormalActivity.class);
-                    intent.putExtra("MuseumState",exhibitionState);
+                    intent.putExtra("MuseumState", exhibitionState);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(MainActivity.this, HelpActivity.class);
