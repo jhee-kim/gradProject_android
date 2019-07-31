@@ -22,19 +22,20 @@
     <string name="normal_part_str">일반 관람</string>
     <string name="explan_part_str">전시 해설</string>
     <string name="temper_str">소속</string>
-    <string name="temper_hint_str">소속 부대를 자세히 입력하세요</string>
+    <string name="temper_hint_str">소속 부대를 자세히 입력하세요.</string>
     <string name="army_str">육군</string>
     <string name="navy_str">해군</string>
     <string name="airforce_str">공군</string>
     <string name="mc_str">해병대</string>
     <string name="destination_str">행선지</string>
-    <string name="destination_hint_str">행선지를 입력하세요</string>
+    <string name="destination_hint_str">행선지를 입력하세요.</string>
     <string name="clause_str">이용 약관</string>
     <string name="clause_detail_1_str">개인정보 수집 및 활용</string>
     <string name="clause_detail_2_str">에 동의하십니까?</string>
     <string name="registration_apply_str">관람 등록</string>
     <string name="apply_str">네</string>
     <string name="cancel_str">아니오</string>
+    <string name="hyphen">-</string>
 
     <string name="name_popup_str">이름 : </string>
     <string name="number_popup_str">군번 : </string>
