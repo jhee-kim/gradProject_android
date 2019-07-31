@@ -1,13 +1,18 @@
 package grad_project.myapplication;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +35,8 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 ***** 도움말 *****
@@ -78,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
 //    public static final String GET_RSSID = BASE_PATH + "get_mac.php";                        //각 전시관 별 RSSI(JSON 형식) - ex) { "number": "1", "mac": "00:70:69:47:2F:30" }
 //    public static final String UPDATE_AUDIENCE = BASE_PATH + "update_audience.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
 
+    /***** 권한 *****/
+    private String[] permissions = {
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH
+    };
+    static final int MULTIPLE_PERMISSION = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
+        if (Build.VERSION.SDK_INT >= 23) {
+            checkPermissions();
+        }
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
         bt_registration = findViewById(R.id.bt_registration);
@@ -146,6 +164,37 @@ public class MainActivity extends AppCompatActivity {
         resumeActivity();
     }
 
+    private void checkPermissions() {
+        int result;
+        List<String> permissionList = new ArrayList<>();
+        for (String pm : permissions) {
+            result = ContextCompat.checkSelfPermission(this, pm);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(pm);
+            }
+        }
+        if (!permissionList.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionList.toArray(new String[permissionList.size()]), MULTIPLE_PERMISSION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == MULTIPLE_PERMISSION) {
+            if (grantResults.length > 0) {
+                for (int i = 0; i < permissions.length; i++) {
+                    if (permissions[i].equals(this.permissions[i])) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(getApplicationContext(), "권한 요청에 동의해주셔야 이용이 가능합니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "권한 요청에 동의해주셔야 이용이 가능합니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -161,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         GetIsStartTask startTask = new GetIsStartTask(this);
         try {
             String result = startTask.execute(GET_ISSTART, s_id).get();
-            is_start = result.equals("1");
+            is_start = !result.equals("0");
             Log.d("ISSTART", Boolean.toString(is_start));
         } catch (Exception e) {
             e.printStackTrace();
@@ -171,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
     // DB 전시관 및 전시해설 데이터 받아오기
     public void getExhibitionData() {
         // 전시관 오픈 여부
+        SharedPreferences.Editor editor = infoData.edit();
         GetExhibitionTask task = new GetExhibitionTask(this);
         try {
             String result = task.execute(GET_EXHIBITION).get();
@@ -182,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject jObject = jArray.getJSONObject(i);
                 exhibitionState[i] = jObject.getString("isOpen");
 
+                editor.putString("EXHIBITION_"+i, exhibitionState[i]);
                 Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
             }
         } catch(Exception e) {
@@ -198,11 +249,13 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject jObject = jArray.getJSONObject(i);
                 exhibitionQrCode[i] = jObject.getString("address");
 
+                editor.putString("EX_QR_"+i, exhibitionQrCode[i]);
                 Log.d("EXHIBITION_QRCODE", exhibitionQrCode[i]);
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
+        editor.apply();
     }
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
@@ -219,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
         if (is_login) {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(false);
+            bt_registration.setTextColor(getResources().getColor(R.color.disableButton));
             iv_registration.setEnabled(false);
             iv_registration.setColorFilter(Color.parseColor("#ffE0E0E0"), PorterDuff.Mode.SRC_IN);
 
@@ -250,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(true);
+            bt_registration.setTextColor(getResources().getColor(R.color.unfocusText));
             iv_registration.setEnabled(true);
             iv_registration.setColorFilter(null);
 
@@ -354,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
             if (is_login) {
                 if (is_start) {
                     Intent intent = new Intent(MainActivity.this, NormalActivity.class);
-                    intent.putExtra("MuseumState",exhibitionState);
+                    intent.putExtra("MuseumState", exhibitionState);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(MainActivity.this, HelpActivity.class);
@@ -402,7 +457,6 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(getApplicationContext(), "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
 
-//            resumeActivity();
             onRestart();
         }
     }

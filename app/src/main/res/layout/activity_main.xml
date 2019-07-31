@@ -59,17 +59,22 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/tv_name"
             android:scaleType="fitCenter"
-            android:background="@drawable/logo"
-            android:layout_marginBottom="20dp"/>
+            android:background="@drawable/logo"/>
 
         <Button
             android:id="@+id/bt_open_map"
-            android:layout_width="120dp"
-            android:layout_height="60dp"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/main_top_image"
+            android:layout_marginTop="30dp"
             android:onClick="onClick"
-            android:text="@string/start_str"/>
+            android:text="@string/start_str"
+            android:textSize="14sp"
+            android:textColor="@color/unfocusText"
+            android:fontFamily="@font/m_gothic_bold"
+            android:background="@drawable/custom_button"
+            style="?android:attr/borderlessButtonStyle"/>
 
         <Button
             android:id="@+id/bt_certificate"
@@ -80,7 +85,12 @@
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="15dp"
             android:onClick="onClick"
-            android:text="@string/certificate_str"/>
+            android:text="@string/certificate_str"
+            android:textSize="18sp"
+            android:textColor="@color/unfocusText"
+            android:fontFamily="@font/m_gothic_bold"
+            android:background="@drawable/custom_button"
+            style="?android:attr/borderlessButtonStyle"/>
 
         <Button
             android:id="@+id/bt_registration"
@@ -89,9 +99,14 @@
             android:layout_above="@+id/bt_certificate"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:onClick="onClick"
-            android:text="@string/registration_str"/>
+            android:text="@string/registration_str"
+            android:textSize="18sp"
+            android:textColor="@color/unfocusText"
+            android:fontFamily="@font/m_gothic_bold"
+            android:background="@drawable/custom_button"
+            style="?android:attr/borderlessButtonStyle"/>
 
     </RelativeLayout>
 

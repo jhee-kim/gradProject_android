@@ -10,5 +10,17 @@
         <item>019</item>
     </string-array>
 
+    <string-array name="number_head">
+        <item>19</item>
+        <item>18</item>
+        <item>17</item>
+        <item>16</item>
+    </string-array>
 
+    <string-array name="division_head">
+        <item>육군</item>
+        <item>해군</item>
+        <item>공군</item>
+        <item>해병대</item>
+    </string-array>
 </resources>
