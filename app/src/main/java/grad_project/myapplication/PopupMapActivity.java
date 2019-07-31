@@ -2,6 +2,7 @@ package grad_project.myapplication;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -44,35 +45,37 @@ public class PopupMapActivity extends Activity {
         MuseImage.setImageResource(R.drawable.ic_alarm_24dp);
 
         QR_Button = findViewById(R.id.QRbutton);
-
+        MuseTitle.setPaintFlags(MuseTitle.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
         switch (TagNumCheck) {
             case 1:
+                MuseImage.setImageResource(R.drawable.exhibit_img01);
                 Mus_Title = "제1전시관 겨레의뿌리";
-                Mus_Sub = "";
+                Mus_Sub = "제1관'겨레의뿌리'는 선사시대부터 조선시대 후기인 1860년대까지 우리 민족의 찬란한 문화유산과 불굴의 민족혼을 살펴볼 수 있습니다.";
                 break;
             case 2:
-                Mus_Title = "제2전시관 교체중";
-                Mus_Sub = "";
+                MuseImage.setImageResource(R.drawable.exhibit_img02);
+                Mus_Title = "제2전시관 겨례의시련";
+                Mus_Sub = "제2관'겨례의시련'은 우리 민족의 긴 역사가 일제의 침략으로 단절되고 국권을 상실한 일제강점기의 시련을 살펴볼 수 있습니다.";
                 break;
             case 3:
+                MuseImage.setImageResource(R.drawable.exhibit_img03);
                 Mus_Title = "제3전시관 겨레의함성";
-                Mus_Sub = "";
+                Mus_Sub = "제3관'겨레의함성'은 3·1운동과 대중투쟁에 참여했던 민중의 모습을 통해 우리 모두가 역사의 주인공임을 확인할 수 있는 전시관입니다.";
                 break;
             case 4:
+                MuseImage.setImageResource(R.drawable.exhibit_img04);
                 Mus_Title = "제4전시관 평화누리";
-                Mus_Sub = "";
+                Mus_Sub = "제4관'평화누리'는 민족의 자유와 독립을 위한 투쟁이자 인류 보편의 가치인 자유와 정의, 평화를 지향한 독립운동의 참뜻을 공감하고 나누는 공간입니다.";
                 break;
             case 5:
+                MuseImage.setImageResource(R.drawable.exhibit_img05);
                 Mus_Title = "제5전시관 나라되찾기";
-                Mus_Sub = "";
+                Mus_Sub = "제5관'나라되찾기'는 일제강점기 조국 독립을 되찾기 위해 국내외 각지에서 전개된 독립전쟁을 살펴볼 수 있습니다.";
                 break;
             case 6:
+                MuseImage.setImageResource(R.drawable.exhibit_img06);
                 Mus_Title = "제6전시관 새나라세우기";
-                Mus_Sub = "";
-                break;
-            case 7:
-                Mus_Title = "제7전시관 없음";
-                Mus_Sub = "";
+                Mus_Sub = "제6관'새나라세우기'는 일제강점기 민족문화 수호운동과 민중의 항일, 그리고 대한민국임시정부의 활동을 살펴볼 수 있습니다.";
                 break;
             case -1:
                 Mus_Title = "오류";
@@ -89,6 +92,9 @@ public class PopupMapActivity extends Activity {
 
         int width = dm.widthPixels;
         int height = dm.heightPixels;
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.gravity = Gravity.BOTTOM;
+        params.y = 400;
 
         getWindow().setLayout((int)(width*0.95), (int)(height * 0.2));
     }

@@ -8,42 +8,43 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        app:srcCompat="@drawable/edit" />
+        android:adjustViewBounds="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
 
     <Button
         android:id="@+id/QRbutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="300dp"
-        android:layout_marginTop="110dp"
-        android:background="#673AB7"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
         android:onClick="QRClick"
+        android:textSize="15sp"
         android:text="QR" />
 
-    <EditText
+    <TextView
         android:id="@+id/museumTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="15"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="140dp"
-        android:inputType="text"
+        android:layout_marginStart="150dp"
+        android:layout_marginEnd="10dp"
         android:background="@null"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:text="건물이름" />
 
-    <EditText
+    <TextView
         android:id="@+id/museumSub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="15"
-        android:layout_marginTop="50dp"
-        android:layout_marginStart="140dp"
-        android:inputType="text"
+        android:singleLine = "false"
+        android:layout_marginTop="35dp"
+        android:layout_marginStart="150dp"
+        android:layout_marginEnd="10dp"
         android:background="@null"
         android:textSize="12sp"
-        android:text="시간" />
+        android:text="건물설명" />
 </RelativeLayout>

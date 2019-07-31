@@ -3,11 +3,13 @@ package grad_project.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -28,13 +30,12 @@ public class PopupTimeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
 
         Intent intent = getIntent();
         startDate = intent.getLongExtra("Time", 0);
 
         setContentView(R.layout.popup_time);
-
+        //mChronometer.setTextColor(Color.RED);
 
         mChronometer = (Chronometer)findViewById(R.id.chronometer);
         //time 초기화
@@ -43,7 +44,8 @@ public class PopupTimeActivity extends Activity {
             public void onChronometerTick(Chronometer cArg) {
                 long now = System.currentTimeMillis() - 9*60*60*1000;
                 long time = now - startDate;
-                cArg.setText(DateFormat.format("kk:mm:ss", time));
+                //if(time >= 2*60*60*1000) {mChronometer.setTextColor(Color.RED);}
+                cArg.setText(DateFormat.format("관람시간 kk:mm:ss", time));
             }
         });
         mChronometer.start();
@@ -53,17 +55,12 @@ public class PopupTimeActivity extends Activity {
 
         int width = dm.widthPixels;
         int height = dm.heightPixels;
-
+        getWindow().setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
         getWindow().setLayout((int)(width*0.95), (int)(height * 0.2));
     }
-
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(0,0);
     }
 }

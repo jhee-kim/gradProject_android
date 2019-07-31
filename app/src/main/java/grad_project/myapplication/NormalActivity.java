@@ -281,6 +281,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         Intent intent = new Intent(NormalActivity.this, PopupTimeActivity.class);
         intent.putExtra("Time", startDate);
         startActivity(intent);
+        overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
     }
 
     // 전시관 오픈 여부 받아오는 부분
