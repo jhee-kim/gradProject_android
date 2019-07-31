@@ -19,22 +19,31 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class PopupTimeActivity extends Activity {
     private Chronometer mChronometer;
-
-
+    Long startDate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
 
+        Intent intent = getIntent();
+        startDate = intent.getLongExtra("Time", 0);
+
         setContentView(R.layout.popup_time);
 
+
         mChronometer = (Chronometer)findViewById(R.id.chronometer);
-        mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+        //time 초기화
+        mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener(){
+            @Override
             public void onChronometerTick(Chronometer cArg) {
-                long t = SystemClock.elapsedRealtime() - cArg.getBase();
-                cArg.setText(DateFormat.format("kk:mm:ss", t));
+                long now = System.currentTimeMillis() - 9*60*60*1000;
+                long time = now - startDate;
+                cArg.setText(DateFormat.format("kk:mm:ss", time));
             }
         });
         mChronometer.start();
@@ -44,11 +53,17 @@ public class PopupTimeActivity extends Activity {
 
         int width = dm.widthPixels;
         int height = dm.heightPixels;
-        WindowManager.LayoutParams params = this.getWindow().getAttributes();
-        params.y = 100;
 
-        //getWindow().setGravity(Gravity.BOTTOM);
         getWindow().setLayout((int)(width*0.95), (int)(height * 0.2));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

@@ -35,8 +35,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
 
 /*
 ***** 도움말 *****
@@ -69,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     Button bt_openMap, bt_registration, bt_certificate;
     RelativeLayout bt_openMenu, bt_closeMenu;
     LinearLayout bt_viewtime, bt_myinfo, bt_certificate_2, bt_registration_2, bt_homepage, bt_information;
+    Long startDate;
     private boolean is_start = false;
 //    private boolean is_finish = false;    // 차후 구현 예정
     private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
@@ -211,7 +211,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             String result = startTask.execute(GET_ISSTART, s_id).get();
             is_start = !result.equals("0");
-            Log.d("ISSTART", Boolean.toString(is_start));
+            SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            startDate = df.parse(result).getTime();
+            Log.d("ISSTART", String.valueOf(startDate));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -409,7 +411,9 @@ public class MainActivity extends AppCompatActivity {
             if (is_login) {
                 if (is_start) {
                     Intent intent = new Intent(MainActivity.this, NormalActivity.class);
-                    intent.putExtra("MuseumState", exhibitionState);
+                    intent.putExtra("MuseumState",exhibitionState);
+                    intent.putExtra("Time", startDate);
+
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(MainActivity.this, HelpActivity.class);
