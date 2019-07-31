@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -18,6 +17,9 @@ import net.daum.mf.map.api.MapView;
 public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener {
     private SharedPreferences infoData;
     private boolean[] isCheckQrArr = new boolean[6];
+    String[] exhibitState;
+    Long startDate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,10 +34,13 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             actionBar.hide();
         }
 
+        Intent intent = getIntent();
+        exhibitState = intent.getStringArrayExtra("MuseumState");
+        startDate = intent.getLongExtra("Time", 0);
+
         MapView mapView = new MapView(this);
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
 
-        //테스트 1
         setMuseMarkers(mapView);
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
@@ -75,9 +80,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.783564, 127.223225), 1, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
-
-        Intent intent = getIntent();
-        String[] exhibitState = intent.getStringArrayExtra("MuseumState");
 
         MapPOIItem marker1 = new MapPOIItem();
         marker1.setItemName("제1전시관");        //눌렀을때 말풍선
@@ -219,6 +221,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
     public void timeOn(View view) {
         Intent intent = new Intent(NormalActivity.this, PopupTimeActivity.class);
+        intent.putExtra("Time", startDate);
         startActivity(intent);
     }
 
