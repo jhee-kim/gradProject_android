@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Timer;
 
 public class HelpActivity extends AppCompatActivity {
@@ -28,6 +29,7 @@ public class HelpActivity extends AppCompatActivity {
     private static int MESSAGE_TIMER_START = 100;
     private boolean is_start = false;
     private String s_id;
+    Long startDate;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -62,22 +64,10 @@ public class HelpActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onDestroy() {
+        super.onDestroy();
 
-        GetIsStartTask startTask = new GetIsStartTask(HelpActivity.this);
-        try {
-            String result = startTask.execute(GET_ISSTART, s_id).get();
-            is_start = !result.equals("0");
-            if (is_start) {
-                Intent intent = new Intent(HelpActivity.this, NormalActivity.class);
-                startActivity(intent);
-                finish();
-            }
-            Log.d("HELP_ISSTART", Boolean.toString(is_start));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        timerhandler.removeMessages(MESSAGE_TIMER_START);
 
     }
 
@@ -87,13 +77,30 @@ public class HelpActivity extends AppCompatActivity {
         }
     }
 
+    // 3초 단위로 시작 여부 서버에서 받아옴
+    // 관람 시작되었을 경우 자동으로 맵 액티비티로 넘어감
     private class TimerHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
             if  (msg.what == MESSAGE_TIMER_START) {
-                onResume();
+                GetIsStartTask startTask = new GetIsStartTask(HelpActivity.this);
+                try {
+                    String result = startTask.execute(GET_ISSTART, s_id).get();
+                    is_start = !result.equals("0");
+                    if (is_start) {
+                        SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        startDate = df.parse(result).getTime();
+                        Intent intent = new Intent(HelpActivity.this, NormalActivity.class);
+                        intent.putExtra("Time", startDate);
+                        startActivity(intent);
+                        finish();
+                    }
+                    Log.d("ISSTART", Boolean.toString(is_start));
+                    Log.d("ISSTART", String.valueOf(startDate));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                Log.d("TIMER", Boolean.toString(is_start));
                 this.sendEmptyMessageDelayed(MESSAGE_TIMER_START, 3000);
             }
         }
@@ -102,7 +109,6 @@ public class HelpActivity extends AppCompatActivity {
     // 관람 시작 여부 받아오는 부분
     public static class GetIsStartTask extends AsyncTask<String, Void, String> {
         private WeakReference<HelpActivity> activityReference;
-        ProgressDialog progressDialog;
 
         GetIsStartTask(HelpActivity context) {
             activityReference = new WeakReference<>(context);
@@ -110,13 +116,10 @@ public class HelpActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
         }
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            progressDialog.dismiss();
             /*출력값*/
         }
         @Override
