@@ -33,6 +33,12 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
     private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
 //    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
+    MapPOIItem marker1;
+    MapPOIItem marker2;
+    MapPOIItem marker3;
+    MapPOIItem marker4;
+    MapPOIItem marker5;
+    MapPOIItem marker6;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -88,6 +94,15 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         loadInfo();
     }
 
+    // 저장된 값 가져오기
+    private void loadInfo() {
+        for(int i = 0 ; i < 6 ; i++) {
+            int num = i + 1;
+            isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);    //true 없으면 false로
+            Log.d(num + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
+        }
+    }
+
     // DB 전시관 및 전시해설 데이터 받아오기
     public void getExhibitionData() {
         // 전시관 오픈 여부
@@ -123,15 +138,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
-    // 저장된 값 가져오기
-    private void loadInfo() {
-        for(int i = 0 ; i < 6 ; i++) {
-            int num = i + 1;
-            isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);    //true 없으면 false로
-            Log.d(num + "전시관 QR체크여부 : ", isCheckQrArr[i] + "");
-        }
-    }
-
     public void setMuseMarkers(MapView mapView){
 
         ViewGroup mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
@@ -139,7 +145,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
 
-        MapPOIItem marker1 = new MapPOIItem();
+        marker1 = new MapPOIItem();
         marker1.setItemName("제1전시관");        //눌렀을때 말풍선
         marker1.setTag(1);
 
@@ -157,7 +163,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         //marker1.getMapPoint();
 
 
-        MapPOIItem marker2 = new MapPOIItem();
+        marker2 = new MapPOIItem();
         marker2.setItemName("제2전시관");
         marker2.setTag(2);
 
@@ -174,7 +180,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         marker2.setShowCalloutBalloonOnTouch(false);
 
 
-        MapPOIItem marker3 = new MapPOIItem();
+        marker3 = new MapPOIItem();
         marker3.setItemName("제3전시관");        //눌렀을때 말풍선
         marker3.setTag(3);
 
@@ -193,7 +199,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
 
 
-        MapPOIItem marker4 = new MapPOIItem();
+        marker4 = new MapPOIItem();
         marker4.setItemName("제4전시관");        //눌렀을때 말풍선
         marker4.setTag(4);
 
@@ -208,7 +214,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         marker4.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker4.setShowCalloutBalloonOnTouch(false);
 
-        MapPOIItem marker5 = new MapPOIItem();
+        marker5 = new MapPOIItem();
         marker5.setItemName("제5전시관");        //눌렀을때 말풍선
         marker5.setTag(5);
 
@@ -223,7 +229,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         marker5.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         marker5.setShowCalloutBalloonOnTouch(false);
 
-        MapPOIItem marker6 = new MapPOIItem();
+        marker6 = new MapPOIItem();
         marker6.setItemName("제6전시관");        //눌렀을때 말풍선
         marker6.setTag(6);
 
@@ -259,6 +265,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         int TagNum = mapPOIItem.getTag();
         Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
         intent.putExtra("TagNum", TagNum);
+        intent.putExtra("exhibitionQrCode", exhibitionQrCode);
         startActivity(intent);
     }
 
