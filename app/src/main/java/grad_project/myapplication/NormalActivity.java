@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -81,20 +82,43 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         super.onResume();
         Intent intent = getIntent();
         int result = intent.getIntExtra("finish_exhibition_num", -1);
-        if(result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
-            SharedPreferences.Editor editor = infoData.edit();  //해당 전시관에 대한 정보를 공유변수에 저장
-            editor.putBoolean("IS_CHECK_" + result, true);
-            editor.apply();
-        }
+        boolean isAlreadyCheckQr = false;
+
         loadInfo();
+        if(result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
+            for(int i = 0 ; i < 6 ; i++) {
+                if(isCheckQrArr[result - 1] == true) {
+                    Toast.makeText(getApplicationContext(), "이미 찍은 QR코드 입니다.", Toast.LENGTH_LONG).show();
+                    isAlreadyCheckQr = true;
+                    break;
+                }
+            }
+            if(isAlreadyCheckQr == false) {
+                Toast.makeText(getApplicationContext(), result + "전시관의 QR코드와 일치합니다!", Toast.LENGTH_LONG).show();
+                SharedPreferences.Editor editor = infoData.edit();  //해당 전시관에 대한 정보를 공유변수에 저장
+                editor.putBoolean("IS_CHECK_" + result, true);
+                editor.apply();
+                isCheckQrArr[result - 1] = true;
+            }
+        }
+        for(int i = 0 ; i < 6 ; i++) {
+            Log.d((i + 1) + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
+        }
+        changePointColorByCheckQr();
+    }
+    public void changePointColorByCheckQr() {
+        for(int i = 0 ; i < 6 ; i++) {
+            if(isCheckQrArr[i] == true) {
+                markerArr[i].setMarkerType((MapPOIItem.MarkerType.RedPin));
+            }
+        }
     }
 
     // 저장된 값 가져오기
-    private void loadInfo() {
+    public void loadInfo() {
         for(int i = 0 ; i < 6 ; i++) {
             int num = i + 1;
             isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);    //true 없으면 false로
-            Log.d(num + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
         }
     }
 
@@ -160,7 +184,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             else if(exhibitionState[i].equals("0"))
                 markerArr[i].setMarkerType((MapPOIItem.MarkerType.YellowPin));
             // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-            markerArr[i].setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+            //markerArr[i].setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
             markerArr[i].setShowCalloutBalloonOnTouch(false);
 
             mapView.addPOIItem(markerArr[i]);
@@ -176,10 +200,12 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     //팝업 띄우기
     @Override
     public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
-        int TagNum = mapPOIItem.getTag();
+        int tagNum = mapPOIItem.getTag();
+        Log.d("Debug_TagNum", tagNum + "");
         Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
-        intent.putExtra("TagNum", TagNum);
+        intent.putExtra("TagNum", tagNum);
         intent.putExtra("exhibitionQrCode", exhibitionQrCode);
+        intent.putExtra("exhibitionState", exhibitionState[tagNum - 1]);
         startActivity(intent);
     }
 

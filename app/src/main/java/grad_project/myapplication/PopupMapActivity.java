@@ -127,8 +127,6 @@ public class PopupMapActivity extends Activity {
                 Log.d("QR_URL : ", qrUrl);
                 int resultExhibitionNum = findCorrespondExhibition(qrUrl);
                 if(resultExhibitionNum >= 1 && resultExhibitionNum <= 6) {
-                    Toast.makeText(getApplicationContext(), resultExhibitionNum + "전시관의 QR코드와 일치합니다!", Toast.LENGTH_LONG).show();
-
                     //Intent로 찍힌 QR코드 전시관 번호 보내기(1~6)
                     Intent intent = new Intent(PopupMapActivity.this, NormalActivity.class);
                     intent.putExtra("finish_exhibition_num",resultExhibitionNum); /*송신*/
