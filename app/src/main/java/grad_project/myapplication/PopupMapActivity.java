@@ -24,7 +24,7 @@ public class PopupMapActivity extends Activity {
     String Mus_Title, Mus_Sub;
     Button QR_Button;
     private IntentIntegrator qrScan;
-    private String[] qrArr = {"1", "2", "3", "4", "5", "6"};
+    private String[] qrCodeUrlArr = new String[6];
 
 
     @Override
@@ -35,6 +35,7 @@ public class PopupMapActivity extends Activity {
 
         Intent intent = getIntent();
         int TagNumCheck = intent.getIntExtra("TagNum", -1);
+        qrCodeUrlArr = intent.getStringArrayExtra("exhibitionQrCode");
 
         //인텐트로 각 qr URL 받아서 qrArr 배열에 저장
 
@@ -115,12 +116,12 @@ public class PopupMapActivity extends Activity {
         // result.getFormatName() : 바코드 종류
         // result.getContents() : 바코드 값
         String qrUrl = result.getContents();
-        Log.d("QR_URL : ", qrUrl);
 
         if (qrUrl == null) {
-            Toast.makeText(getApplicationContext(), "내용이 존재하지 않습니다.", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "내용이 존재하지 않습니다.", Toast.LENGTH_LONG).show();
         } else { //QR코드, 내용 존재
             try {
+                Log.d("QR_URL : ", qrUrl);
                 int resultExhibitionNum = findCorrespondExhibition(qrUrl);
                 if(resultExhibitionNum >= 1 && resultExhibitionNum <= 6) {
                     Toast.makeText(getApplicationContext(), resultExhibitionNum + "전시관의 QR코드와 일치합니다!", Toast.LENGTH_LONG).show();
@@ -144,7 +145,7 @@ public class PopupMapActivity extends Activity {
     public int findCorrespondExhibition(String qrUrl) { //QR코드를 비교, 일치하는 전시관이 있으면 전시관 번호 반환 / 아니면 -1 반환
         int resultExhibition = -1;
         for(int i = 0 ; i < 6 ; i++) {   //URL 비교(전체 전시관)
-            if(qrUrl.equals(qrArr[i])) {
+            if(qrUrl.equals(qrCodeUrlArr[i])) {
                 resultExhibition = i + 1;
                 Log.d("Debug i : ", qrUrl);
                 break;
