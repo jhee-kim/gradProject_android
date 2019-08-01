@@ -66,6 +66,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
 
         getExhibitionData();
+        loadInfo();
+        getPopupMapIntent();
         setMuseMarkers(mapView);
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
@@ -77,14 +79,10 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public void getPopupMapIntent() {
         Intent intent = getIntent();
         int result = intent.getIntExtra("finish_exhibition_num", -1);
         boolean isAlreadyCheckQr = false;
-
-        loadInfo();
         if(result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
             for(int i = 0 ; i < 6 ; i++) {
                 if(isCheckQrArr[result - 1] == true) {
@@ -103,14 +101,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
         for(int i = 0 ; i < 6 ; i++) {
             Log.d((i + 1) + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
-        }
-        changePointColorByCheckQr();
-    }
-    public void changePointColorByCheckQr() {
-        for(int i = 0 ; i < 6 ; i++) {
-            if(isCheckQrArr[i] == true) {
-                markerArr[i].setMarkerType((MapPOIItem.MarkerType.RedPin));
-            }
         }
     }
 
@@ -179,10 +169,13 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             markerArr[i].setMapPoint(mapPointArr[i]);
 
             // 기본으로 제공하는 BluePin 마커 모양.
-            if(exhibitionState[i].equals("1"))
-                markerArr[i].setMarkerType(MapPOIItem.MarkerType.BluePin);
-            else if(exhibitionState[i].equals("0"))
+
+            if(exhibitionState[i].equals("0"))
                 markerArr[i].setMarkerType((MapPOIItem.MarkerType.YellowPin));
+            else if(isCheckQrArr[i] == true)            //이미 찍은 QR코드의 전시관을 빨강으로 표시
+                markerArr[i].setMarkerType((MapPOIItem.MarkerType.RedPin));
+            else if(exhibitionState[i].equals("1"))
+                markerArr[i].setMarkerType(MapPOIItem.MarkerType.BluePin);
             // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
             //markerArr[i].setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
             markerArr[i].setShowCalloutBalloonOnTouch(false);
