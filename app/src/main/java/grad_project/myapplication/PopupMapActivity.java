@@ -24,6 +24,7 @@ public class PopupMapActivity extends Activity {
     Button QR_Button;
     private IntentIntegrator qrScan;
     private String[] qrCodeUrlArr = new String[6];
+    private String exhibitionState; //해당 전시관이 열렸는지 여부
 
 
     @Override
@@ -35,6 +36,7 @@ public class PopupMapActivity extends Activity {
         Intent intent = getIntent();
         int TagNumCheck = intent.getIntExtra("TagNum", -1);
         qrCodeUrlArr = intent.getStringArrayExtra("exhibitionQrCode");
+        exhibitionState = intent.getStringExtra("exhibitionState");
 
         //인텐트로 각 qr URL 받아서 qrArr 배열에 저장
 
@@ -45,6 +47,7 @@ public class PopupMapActivity extends Activity {
         MuseImage.setImageResource(R.drawable.ic_alarm_24dp);
 
         QR_Button = findViewById(R.id.QRbutton);
+        setQrButton();
 
         switch (TagNumCheck) {
             case 1:
@@ -92,6 +95,12 @@ public class PopupMapActivity extends Activity {
         int height = dm.heightPixels;
 
         getWindow().setLayout((int)(width*0.95), (int)(height * 0.2));
+    }
+
+    public void setQrButton() {     //열리지 않은 전시관의 QR버튼이 나타나지 않도록
+        if(exhibitionState.equals("0")) {
+            QR_Button.setVisibility(View.GONE);
+        }
     }
 
     //QR을 위한 액티비티 연결 필요
