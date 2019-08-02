@@ -43,10 +43,13 @@ public class PopupTimeActivity extends Activity {
         mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener(){
             @Override
             public void onChronometerTick(Chronometer cArg) {
-                long now = System.currentTimeMillis() - 9*60*60*1000;
+                long now = System.currentTimeMillis();
                 long time = now - startDate;
-                //if() {mChronometer.setTextColor(Color.parseColor("#FF0000"));}
-                cArg.setText(DateFormat.format("kk:mm:ss", time));
+                Log.d("now: ", String.valueOf(now));
+                Log.d("starDate : ", String.valueOf(startDate));
+                Log.d("TIME : ", String.valueOf(time));
+                if(time >= 2*60*60*1000) {mChronometer.setTextColor(Color.parseColor("#FF0000"));}
+                cArg.setText(DateFormat.format("kk:mm:ss", time-9*60*60*1000));
             }
         });
         mChronometer.start();

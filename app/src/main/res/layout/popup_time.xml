@@ -6,7 +6,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_visit_time"
         android:background="@color/colorPrimary" >
 
         <TextView
@@ -15,6 +16,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_gravity="center_horizontal"
+            android:fontFamily="@font/m_gothic_bold"
             android:text="관람시간"
             android:textSize="40sp"
             android:textColor="#FFFFFF" />
@@ -24,7 +26,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp">
+        android:layout_below="@id/layout_visit_time">
 
         <Chronometer
             android:id="@+id/chronometer"
