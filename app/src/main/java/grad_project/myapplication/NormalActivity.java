@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -18,6 +19,9 @@ import net.daum.mf.map.api.MapView;
 public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener {
     private SharedPreferences infoData;
     private boolean[] isCheckQrArr = new boolean[6];
+    String[] exhibitState;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +35,9 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         } else {
             actionBar.hide();
         }
+
+        Intent intent = getIntent();
+        exhibitState = intent.getStringArrayExtra("MuseumState");
 
         MapView mapView = new MapView(this);
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
@@ -76,8 +83,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
 
-        Intent intent = getIntent();
-        String[] exhibitState = intent.getStringArrayExtra("MuseumState");
 
         MapPOIItem marker1 = new MapPOIItem();
         marker1.setItemName("제1전시관");        //눌렀을때 말풍선
@@ -209,9 +214,14 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     @Override
     public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
         int TagNum = mapPOIItem.getTag();
-        Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
-        intent.putExtra("TagNum", TagNum);
-        startActivity(intent);
+        if (exhibitState[(TagNum-1)].equals("1")) {
+            Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
+            intent.putExtra("TagNum", TagNum);
+            startActivity(intent);
+        } else {
+            final Toast toast = Toast.makeText(getApplicationContext(), "이 전시실은 닫혀있습니다.", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, 300);
+        }
     }
 
     @Override

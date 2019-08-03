@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         GetIsStartTask startTask = new GetIsStartTask(this);
         try {
             String result = startTask.execute(GET_ISSTART, s_id).get();
-            is_start = result.equals("1");
+            is_start = !result.equals("0");
             Log.d("ISSTART", Boolean.toString(is_start));
         } catch (Exception e) {
             e.printStackTrace();

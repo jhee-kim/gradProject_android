@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -81,6 +80,7 @@ public class PopupMapActivity extends Activity {
         }
 
         MuseTitle.setText(Mus_Title);
+        MuseTitle.setClickable(false);
         MuseSub.setText(Mus_Sub);
 
 
@@ -90,7 +90,7 @@ public class PopupMapActivity extends Activity {
         int width = dm.widthPixels;
         int height = dm.heightPixels;
         WindowManager.LayoutParams params = this.getWindow().getAttributes();
-        params.y = 800;
+        params.y = (int) (height/3);
 
         //getWindow().setGravity(Gravity.BOTTOM);
         //getWindow().setGravity(Gravity);
