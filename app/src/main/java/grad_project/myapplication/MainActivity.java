@@ -1,13 +1,18 @@
 package grad_project.myapplication;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,9 +25,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,6 +32,9 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 ***** 도움말 *****
@@ -62,21 +67,23 @@ public class MainActivity extends AppCompatActivity {
     Button bt_openMap, bt_registration, bt_certificate;
     RelativeLayout bt_openMenu, bt_closeMenu;
     LinearLayout bt_viewtime, bt_myinfo, bt_certificate_2, bt_registration_2, bt_homepage, bt_information;
+    Long startDate;
     private boolean is_start = false;
 //    private boolean is_finish = false;    // 차후 구현 예정
-    private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
-    private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
-//    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
     public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
-//    public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";            //관람등록시 전시해설 on/oof 여부(해설자 스케줄 확인)  - 미구현
-    public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";          //각 전시관 별 개설 여부(JSON 형식) - ex) { "number": "1", "isOpen": "1" }
-    public static final String GET_QR = BASE_PATH + "get_qr.php";                              //각 전시관 별 qr코드 파일 위치(JSON 형식) - ex) { "number": "1", "address": "http://35.221.108.183/QR/1.png" }
-//    public static final String GET_RSSID = BASE_PATH + "get_mac.php";                        //각 전시관 별 RSSI(JSON 형식) - ex) { "number": "1", "mac": "00:70:69:47:2F:30" }
 //    public static final String UPDATE_AUDIENCE = BASE_PATH + "update_audience.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
+
+    /***** 권한 *****/
+    private String[] permissions = {
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH
+    };
+    static final int MULTIPLE_PERMISSION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
+        if (Build.VERSION.SDK_INT >= 23) {
+            checkPermissions();
+        }
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
         bt_registration = findViewById(R.id.bt_registration);
@@ -142,8 +152,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        getExhibitionData();
         resumeActivity();
+    }
+
+    private void checkPermissions() {
+        int result;
+        List<String> permissionList = new ArrayList<>();
+        for (String pm : permissions) {
+            result = ContextCompat.checkSelfPermission(this, pm);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(pm);
+            }
+        }
+        if (!permissionList.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionList.toArray(new String[permissionList.size()]), MULTIPLE_PERMISSION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == MULTIPLE_PERMISSION) {
+            if (grantResults.length > 0) {
+                for (int i = 0; i < permissions.length; i++) {
+                    if (permissions[i].equals(this.permissions[i])) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(getApplicationContext(), "권한 요청에 동의해주셔야 이용이 가능합니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "권한 요청에 동의해주셔야 이용이 가능합니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -162,48 +202,16 @@ public class MainActivity extends AppCompatActivity {
         try {
             String result = startTask.execute(GET_ISSTART, s_id).get();
             is_start = !result.equals("0");
-            Log.d("ISSTART", Boolean.toString(is_start));
+            if (is_start) {
+                SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                startDate = df.parse(result).getTime();
+            }
+            Log.d("ISSTART", String.valueOf(startDate));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // DB 전시관 및 전시해설 데이터 받아오기
-    public void getExhibitionData() {
-        // 전시관 오픈 여부
-        GetExhibitionTask task = new GetExhibitionTask(this);
-        try {
-            String result = task.execute(GET_EXHIBITION).get();
-            Log.d("Exhibition", result);
-            JSONObject jResult = new JSONObject(result);
-            JSONArray jArray = jResult.getJSONArray("result");
-            Log.d("ARRAY LENGTH", Integer.toString(jArray.length()));
-            for (int i = 0; i < jArray.length(); i++) {
-                JSONObject jObject = jArray.getJSONObject(i);
-                exhibitionState[i] = jObject.getString("isOpen");
-
-                Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-        // 전시관 QR코드
-        GetExhibitionQrTask qrTask = new GetExhibitionQrTask(this);
-        try {
-            String result = qrTask.execute(GET_QR).get();
-            JSONObject jResult = new JSONObject(result);
-            JSONArray jArray = jResult.getJSONArray("result");
-            for (int i = 0; i < jArray.length(); i++) {
-                JSONObject jObject = jArray.getJSONObject(i);
-                exhibitionQrCode[i] = jObject.getString("address");
-
-                Log.d("EXHIBITION_QRCODE", exhibitionQrCode[i]);
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
         final ImageView iv_registration = findViewById(R.id.iv_registration);
@@ -219,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
         if (is_login) {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(false);
+            bt_registration.setTextColor(getResources().getColor(R.color.disableButton));
             iv_registration.setEnabled(false);
             iv_registration.setColorFilter(Color.parseColor("#ffE0E0E0"), PorterDuff.Mode.SRC_IN);
 
@@ -250,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(true);
+            bt_registration.setTextColor(getResources().getColor(R.color.unfocusText));
             iv_registration.setEnabled(true);
             iv_registration.setColorFilter(null);
 
@@ -354,7 +364,8 @@ public class MainActivity extends AppCompatActivity {
             if (is_login) {
                 if (is_start) {
                     Intent intent = new Intent(MainActivity.this, NormalActivity.class);
-                    intent.putExtra("MuseumState",exhibitionState);
+                    intent.putExtra("Time", startDate);
+
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(MainActivity.this, HelpActivity.class);
@@ -531,110 +542,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 */
-    // 전시관 오픈 여부 받아오는 부분
-    public static class GetExhibitionTask extends AsyncTask<String, Void, String> {
-        private WeakReference<MainActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetExhibitionTask(MainActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-    }
-
-    // 전시관 QR코드 정보 받아오는 부분
-    public static class GetExhibitionQrTask extends AsyncTask<String, Void, String> {
-        private WeakReference<MainActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetExhibitionQrTask(MainActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-    }
 }
 

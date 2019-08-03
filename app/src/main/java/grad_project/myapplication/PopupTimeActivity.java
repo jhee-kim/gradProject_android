@@ -3,11 +3,13 @@ package grad_project.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,22 +21,35 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class PopupTimeActivity extends Activity {
     private Chronometer mChronometer;
-
-
+    Long startDate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
+
+        Intent intent = getIntent();
+        startDate = intent.getLongExtra("Time", 0);
 
         setContentView(R.layout.popup_time);
-
         mChronometer = (Chronometer)findViewById(R.id.chronometer);
-        mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+
+        //time 초기화
+        mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener(){
+            @Override
             public void onChronometerTick(Chronometer cArg) {
-                long t = SystemClock.elapsedRealtime() - cArg.getBase();
-                cArg.setText(DateFormat.format("kk:mm:ss", t));
+                long now = System.currentTimeMillis();
+                long time = now - startDate;
+                Log.d("now: ", String.valueOf(now));
+                Log.d("starDate : ", String.valueOf(startDate));
+                Log.d("TIME : ", String.valueOf(time));
+                if(time >= 2*60*60*1000) {mChronometer.setTextColor(Color.parseColor("#FF0000"));}
+                cArg.setText(DateFormat.format("kk:mm:ss", time-9*60*60*1000));
             }
         });
         mChronometer.start();
@@ -44,11 +59,12 @@ public class PopupTimeActivity extends Activity {
 
         int width = dm.widthPixels;
         int height = dm.heightPixels;
-        WindowManager.LayoutParams params = this.getWindow().getAttributes();
-        params.y = 100;
-
-        //getWindow().setGravity(Gravity.BOTTOM);
-        getWindow().setLayout((int)(width*0.95), (int)(height * 0.2));
+        getWindow().setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+        getWindow().setLayout((int)(width*0.8), (int)(height * 0.2));
     }
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(0,0);
+    }
 }

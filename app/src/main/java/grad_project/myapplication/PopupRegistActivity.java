@@ -3,6 +3,7 @@ package grad_project.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -82,25 +83,27 @@ public class PopupRegistActivity extends Activity {
         tv_participation.setText(s_participation);
         tv_destination.setText(s_destination);
 
-//        ll_buttons.setVisibility(View.INVISIBLE);
-//        bt_apply.setEnabled(false);
-//        bt_cancel.setEnabled(false);
-//        tv_question.setText("입력하신 내용을 확인해주세요.");
-//
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        tv_question.setText("정확하게 입력하셨나요?");
-//                        ll_buttons.setVisibility(View.VISIBLE);
-//                        bt_apply.setEnabled(true);
-//                        bt_cancel.setEnabled(true);
-//                    }
-//                }, 5000);
-//            }
-//        });
+        bt_apply.setEnabled(false);
+        bt_cancel.setEnabled(false);
+        tv_question.setText("입력하신 내용을 확인해주세요.");
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv_question.setText("정확하게 입력하셨나요?");
+                        bt_apply.setBackgroundColor(getResources().getColor(R.color.applyButton));
+                        bt_apply.setTextColor(getResources().getColor(R.color.unfocusText));
+                        bt_cancel.setBackgroundColor(getResources().getColor(R.color.cancelButton));
+                        bt_cancel.setTextColor(getResources().getColor(R.color.unfocusText));
+                        bt_apply.setEnabled(true);
+                        bt_cancel.setEnabled(true);
+                    }
+                }, 5000);
+            }
+        });
     }
 
     @Override

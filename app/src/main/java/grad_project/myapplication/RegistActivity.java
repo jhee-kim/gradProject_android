@@ -9,10 +9,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -25,14 +27,21 @@ import java.net.URL;
 
 public class RegistActivity extends AppCompatActivity {
     private SharedPreferences infoData;
+    private String s_id;
     private String s_name = "";
     private int i_division = -1;
     private int i_participation = -1;
     private String s_temper = "";
     private String s_number = "";
+    private String s_number_0 = "";
+    private String s_number_1 = "";
     private String s_phone = "";
+    private String s_phone_0 = "";
+    private String s_phone_1 = "";
+    private String s_phone_2 = "";
     private String s_destination = "";
-    EditText et_name, et_temper, et_number, et_phone, et_destination;
+    EditText et_name, et_temper, et_number_1, et_phone_1, et_phone_2, et_destination;
+    Spinner sp_number_0, sp_phone_0, sp_division;
     CheckBox cb_check;
     RadioGroup rg_participation, rg_division;
 
@@ -54,14 +63,38 @@ public class RegistActivity extends AppCompatActivity {
 
         et_name = findViewById(R.id.et_name);
         et_temper = findViewById(R.id.et_temper);
-        et_number = findViewById(R.id.et_number);
-        et_phone = findViewById(R.id.et_phone);
+        sp_number_0 = findViewById(R.id.sp_number_0);
+        et_number_1 = findViewById(R.id.et_number_1);
+        sp_phone_0 = findViewById(R.id.sp_phone_0);
+        et_phone_1 = findViewById(R.id.et_phone_1);
+        et_phone_2 = findViewById(R.id.et_phone_2);
         et_destination = findViewById(R.id.et_destination);
         cb_check = findViewById(R.id.cb_check);
-
+        sp_division = findViewById(R.id.sp_division);
         rg_participation = findViewById(R.id.rg_participation);
-        rg_division = findViewById(R.id.rg_division);
 
+        sp_number_0.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                s_number_0 = parent.getItemAtPosition(position).toString();
+            }
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+        sp_phone_0.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                s_phone_0 = parent.getItemAtPosition(position).toString();
+            }
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        sp_division.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                i_division = position;
+            }
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
@@ -82,14 +115,18 @@ public class RegistActivity extends AppCompatActivity {
 
     public void onClick(View v) {
         int participation_selected = rg_participation.getCheckedRadioButtonId();
-        int division_selected = rg_division.getCheckedRadioButtonId();
 
         s_name = et_name.getText().toString().trim();
         s_temper = et_temper.getText().toString().trim();
-        s_number = et_number.getText().toString().trim();
-        s_phone = et_phone.getText().toString().trim();
+        s_number_1 = et_number_1.getText().toString().trim();
+        s_number = s_number_0 + s_number_1;
+        s_phone_1 = et_phone_1.getText().toString().trim();
+        s_phone_2 = et_phone_2.getText().toString().trim();
+        s_phone = s_phone_0 + s_phone_1 + s_phone_2;
         s_destination = et_destination.getText().toString().trim();
         boolean b_check = cb_check.isChecked();
+        String temp_phone = s_phone_0 + "-" + s_phone_1 + "-" + s_phone_2;
+        String temp_number = s_number_0 + "-" + s_number_1;
 
         switch (participation_selected) {
             case R.id.rb_normal:
@@ -100,24 +137,6 @@ public class RegistActivity extends AppCompatActivity {
                 break;
             default:
                 i_participation = -1;
-                break;
-        }
-
-        switch (division_selected) {
-            case R.id.rb_army:
-                i_division = 0;
-                break;
-            case R.id.rb_navy:
-                i_division = 1;
-                break;
-            case R.id.rb_airforce:
-                i_division = 2;
-                break;
-            case R.id.rb_mc:
-                i_division = 3;
-                break;
-            default:
-                i_division = -1;
                 break;
         }
 
@@ -132,10 +151,10 @@ public class RegistActivity extends AppCompatActivity {
             et_name.requestFocus();
         } else if (s_number.equals("")) {
             Toast.makeText(RegistActivity.this,"군번을 입력해주세요.", Toast.LENGTH_SHORT).show();
-            et_number.requestFocus();
+            et_number_1.requestFocus();
         } else if (s_phone.equals("")) {
             Toast.makeText(RegistActivity.this,"휴대폰 번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
-            et_phone.requestFocus();
+            et_phone_1.requestFocus();
         } else if (i_participation == -1) {
             Toast.makeText(RegistActivity.this, "관람 방법을 선택해주세요.", Toast.LENGTH_SHORT).show();
         } else if(i_division == -1) {
@@ -151,8 +170,8 @@ public class RegistActivity extends AppCompatActivity {
         } else {
             Intent intent = new Intent(RegistActivity.this, PopupRegistActivity.class);
             intent.putExtra("NAME", s_name);
-            intent.putExtra("NUMBER", s_number);
-            intent.putExtra("PHONE", s_phone);
+            intent.putExtra("NUMBER", temp_number);
+            intent.putExtra("PHONE", temp_phone);
             intent.putExtra("DIVISION", i_division);
             intent.putExtra("TEMPER", s_temper);
             intent.putExtra("DESTINATION", s_destination);
@@ -168,24 +187,29 @@ public class RegistActivity extends AppCompatActivity {
         // 입력된 정보 최종 확인이 되었을 경우
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                registrationInfo();
-                Toast.makeText(RegistActivity.this, "등록 완료되었습니다.", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegistActivity.this, MainActivity.class);
-                setResult(RESULT_OK, intent);
-                finish();
+                SharedPreferences.Editor editor = infoData.edit();
+                InsertData task = new InsertData(this);
+                try {
+                    String result = task.execute(ADD_AUDIENCE, s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination).get();
+                    if (result.equals("0")) {
+                        Toast.makeText(RegistActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    } else {
+                        s_id = result;
+                        Toast.makeText(RegistActivity.this, "등록 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(RegistActivity.this, MainActivity.class);
+                        editor.putBoolean("IS_AUTOLOGIN", true);
+                        editor.putString("ID", s_id);
+                        editor.putString("NAME", s_name);
+                        editor.apply();
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
-
-    private void registrationInfo() {
-        SharedPreferences.Editor editor = infoData.edit();
-        editor.putBoolean("IS_AUTOLOGIN", true);
-        editor.apply();
-
-        InsertData task = new InsertData(this);
-        task.execute(ADD_AUDIENCE, s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination);
-    }
-
 
     /***** 서버 통신 *****/
     public static class InsertData extends AsyncTask<String, Void, String> {
