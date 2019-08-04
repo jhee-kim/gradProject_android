@@ -112,8 +112,11 @@ public class PopupMapActivity extends Activity {
 
     //QR을 위한 액티비티 연결 필요
     public void QRClick(View view){
+        qrScan.setCaptureActivity(QrActivity.class);
         qrScan.setBeepEnabled(false);
-        qrScan.setPrompt("전시관 QR코드를 스캔해주세요.");
+        qrScan.setPrompt("전시관의 QR코드를 스캔해주세요.");
+        qrScan.setCameraId(0);
+        qrScan.setOrientationLocked(false);
         qrScan.initiateScan();
     }
 
