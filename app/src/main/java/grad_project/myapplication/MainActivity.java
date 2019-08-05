@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
+    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 시작 시간, 실패 0 반환)
 //    public static final String UPDATE_AUDIENCE = BASE_PATH + "update_audience.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
 
     /***** 권한 *****/

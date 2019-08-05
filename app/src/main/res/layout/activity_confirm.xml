@@ -36,11 +36,245 @@
             android:text="@string/certificate_str"
             android:textSize="24sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
+
     </RelativeLayout>
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="@color/menubar"
-        android:layout_below="@id/title_confirm"/>
+        android:layout_below="@+id/title_confirm"/>
+
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/title_confirm"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/tv_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/m_gothic_bold"
+            android:layout_marginTop="30dp"
+            android:textSize="25sp"
+            android:text="확 인 증"
+            android:textColor="@color/focusText"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_main"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
+        android:src="@drawable/background_logo" />
+
+        <TextView
+            android:id="@+id/tv_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_main"
+            android:layout_marginTop="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_gravity="center_vertical"
+            android:textSize="18sp"
+            android:text="□ 국군 병사 독립기념관 방문 확인"
+            android:textColor="@color/focusText"/>
+
+        <TableLayout
+            android:id="@+id/table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/tv_1"
+            android:background="#000000"
+            android:paddingTop="1dp"
+            android:paddingStart="1dp"
+            android:paddingEnd="0.5dp"
+            android:paddingBottom="1dp"
+
+            android:stretchColumns="*">
+
+            <TableRow
+                android:background="#000000"
+                android:paddingBottom="0.5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:textSize="15sp"
+                    android:padding="3dp"
+                    android:layout_marginRight="0.5dp"
+                    android:text="구분"
+                    android:background="#BDBDBD"
+                    android:textColor="@color/focusText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:textSize="15sp"
+                    android:padding="3dp"
+                    android:layout_marginRight="0.5dp"
+                    android:text="방문자"
+                    android:background="#BDBDBD"
+                    android:textColor="@color/focusText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:textSize="15sp"
+                    android:padding="3dp"
+                    android:layout_marginRight="0.5dp"
+                    android:text="방문일"
+                    android:background="#BDBDBD"
+                    android:textColor="@color/focusText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:padding="3dp"
+                    android:textSize="15sp"
+                    android:text="이용시간"
+                    android:background="#BDBDBD"
+                    android:textColor="@color/focusText"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:id="@+id/tv_participation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:layout_marginRight="0.5dp"
+                    android:padding="3dp"
+                    android:textSize="14sp"
+                    android:text="전시관람"
+                    android:background="#FFFFFF"
+                    android:textColor="@color/focusText"/>
+
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:layout_marginRight="0.5dp"
+                    android:padding="3dp"
+                    android:textSize="14sp"
+                    android:text="한동곤\n(16-7300612)"
+                    android:background="#FFFFFF"
+                    android:textColor="@color/focusText"/>
+
+                <TextView
+                    android:id="@+id/tv_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:layout_marginRight="0.5dp"
+                    android:padding="3dp"
+                    android:textSize="14sp"
+                    android:text="2016-12-17\n(09:53)"
+                    android:background="#FFFFFF"
+                    android:textColor="@color/focusText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:padding="3dp"
+                    android:text="2시간 이상"
+                    android:background="#FFFFFF"
+                    android:textColor="@color/focusText"/>
+           </TableRow>
+        </TableLayout>
+
+        <TextView
+            android:id="@+id/tv_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:layout_below="@+id/table"
+            android:layout_marginTop="50dp"
+            android:textSize="12sp"
+            android:text="위 사람은 독립기념관 방문을 통해 전시관람 또는\n 전시해설을 이용하여 2시간 이상의 교육을 이수하였음을 확인합니다."
+            android:textColor="@color/focusText"/>
+
+        <TextView
+            android:id="@+id/tv_date1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:layout_below="@+id/tv_2"
+            android:layout_marginTop="50dp"
+            android:fontFamily="@font/m_gothic_bold"
+            android:text="2019년 08월 03일"
+            android:textSize="20sp"
+            android:textColor="@color/focusText"/>
+
+        <TextView
+            android:id="@+id/tv_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:layout_below="@+id/tv_date1"
+            android:layout_marginTop="70dp"
+            android:fontFamily="@font/m_gothic_bold"
+            android:textSize="25sp"
+            android:text="독 립 기 념 관 장"
+            android:textColor="@color/focusText"/>
+
+        <ImageView
+            android:id="@+id/img1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/tv_date1"
+            android:layout_toRightOf="@+id/tv_4"
+            android:layout_marginTop="60dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/confirm_stamp" />
+
+        <TextView
+            android:id="@+id/tv_date2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:layout_alignStart="@+id/img1"
+            android:layout_alignTop="@+id/img1"
+            android:layout_marginTop="21.5dp"
+            android:layout_marginStart="10dp"
+            android:fontFamily="@font/m_gothic_bold"
+            android:textSize="5dp"
+            android:text="2019. 08. 03"
+            android:textColor="@color/focusText"/>
+
+    </RelativeLayout>
 </RelativeLayout>
