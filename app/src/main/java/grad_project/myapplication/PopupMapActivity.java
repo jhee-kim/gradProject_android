@@ -25,6 +25,7 @@ public class PopupMapActivity extends Activity {
     Button QR_Button;
     private IntentIntegrator qrScan;
     private String[] qrCodeUrlArr = new String[6];
+    private String exhibitionState; //해당 전시관이 열렸는지 여부
 
 
     @Override
@@ -36,6 +37,7 @@ public class PopupMapActivity extends Activity {
         Intent intent = getIntent();
         int TagNumCheck = intent.getIntExtra("TagNum", -1);
         qrCodeUrlArr = intent.getStringArrayExtra("exhibitionQrCode");
+        exhibitionState = intent.getStringExtra("exhibitionState");
 
         //인텐트로 각 qr URL 받아서 qrArr 배열에 저장
 
@@ -46,6 +48,8 @@ public class PopupMapActivity extends Activity {
         MuseImage.setImageResource(R.drawable.ic_alarm_24dp);
 
         QR_Button = findViewById(R.id.QRbutton);
+        setQrButton();
+
         MuseTitle.setPaintFlags(MuseTitle.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
         switch (TagNumCheck) {
             case 1:
@@ -101,10 +105,19 @@ public class PopupMapActivity extends Activity {
         getWindow().setLayout((int)(width*0.95), (int)(height * 0.2));
     }
 
+    public void setQrButton() {     //열리지 않은 전시관의 QR버튼이 나타나지 않도록
+        if(exhibitionState.equals("0")) {
+            QR_Button.setVisibility(View.GONE);
+        }
+    }
+
     //QR을 위한 액티비티 연결 필요
     public void QRClick(View view){
+        qrScan.setCaptureActivity(QrActivity.class);
         qrScan.setBeepEnabled(false);
-        qrScan.setPrompt("전시관 QR코드를 스캔해주세요.");
+        qrScan.setPrompt("전시관의 QR코드를 스캔해주세요.");
+        qrScan.setCameraId(0);
+        qrScan.setOrientationLocked(false);
         qrScan.initiateScan();
     }
 
@@ -125,8 +138,6 @@ public class PopupMapActivity extends Activity {
                 Log.d("QR_URL : ", qrUrl);
                 int resultExhibitionNum = findCorrespondExhibition(qrUrl);
                 if(resultExhibitionNum >= 1 && resultExhibitionNum <= 6) {
-                    Toast.makeText(getApplicationContext(), resultExhibitionNum + "전시관의 QR코드와 일치합니다!", Toast.LENGTH_LONG).show();
-
                     //Intent로 찍힌 QR코드 전시관 번호 보내기(1~6)
                     Intent intent = new Intent(PopupMapActivity.this, NormalActivity.class);
                     intent.putExtra("finish_exhibition_num",resultExhibitionNum); /*송신*/

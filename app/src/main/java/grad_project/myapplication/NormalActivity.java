@@ -80,6 +80,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         MapPointBounds mapPointBounds = new MapPointBounds();
 
         getExhibitionData();
+        loadInfo();
+        getPopupMapIntent();
         setMuseMarkers(mapView);
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
@@ -91,25 +93,36 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public void getPopupMapIntent() {
         Intent intent = getIntent();
         int result = intent.getIntExtra("finish_exhibition_num", -1);
+        boolean isAlreadyCheckQr = false;
         if(result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
-            SharedPreferences.Editor editor = infoData.edit();  //해당 전시관에 대한 정보를 공유변수에 저장
-            editor.putBoolean("IS_CHECK_" + result, true);
-            editor.apply();
+            for(int i = 0 ; i < 6 ; i++) {
+                if(isCheckQrArr[result - 1] == true) {
+                    Toast.makeText(getApplicationContext(), "이미 찍은 QR코드 입니다.", Toast.LENGTH_LONG).show();
+                    isAlreadyCheckQr = true;
+                    break;
+                }
+            }
+            if(isAlreadyCheckQr == false) {
+                Toast.makeText(getApplicationContext(), result + "전시관의 QR코드와 일치합니다!", Toast.LENGTH_LONG).show();
+                SharedPreferences.Editor editor = infoData.edit();  //해당 전시관에 대한 정보를 공유변수에 저장
+                editor.putBoolean("IS_CHECK_" + result, true);
+                editor.apply();
+                isCheckQrArr[result - 1] = true;
+            }
         }
-        loadInfo();
+        for(int i = 0 ; i < 6 ; i++) {
+            Log.d((i + 1) + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
+        }
     }
 
     // 저장된 값 가져오기
-    private void loadInfo() {
+    public void loadInfo() {
         for(int i = 0 ; i < 6 ; i++) {
             int num = i + 1;
             isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);    //true 없으면 false로
-            Log.d(num + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
         }
     }
 
@@ -151,7 +164,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     public void setMuseMarkers(MapView mapView){
 
         ViewGroup mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
-        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.783564, 127.223225), 1, true);
+        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 0, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
         mapView.setCurrentLocationEventListener(this);
@@ -177,25 +190,17 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             markerArr[i].setTag(i + 1);
             markerArr[i].setMapPoint(mapPointArr[i]);
 
-            // 기본으로 제공하는 BluePin 마커 모양.
             if(exhibitionState[i].equals("1") && isCheckQrArr[i] == false) {
-                //markerArr[i].setMarkerType(MapPOIItem.MarkerType.BluePin);
                 markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                 markerArr[i].setCustomImageResourceId(R.drawable.open_marker);
-                //markerArr[i].setSelectedMarkerType(MapPOIItem.MarkerType.CustomImage);
-                //markerArr[i].setCustomImageResourceId(R.drawable.open_marker_touched);
             } else if(exhibitionState[i].equals("1") && isCheckQrArr[i] == true){
                 markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                 markerArr[i].setCustomImageResourceId(R.drawable.qr_marker);
             } else if(exhibitionState[i].equals("0")) {
-                //markerArr[i].setMarkerType((MapPOIItem.MarkerType.YellowPin));
                 markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                 markerArr[i].setCustomImageResourceId(R.drawable.closed_marker);
-                //markerArr[i].setSelectedMarkerType(MapPOIItem.MarkerType.CustomImage);
-                //markerArr[i].setCustomImageResourceId(R.drawable.closed_marker);
             }
             // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-            //markerArr[i].setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
             markerArr[i].setShowCalloutBalloonOnTouch(false);
 
             mapView.addPOIItem(markerArr[i]);
@@ -224,11 +229,12 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     //팝업 띄우기
     @Override
     public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
-        int TagNum = mapPOIItem.getTag();
-        if(exhibitionState[(TagNum-1)].equals("1")) {
+        int tagNum = mapPOIItem.getTag();
+        if(exhibitionState[(tagNum-1)].equals("1")) {
             Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
-            intent.putExtra("TagNum", TagNum);
+            intent.putExtra("TagNum", tagNum);
             intent.putExtra("exhibitionQrCode", exhibitionQrCode);
+            intent.putExtra("exhibitionState", exhibitionState[tagNum - 1]);
             startActivity(intent);
         } else
             Toast.makeText(getApplicationContext(), "아직 개장 중 입니다.", Toast.LENGTH_LONG).show();
