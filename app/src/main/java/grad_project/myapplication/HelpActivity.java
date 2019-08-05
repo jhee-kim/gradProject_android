@@ -1,6 +1,5 @@
 package grad_project.myapplication;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -26,7 +25,6 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Timer;
 
 public class HelpActivity extends AppCompatActivity {
     private SharedPreferences infoData;

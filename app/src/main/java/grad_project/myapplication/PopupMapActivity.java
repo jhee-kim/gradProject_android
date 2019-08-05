@@ -89,6 +89,7 @@ public class PopupMapActivity extends Activity {
         }
 
         MuseTitle.setText(Mus_Title);
+        MuseTitle.setClickable(false);
         MuseSub.setText(Mus_Sub);
 
 

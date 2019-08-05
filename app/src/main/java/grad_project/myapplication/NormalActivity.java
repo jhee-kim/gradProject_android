@@ -150,7 +150,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     public void setMuseMarkers(MapView mapView){
 
         ViewGroup mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
-        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.783564, 127.223225), 1, true);
+        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 0, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
 
@@ -168,16 +168,17 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             markerArr[i].setTag(i + 1);
             markerArr[i].setMapPoint(mapPointArr[i]);
 
-            // 기본으로 제공하는 BluePin 마커 모양.
-
-            if(exhibitionState[i].equals("0"))
-                markerArr[i].setMarkerType((MapPOIItem.MarkerType.YellowPin));
-            else if(isCheckQrArr[i] == true)            //이미 찍은 QR코드의 전시관을 빨강으로 표시
-                markerArr[i].setMarkerType((MapPOIItem.MarkerType.RedPin));
-            else if(exhibitionState[i].equals("1"))
-                markerArr[i].setMarkerType(MapPOIItem.MarkerType.BluePin);
+            if(exhibitionState[i].equals("1") && isCheckQrArr[i] == false) {
+                markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                markerArr[i].setCustomImageResourceId(R.drawable.open_marker);
+            } else if(exhibitionState[i].equals("1") && isCheckQrArr[i] == true){
+                markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                markerArr[i].setCustomImageResourceId(R.drawable.qr_marker);
+            } else if(exhibitionState[i].equals("0")) {
+                markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                markerArr[i].setCustomImageResourceId(R.drawable.closed_marker);
+            }
             // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-            //markerArr[i].setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
             markerArr[i].setShowCalloutBalloonOnTouch(false);
 
             mapView.addPOIItem(markerArr[i]);
@@ -194,12 +195,14 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     @Override
     public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
         int tagNum = mapPOIItem.getTag();
-        Log.d("Debug_TagNum", tagNum + "");
-        Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
-        intent.putExtra("TagNum", tagNum);
-        intent.putExtra("exhibitionQrCode", exhibitionQrCode);
-        intent.putExtra("exhibitionState", exhibitionState[tagNum - 1]);
-        startActivity(intent);
+        if(exhibitionState[(tagNum-1)].equals("1")) {
+            Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
+            intent.putExtra("TagNum", tagNum);
+            intent.putExtra("exhibitionQrCode", exhibitionQrCode);
+            intent.putExtra("exhibitionState", exhibitionState[tagNum - 1]);
+            startActivity(intent);
+        } else
+            Toast.makeText(getApplicationContext(), "아직 개장 중 입니다.", Toast.LENGTH_LONG).show();
     }
 
     @Override
