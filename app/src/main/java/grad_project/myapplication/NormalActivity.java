@@ -29,6 +29,8 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
     private SharedPreferences infoData;
@@ -42,7 +44,10 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     private MapPoint curPosition;
     private float accuracyDis;
 
+    private Timer timer = new Timer();
+    private TimerTask TT;
 
+    Long time;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -212,8 +217,26 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
     public void checkBoundary(){
         boolean isContain;
-        MapPointBounds boundary = new MapPointBounds();
+        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.780428, 127.218812);
+        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.786404, 127.226782);
+
+        MapPointBounds boundary = new MapPointBounds(leftB, RightT);
         isContain = boundary.contains(curPosition);
+
+        if(!isContain){
+            TT = new TimerTask() {
+                @Override
+                public void run() {
+                    time += 1;
+                }
+            };
+            timer.schedule(TT, 0, 1000);
+        } else
+            timer.cancel();
+
+        SharedPreferences.Editor editor = infoData.edit();
+        editor.putLong("OutTime", time);
+        editor.apply();
         //Intent intent = new Intent(NormalActivity.this, PopupTimeActivity.class);
         //intent.putExtra("isContain", isContain);
         //startActivity(intent);
