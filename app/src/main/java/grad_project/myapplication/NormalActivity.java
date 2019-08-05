@@ -3,6 +3,7 @@ package grad_project.myapplication;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -13,8 +14,10 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import net.daum.mf.map.api.MapCircle;
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
+import net.daum.mf.map.api.MapPointBounds;
 import net.daum.mf.map.api.MapView;
 
 import org.json.JSONArray;
@@ -27,7 +30,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener {
+public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
     private SharedPreferences infoData;
     private boolean[] isCheckQrArr = new boolean[6];
     Long startDate;
@@ -35,6 +38,11 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
 //    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
     private MapPOIItem[] markerArr = new MapPOIItem[6];
+
+    private MapPoint curPosition;
+    private float accuracyDis;
+
+
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -64,6 +72,12 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
         MapView mapView = new MapView(this);
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
+
+
+        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+
+
+        MapPointBounds mapPointBounds = new MapPointBounds();
 
         getExhibitionData();
         setMuseMarkers(mapView);
@@ -140,6 +154,14 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.783564, 127.223225), 1, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
+        mapView.setCurrentLocationEventListener(this);
+
+        MapPoint centerPoint;
+        centerPoint = MapPoint.mapPointWithGeoCoord(36.783564, 127.223225);
+
+        MapCircle mapCircle = new MapCircle(centerPoint, 50, Color.RED, 0);
+
+        mapView.addCircle(mapCircle);
 
         MapPoint[] mapPointArr = new MapPoint[6];
         mapPointArr[0] = MapPoint.mapPointWithGeoCoord(36.783323, 127.221605);
@@ -177,7 +199,20 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             markerArr[i].setShowCalloutBalloonOnTouch(false);
 
             mapView.addPOIItem(markerArr[i]);
+
+            //mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+
         }
+    }
+
+    public void checkBoundary(){
+        boolean isContain;
+        MapPointBounds boundary = new MapPointBounds();
+        isContain = boundary.contains(curPosition);
+        //Intent intent = new Intent(NormalActivity.this, PopupTimeActivity.class);
+        //intent.putExtra("isContain", isContain);
+        //startActivity(intent);
+
     }
 
     public void onBack(View v) {
@@ -219,6 +254,29 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         intent.putExtra("Time", startDate);
         startActivity(intent);
         overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
+    }
+
+    @Override
+    //현재 위치 좌표 받아오기
+    public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float accuracyInMeters) {
+        MapPoint mapPointCurrent = mapPoint;
+        curPosition = mapPointCurrent;
+        accuracyDis = accuracyInMeters;
+    }
+
+    @Override
+    public void onCurrentLocationDeviceHeadingUpdate(MapView mapView, float v) {
+
+    }
+
+    @Override
+    public void onCurrentLocationUpdateFailed(MapView mapView) {
+
+    }
+
+    @Override
+    public void onCurrentLocationUpdateCancelled(MapView mapView) {
+
     }
 
     // 전시관 오픈 여부 받아오는 부분
