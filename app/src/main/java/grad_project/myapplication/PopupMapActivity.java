@@ -139,9 +139,10 @@ public class PopupMapActivity extends Activity {
                 int resultExhibitionNum = findCorrespondExhibition(qrUrl);
                 if(resultExhibitionNum >= 1 && resultExhibitionNum <= 6) {
                     //Intent로 찍힌 QR코드 전시관 번호 보내기(1~6)
-                    Intent intent = new Intent(PopupMapActivity.this, NormalActivity.class);
-                    intent.putExtra("finish_exhibition_num",resultExhibitionNum); /*송신*/
-                    startActivity(intent);
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("finish_exhibition_num",resultExhibitionNum); /*송신*/
+                    setResult(RESULT_OK, resultIntent);
+                    finish();
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "QR코드가 일치하지 않습니다.", Toast.LENGTH_LONG).show();

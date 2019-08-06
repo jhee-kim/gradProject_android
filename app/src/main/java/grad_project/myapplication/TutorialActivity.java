@@ -39,6 +39,12 @@ public class TutorialActivity extends AppCompatActivity {
         } else {
             actionBar.hide();
         }
+
+        infoData = getSharedPreferences("infoData", MODE_PRIVATE);
+        SharedPreferences.Editor editor = infoData.edit();  //튜토리얼 봤음을 저장
+        editor.putBoolean("IS_SHOW_TUTORIAL", true);
+        editor.apply();
+        Log.d("Debug:IS_SHOW_TUTORIAL", infoData.getBoolean("IS_SHOW_TUTORIAL", false) + "");
     }
 
     class ViewPagerAdapter extends PagerAdapter {
