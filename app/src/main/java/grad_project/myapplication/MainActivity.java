@@ -47,7 +47,7 @@ import java.util.List;
 * (주요 변수)
 *   - name : 사용자 이름
 *   - number : 군번
-*   - participation : 참여 구분(0:일반관람 / 1:전시 해설)
+*   - participation : 참여 구분(0:전시 관람 / 1:전시 해설)
 *   - division : 군종 구분(0:육군 / 1:해군 / 2:공군 / 3:해병대)
 *   - temper : 부대명
 *   - phone : 휴대폰 번호

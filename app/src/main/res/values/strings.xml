@@ -18,8 +18,8 @@
     <string name="map_str">지도</string>
     <string name="personaldata_str">개인 정보</string>
     <string name="additiondata_str">추가 정보</string>
-    <string name="participate_str">관람 방법</string>
-    <string name="normal_part_str">일반 관람</string>
+    <string name="participate_str">관람 구분</string>
+    <string name="normal_part_str">전시 관람</string>
     <string name="explan_part_str">전시 해설</string>
     <string name="temper_str">소속</string>
     <string name="temper_hint_str">소속 부대를 자세히 입력하세요.</string>
