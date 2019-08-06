@@ -47,7 +47,7 @@ import java.util.List;
 * (주요 변수)
 *   - name : 사용자 이름
 *   - number : 군번
-*   - participation : 참여 구분(0:일반관람 / 1:전시 해설)
+*   - participation : 참여 구분(0:전시 관람 / 1:전시 해설)
 *   - division : 군종 구분(0:육군 / 1:해군 / 2:공군 / 3:해병대)
 *   - temper : 부대명
 *   - phone : 휴대폰 번호
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
+    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 시작 시간, 실패 0 반환)
 //    public static final String UPDATE_AUDIENCE = BASE_PATH + "update_audience.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
 
     /***** 권한 *****/

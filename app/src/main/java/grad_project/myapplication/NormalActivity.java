@@ -12,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
+import net.daum.mf.map.api.MapPointBounds;
 import net.daum.mf.map.api.MapView;
 
 import org.json.JSONArray;
@@ -26,8 +28,10 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener {
+public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
     private SharedPreferences infoData;
     private boolean[] isCheckQrArr = new boolean[6];
     Long startDate;
@@ -38,6 +42,17 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     private boolean isShowTutorial;
     private ViewGroup mapViewContainer;
     private MapView mapView;
+
+    private MapPoint curPosition = MapPoint.mapPointWithGeoCoord(0, 0);
+    private float accuracyDis;
+
+    private Timer timer = new Timer();
+    private TimerTask TT;
+
+    Long time = 0L;
+
+    //private boolean showLoc = false;
+    private boolean ToggleCheck;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -65,10 +80,32 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 //        exhibitState = intent.getStringArrayExtra("MuseumState");
         startDate = intent.getLongExtra("Time", 0);
 
+        mapView = new MapView(this);
+        ViewGroup mapViewContainer = findViewById(R.id.map_view);
+
+
+        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
+
+
+        MapPointBounds mapPointBounds = new MapPointBounds();
+
         getExhibitionData();
         loadInfo();
-        mapView = new MapView(this);
         setMuseMarkers(mapView);
+
+/*
+        if(!isContain && accuracyDis <= 3.0){
+            TT = new TimerTask() {
+                @Override
+                public void run() {
+                    mapView.setCurrentLocationTrackingMode(MapView);
+                }
+            };
+            timer.schedule(TT, 0, 1000);
+        } else
+            timer.cancel();
+ */
+        //checkBoundary();
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
         bt_back_layout.setOnClickListener(new View.OnClickListener() {
@@ -81,11 +118,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             intent = new Intent(NormalActivity.this, TutorialActivity.class);
             startActivityForResult(intent,3000);
         }
-    }
-
-    @Override
-    protected void onResume() { //PopupMapActivity에서 돌아왔을 때 QR정보 바로 맵에 적용하기 위함
-        super.onResume();
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {     //보낸 Intent 정보 받음
@@ -174,6 +206,14 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 0, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
+        mapView.setCurrentLocationEventListener(this);
+
+        MapPoint centerPoint;
+        centerPoint = MapPoint.mapPointWithGeoCoord(36.783564, 127.223225);
+
+        //MapCircle mapCircle = new MapCircle(centerPoint, 380, Color.RED, 0);
+
+        //mapView.addCircle(mapCircle);
 
         MapPoint[] mapPointArr = new MapPoint[6];
         mapPointArr[0] = MapPoint.mapPointWithGeoCoord(36.783323, 127.221605);
@@ -203,12 +243,27 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             markerArr[i].setShowCalloutBalloonOnTouch(false);
 
             mapView.addPOIItem(markerArr[i]);
+
+            //mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+
         }
     }
+
+
 
     public void onBack(View v) {
         if (v == findViewById(R.id.bt_back)) {
             finish();
+        }
+    }
+
+    public void onLocation (View view) {
+        //MapView mapView = new MapView(this);
+        ToggleCheck = ((ToggleButton)view).isChecked();
+        if(ToggleCheck && accuracyDis <= 10.0){
+            mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+        } else {
+            mapView.setShowCurrentLocationMarker(false);
         }
     }
     //마커 선택시의 액션
@@ -246,6 +301,66 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         intent.putExtra("Time", startDate);
         startActivity(intent);
         overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
+    }
+
+    @Override
+    //현재 위치 좌표 받아오기
+    public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float accuracyInMeters) {
+        MapPoint mapPointCurrent = mapPoint;
+        curPosition = mapPointCurrent;
+        accuracyDis = accuracyInMeters;
+
+        Log.d("Accuracy", "정확도 " + accuracyDis);
+
+        if(!ToggleCheck)
+            mapView.setShowCurrentLocationMarker(false);
+
+        checkBoundary();
+    }
+
+    public void checkBoundary(){
+        boolean isContain;
+        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.780428, 127.218812);
+        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.786404, 127.226782);
+
+        MapPointBounds boundary = new MapPointBounds(leftB, RightT);
+        isContain = boundary.contains(curPosition);
+
+        time += 1;
+        Log.d("MyTag", "현재 time " + time);
+
+        if(!isContain && accuracyDis <= 3.0){
+            TT = new TimerTask() {
+                @Override
+                public void run() {
+                    time += 1;
+                    Log.d("MyTag", "현재 time " + time);
+                }
+            };
+            timer.schedule(TT, 0, 1000);
+        } else
+            timer.cancel();
+
+
+
+        SharedPreferences.Editor editor = infoData.edit();
+        editor.putLong("OutTime", time);
+        editor.apply();
+    }
+
+    @Override
+    public void onCurrentLocationDeviceHeadingUpdate(MapView mapView, float v) {
+
+    }
+
+    @Override
+    public void onCurrentLocationUpdateFailed(MapView mapView) {
+
+    }
+
+    @Override
+    public void onCurrentLocationUpdateCancelled(MapView mapView) {
+
     }
 
     // 전시관 오픈 여부 받아오는 부분

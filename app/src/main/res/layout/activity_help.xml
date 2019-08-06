@@ -53,7 +53,6 @@
         android:layout_marginTop="20dp">
 
         <TableLayout
-            android:id="@+id/layout_help_text1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
