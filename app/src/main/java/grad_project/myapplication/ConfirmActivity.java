@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,15 +34,7 @@ import java.util.concurrent.ForkJoinPool;
 
 public class ConfirmActivity extends AppCompatActivity {
     private SharedPreferences infoData;
-    String s_id;
-    String s_name;
-    String s_number;
-    String s_phone;
-    String s_temper;
-    String s_destination;
-    String s_participation;
-    String s_division;
-    String s_startDate;
+    String s_id, s_name, s_number, s_phone, s_temper, s_destination, s_participation, s_division, s_startDate;
     TextView tv_participation, tv_name, tv_start, tv_date1, tv_date2;
 
     /***** php 통신 *****/
@@ -82,8 +75,9 @@ public class ConfirmActivity extends AppCompatActivity {
         tv_start = findViewById(R.id.tv_start);
         tv_date1 = findViewById(R.id.tv_date1);
         tv_date2  = findViewById(R.id.tv_date2);
-
-        s_number = s_number.substring(0, 2) + "-" + s_number.substring(3, s_number.length());
+        if(s_number.length() > 3) {
+            s_number = s_number.substring(0, 2) + "-" + s_number.substring(3, s_number.length());
+        }
         tv_name.setText(s_name+"\n("+s_number+")");
         switch (s_participation) {
             case "0":
@@ -184,7 +178,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.connect();
                 OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.write(postParameters.getBytes(StandardCharsets.UTF_8));
                 outputStream.flush();
                 outputStream.close();
                 int responseStatusCode = httpURLConnection.getResponseCode();
@@ -195,7 +189,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 else{
                     inputStream = httpURLConnection.getErrorStream();
                 }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -243,7 +237,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.connect();
                 OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.write(postParameters.getBytes(StandardCharsets.UTF_8));
                 outputStream.flush();
                 outputStream.close();
                 int responseStatusCode = httpURLConnection.getResponseCode();
@@ -254,7 +248,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 else{
                     inputStream = httpURLConnection.getErrorStream();
                 }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 StringBuilder sb = new StringBuilder();
                 String line;
