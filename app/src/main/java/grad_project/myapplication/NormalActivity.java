@@ -35,6 +35,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
 //    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
     private MapPOIItem[] markerArr = new MapPOIItem[6];
+    private boolean isShowTutorial;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -77,6 +78,25 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 finish();
             }
         });
+        /*if(isShowTutorial == false) {       //처음 지도를 보는 거면(튜토리얼을 본 적이 없으면) 튜토리얼을 보여줌
+            intent = new Intent(NormalActivity.this, TutorialActivity.class);
+            startActivityForResult(intent,3000);
+        }*/
+        intent = new Intent(NormalActivity.this, TutorialActivity.class);   //임시
+        startActivityForResult(intent,3000);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {     //튜토리얼 보고 왔으면 preference로 설정해줌
+        if(resultCode == RESULT_OK){
+            switch (requestCode){   // NormalActivity에서 TutorialActivity로 요청할 때 보낸 요청 코드 (3000)
+                case 3000:
+                    SharedPreferences.Editor editor = infoData.edit();  //튜토리얼 봤음을 저장
+                    editor.putBoolean("IS_SHOW_TUTORIAL", true);
+                    editor.apply();
+                    Log.d("Debug:IS_SHOW_TUTORIAL", infoData.getBoolean("IS_SHOW_TUTORIAL", false) + "");
+                    break;
+            }
+        }
     }
 
     public void getPopupMapIntent() {
@@ -104,12 +124,13 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
-    // 저장된 값 가져오기
+    // 저장된 값 가져오기 - 각 전시관 QR코드 체크 여부, 튜토리얼 여부
     public void loadInfo() {
         for(int i = 0 ; i < 6 ; i++) {
             int num = i + 1;
             isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);    //true 없으면 false로
         }
+        isShowTutorial = infoData.getBoolean("IS_SHOW_TUTORIAL", false);
     }
 
     // DB 전시관 및 전시해설 데이터 받아오기

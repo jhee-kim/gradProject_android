@@ -50,6 +50,8 @@
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"
             android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity android:name=".TutorialActivity">
+        </activity>
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="63c2eeea64bff757d4f3fbb253f2ff59"/>
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
     </application>
