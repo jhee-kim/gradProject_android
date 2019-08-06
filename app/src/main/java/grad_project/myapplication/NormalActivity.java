@@ -78,12 +78,10 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 finish();
             }
         });
-        /*if(isShowTutorial == false) {       //처음 지도를 보는 거면(튜토리얼을 본 적이 없으면) 튜토리얼을 보여줌
+        if(isShowTutorial == false) {       //처음 지도를 보는 거면(튜토리얼을 본 적이 없으면) 튜토리얼을 보여줌
             intent = new Intent(NormalActivity.this, TutorialActivity.class);
             startActivityForResult(intent,3000);
-        }*/
-        intent = new Intent(NormalActivity.this, TutorialActivity.class);   //임시
-        startActivityForResult(intent,3000);
+        }
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {     //튜토리얼 보고 왔으면 preference로 설정해줌
