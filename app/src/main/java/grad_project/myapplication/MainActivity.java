@@ -47,7 +47,7 @@ import java.util.List;
 * (주요 변수)
 *   - name : 사용자 이름
 *   - number : 군번
-*   - participation : 참여 구분(0:전시 관람 / 1:전시 해설)
+*   - participation : 참여 구분(0:전시관람 / 1:전시 해설)
 *   - division : 군종 구분(0:육군 / 1:해군 / 2:공군 / 3:해병대)
 *   - temper : 부대명
 *   - phone : 휴대폰 번호
@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     boolean is_login = false;
     boolean is_registered = false;
     boolean is_autoLogin;
+    boolean is_menuOpen = false;
     String s_id, s_name;
     DrawerLayout drawerLayout;
     View slideView;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 시작 시간, 실패 0 반환)
+    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
 //    public static final String UPDATE_AUDIENCE = BASE_PATH + "update_audience.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
 
     /***** 권한 *****/
@@ -115,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 drawerLayout.openDrawer(slideView);
+                is_menuOpen = true;
             }
         });
 
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 drawerLayout.closeDrawer(slideView);
+                is_menuOpen = false;
             }
         });
 
@@ -192,6 +195,15 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("RESTART", "onRestart()");
         resumeActivity();
+    }
+    @Override
+    public void onBackPressed() {
+        if (is_menuOpen) {
+            drawerLayout.closeDrawer(slideView);
+            is_menuOpen = false;
+        } else {
+            super.onBackPressed();
+        }
     }
 
     /* DB-서버 통신 파트 */
@@ -352,6 +364,15 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 is_login = true;
+            }
+        }
+
+        // 관람 완료 후 메인 액티비티로 자동 진입할 때
+        if (requestCode == 2) {
+            if (resultCode == RESULT_OK) {
+                drawerLayout.closeDrawer(slideView);
+                Log.d("DRAWER", "CLOSING");
+                is_menuOpen = false;
             }
         }
     }
