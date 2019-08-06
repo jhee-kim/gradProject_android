@@ -3,7 +3,6 @@ package grad_project.myapplication;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -13,8 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
-import net.daum.mf.map.api.MapCircle;
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapPointBounds;
@@ -41,13 +40,18 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 //    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
     private MapPOIItem[] markerArr = new MapPOIItem[6];
 
-    private MapPoint curPosition;
+    private MapView mapView;
+
+    private MapPoint curPosition = MapPoint.mapPointWithGeoCoord(0, 0);
     private float accuracyDis;
 
     private Timer timer = new Timer();
     private TimerTask TT;
 
-    Long time;
+    Long time = 0L;
+
+    //private boolean showLoc = false;
+    private boolean ToggleCheck;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -75,11 +79,11 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 //        exhibitState = intent.getStringArrayExtra("MuseumState");
         startDate = intent.getLongExtra("Time", 0);
 
-        MapView mapView = new MapView(this);
+        mapView = new MapView(this);
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
 
 
-        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
 
 
         MapPointBounds mapPointBounds = new MapPointBounds();
@@ -88,6 +92,20 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         loadInfo();
         getPopupMapIntent();
         setMuseMarkers(mapView);
+
+/*
+        if(!isContain && accuracyDis <= 3.0){
+            TT = new TimerTask() {
+                @Override
+                public void run() {
+                    mapView.setCurrentLocationTrackingMode(MapView);
+                }
+            };
+            timer.schedule(TT, 0, 1000);
+        } else
+            timer.cancel();
+ */
+        //checkBoundary();
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
         bt_back_layout.setOnClickListener(new View.OnClickListener() {
@@ -177,9 +195,9 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         MapPoint centerPoint;
         centerPoint = MapPoint.mapPointWithGeoCoord(36.783564, 127.223225);
 
-        MapCircle mapCircle = new MapCircle(centerPoint, 50, Color.RED, 0);
+        //MapCircle mapCircle = new MapCircle(centerPoint, 380, Color.RED, 0);
 
-        mapView.addCircle(mapCircle);
+        //mapView.addCircle(mapCircle);
 
         MapPoint[] mapPointArr = new MapPoint[6];
         mapPointArr[0] = MapPoint.mapPointWithGeoCoord(36.783323, 127.221605);
@@ -215,37 +233,21 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
-    public void checkBoundary(){
-        boolean isContain;
-        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.780428, 127.218812);
-        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.786404, 127.226782);
 
-        MapPointBounds boundary = new MapPointBounds(leftB, RightT);
-        isContain = boundary.contains(curPosition);
-
-        if(!isContain){
-            TT = new TimerTask() {
-                @Override
-                public void run() {
-                    time += 1;
-                }
-            };
-            timer.schedule(TT, 0, 1000);
-        } else
-            timer.cancel();
-
-        SharedPreferences.Editor editor = infoData.edit();
-        editor.putLong("OutTime", time);
-        editor.apply();
-        //Intent intent = new Intent(NormalActivity.this, PopupTimeActivity.class);
-        //intent.putExtra("isContain", isContain);
-        //startActivity(intent);
-
-    }
 
     public void onBack(View v) {
         if (v == findViewById(R.id.bt_back)) {
             finish();
+        }
+    }
+
+    public void onLocation (View view) {
+        //MapView mapView = new MapView(this);
+        ToggleCheck = ((ToggleButton)view).isChecked();
+        if(ToggleCheck && accuracyDis <= 10.0){
+            mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+        } else {
+            mapView.setShowCurrentLocationMarker(false);
         }
     }
     //마커 선택시의 액션
@@ -291,6 +293,43 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         MapPoint mapPointCurrent = mapPoint;
         curPosition = mapPointCurrent;
         accuracyDis = accuracyInMeters;
+
+        Log.d("Accuracy", "정확도 " + accuracyDis);
+
+        if(!ToggleCheck)
+            mapView.setShowCurrentLocationMarker(false);
+
+        checkBoundary();
+    }
+
+    public void checkBoundary(){
+        boolean isContain;
+        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.780428, 127.218812);
+        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.786404, 127.226782);
+
+        MapPointBounds boundary = new MapPointBounds(leftB, RightT);
+        isContain = boundary.contains(curPosition);
+
+        time += 1;
+        Log.d("MyTag", "현재 time " + time);
+
+        if(!isContain && accuracyDis <= 3.0){
+            TT = new TimerTask() {
+                @Override
+                public void run() {
+                    time += 1;
+                    Log.d("MyTag", "현재 time " + time);
+                }
+            };
+            timer.schedule(TT, 0, 1000);
+        } else
+            timer.cancel();
+
+
+
+        SharedPreferences.Editor editor = infoData.edit();
+        editor.putLong("OutTime", time);
+        editor.apply();
     }
 
     @Override
