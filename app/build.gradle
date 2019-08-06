@@ -23,6 +23,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.ssomai:android.scalablelayout:2.1.6'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation files('libs/libDaumMapAndroid.jar')
 

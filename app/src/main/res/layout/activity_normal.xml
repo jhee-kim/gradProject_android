@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sl="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -70,15 +71,27 @@
 
     </RelativeLayout>
 
-    <ToggleButton
-        android:id="@+id/myLocation"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:background="@drawable/location_selector"
-        android:layout_marginTop="600dp"
-        android:layout_marginLeft="20dp"
-        android:textOn=""
-        android:textOff=""
-        android:onClick="onLocation" />
+    <com.ssomai.android.scalablelayout.ScalableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/content_normal"
+        sl:scale_base_width="1080"
+        sl:scale_base_height="500">
+
+        <ToggleButton
+            android:id="@+id/myLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/location_selector"
+            android:layout_marginTop="450dp"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:textOn=""
+            android:textOff=""
+            android:onClick="onLocation" />
+
+    </com.ssomai.android.scalablelayout.ScalableLayout>
+
+
 
 </RelativeLayout>
