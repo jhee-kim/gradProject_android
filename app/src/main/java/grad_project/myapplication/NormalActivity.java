@@ -39,7 +39,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
 //    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
     private MapPOIItem[] markerArr = new MapPOIItem[6];
-
+    private boolean isShowTutorial;
+    private ViewGroup mapViewContainer;
     private MapView mapView;
 
     private MapPoint curPosition = MapPoint.mapPointWithGeoCoord(0, 0);
@@ -90,7 +91,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
         getExhibitionData();
         loadInfo();
-        getPopupMapIntent();
         setMuseMarkers(mapView);
 
 /*
@@ -114,39 +114,55 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 finish();
             }
         });
+        if(isShowTutorial == false) {       //처음 지도를 보는 거면(튜토리얼을 본 적이 없으면) 튜토리얼을 보여줌
+            intent = new Intent(NormalActivity.this, TutorialActivity.class);
+            startActivityForResult(intent,3000);
+        }
     }
 
-    public void getPopupMapIntent() {
-        Intent intent = getIntent();
-        int result = intent.getIntExtra("finish_exhibition_num", -1);
-        boolean isAlreadyCheckQr = false;
-        if(result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
-            for(int i = 0 ; i < 6 ; i++) {
-                if(isCheckQrArr[result - 1] == true) {
-                    Toast.makeText(getApplicationContext(), "이미 찍은 QR코드 입니다.", Toast.LENGTH_LONG).show();
-                    isAlreadyCheckQr = true;
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {     //보낸 Intent 정보 받음
+        if(resultCode == RESULT_OK){
+            switch (requestCode){   // NormalActivity에서 TutorialActivity로 요청할 때 보낸 요청 코드 (3000)
+                case 3000:  //TutorialActivity에서 돌아왔을 때
                     break;
-                }
+                case 2000:  //PopupMapActivity에서 돌아왔을 때
+                    int result = intent.getIntExtra("finish_exhibition_num", -1);
+                    boolean isAlreadyCheckQr = false;
+                    if(result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
+                        for(int i = 0 ; i < 6 ; i++) {
+                            if(isCheckQrArr[result - 1] == true) {
+                                Toast.makeText(getApplicationContext(), "이미 찍은 QR코드 입니다.", Toast.LENGTH_LONG).show();
+                                isAlreadyCheckQr = true;
+                                break;
+                            }
+                        }
+                        if(isAlreadyCheckQr == false) {
+                            Toast.makeText(getApplicationContext(), result + "전시관의 QR코드와 일치합니다!", Toast.LENGTH_LONG).show();
+                            SharedPreferences.Editor editor = infoData.edit();  //해당 전시관에 대한 정보를 공유변수에 저장
+                            editor.putBoolean("IS_CHECK_" + result, true);
+                            editor.apply();
+                            isCheckQrArr[result - 1] = true;
+
+                            mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
+                            mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
+                            setMuseMarkers(mapView);
+                            break;
+                        }
+                    }
+                    for(int i = 0 ; i < 6 ; i++) {
+                        Log.d((i + 1) + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
+                    }
             }
-            if(isAlreadyCheckQr == false) {
-                Toast.makeText(getApplicationContext(), result + "전시관의 QR코드와 일치합니다!", Toast.LENGTH_LONG).show();
-                SharedPreferences.Editor editor = infoData.edit();  //해당 전시관에 대한 정보를 공유변수에 저장
-                editor.putBoolean("IS_CHECK_" + result, true);
-                editor.apply();
-                isCheckQrArr[result - 1] = true;
-            }
-        }
-        for(int i = 0 ; i < 6 ; i++) {
-            Log.d((i + 1) + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
         }
     }
 
-    // 저장된 값 가져오기
+    // 저장된 값 가져오기 - 각 전시관 QR코드 체크 여부, 튜토리얼 여부
     public void loadInfo() {
         for(int i = 0 ; i < 6 ; i++) {
             int num = i + 1;
             isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);    //true 없으면 false로
         }
+        isShowTutorial = infoData.getBoolean("IS_SHOW_TUTORIAL", false);
     }
 
     // DB 전시관 및 전시해설 데이터 받아오기
@@ -186,7 +202,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
     public void setMuseMarkers(MapView mapView){
 
-        ViewGroup mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 0, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
@@ -260,7 +276,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
             intent.putExtra("TagNum", tagNum);
             intent.putExtra("exhibitionQrCode", exhibitionQrCode);
             intent.putExtra("exhibitionState", exhibitionState[tagNum - 1]);
-            startActivity(intent);
+            startActivityForResult(intent,2000);
         } else
             Toast.makeText(getApplicationContext(), "아직 개장 중 입니다.", Toast.LENGTH_LONG).show();
     }

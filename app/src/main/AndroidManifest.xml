@@ -18,38 +18,51 @@
         android:fullBackupContent="false"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".RegistActivity">
+        <activity android:name=".RegistActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NormalActivity">
+        <activity android:name=".NormalActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".HelpActivity">
+        <activity android:name=".HelpActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ConfirmActivity">
+        <activity android:name=".ConfirmActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PersonalActivity">
+        <activity android:name=".PersonalActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".CheckActivity">
+        <activity android:name=".CheckActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog">
+        <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.popup_Map_Theme">
+        <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.popup_Map_Theme"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PopupTimeActivity" android:theme="@style/AppTheme.popup_Time_Theme">
+        <activity android:name=".PopupTimeActivity" android:theme="@style/AppTheme.popup_Time_Theme"
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".QrActivity"
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"
             android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity android:name=".TutorialActivity">
+        </activity>
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="63c2eeea64bff757d4f3fbb253f2ff59"/>
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
     </application>

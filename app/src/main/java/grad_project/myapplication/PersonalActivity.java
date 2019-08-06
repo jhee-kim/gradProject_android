@@ -91,7 +91,7 @@ public class PersonalActivity extends AppCompatActivity {
         tv_destination.setText(s_destination);
         switch (s_participation) {
             case "0":
-                tv_participation.setText("일반 관람");
+                tv_participation.setText("전시 관람");
                 break;
             case "1":
                 tv_participation.setText("전시 해설");
