@@ -1,11 +1,11 @@
 package grad_project.myapplication;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,8 +34,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class CheckActivity extends AppCompatActivity {
     private SharedPreferences infoData;
@@ -109,7 +107,6 @@ public class CheckActivity extends AppCompatActivity {
         getTimeData();
         getExhibitionData();
 
-//        bt_finish.setEnabled(false);
         timerhandler = new TimerHandler();
     }
 
@@ -187,12 +184,6 @@ public class CheckActivity extends AppCompatActivity {
                 });
             }
             bt_finish.setEnabled(false);
-//            try {
-//                SimpleDateFormat sdfStart = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
-//                l_endTime = sdfStart.parse(endResult).getTime();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
         }
     }
 
@@ -204,15 +195,23 @@ public class CheckActivity extends AppCompatActivity {
         timerhandler.removeMessages(REFRESH_TIMER_START);
     }
 
-    @Override
-    protected void onDestroy() {
-//        Intent intent = new Intent(CheckActivity.this, MainActivity.class);
-//        setResult(RESULT_OK, intent);
-
-        super.onDestroy();
-
-        Log.d("DESTROY", "TRUE");
+    // 설문조사 요청
+    public void surveyDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("설문조사에 참여해주세요!");
+        builder.setPositiveButton("확인",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.i815.or.kr/"));
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+        builder.setCancelable(false);
+        builder.show();
     }
+
 
     public void onBack(View v) {
         if (v == findViewById(R.id.bt_back)) {
@@ -246,7 +245,7 @@ public class CheckActivity extends AppCompatActivity {
                         else if (result.equals("1")) {
                             Toast.makeText(getApplicationContext(), "관람 종료 확인이 되었습니다.", Toast.LENGTH_SHORT).show();
                             connectState = true;
-                            finish();
+                            surveyDialog();
                             break;
                         }
                     } catch (Exception e) {

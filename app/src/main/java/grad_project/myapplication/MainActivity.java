@@ -1,6 +1,7 @@
 package grad_project.myapplication;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,7 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -34,7 +35,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 /*
 ***** 도움말 *****
@@ -70,13 +71,14 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout bt_viewtime, bt_myinfo, bt_certificate_2, bt_registration_2, bt_homepage, bt_information;
     Long startDate;
     private boolean is_start = false;
-//    private boolean is_finish = false;    // 차후 구현 예정
+    boolean connectState = false;
+
+    public static Activity A_MainActivity;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
     public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
-//    public static final String UPDATE_AUDIENCE = BASE_PATH + "update_audience.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
 
     /***** 권한 *****/
     private String[] permissions = {
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.BLUETOOTH
     };
-    static final int MULTIPLE_PERMISSION = 1;
+    ArrayList<String> permissionList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,9 +100,8 @@ public class MainActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            checkPermissions();
-        }
+        A_MainActivity = MainActivity.this;
+
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
         bt_registration = findViewById(R.id.bt_registration);
@@ -158,35 +159,18 @@ public class MainActivity extends AppCompatActivity {
         resumeActivity();
     }
 
-    private void checkPermissions() {
-        int result;
-        List<String> permissionList = new ArrayList<>();
-        for (String pm : permissions) {
-            result = ContextCompat.checkSelfPermission(this, pm);
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                permissionList.add(pm);
-            }
-        }
-        if (!permissionList.isEmpty()) {
-            ActivityCompat.requestPermissions(this, permissionList.toArray(new String[permissionList.size()]), MULTIPLE_PERMISSION);
-        }
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == MULTIPLE_PERMISSION) {
-            if (grantResults.length > 0) {
-                for (int i = 0; i < permissions.length; i++) {
-                    if (permissions[i].equals(this.permissions[i])) {
-                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(getApplicationContext(), "권한 요청에 동의해주셔야 이용이 가능합니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+    protected void onResume() {
+        super.onResume();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (Build.VERSION.SDK_INT >= 23) {
+                    checkPermissions();
                 }
-            } else {
-                Toast.makeText(getApplicationContext(), "권한 요청에 동의해주셔야 이용이 가능합니다.", Toast.LENGTH_SHORT).show();
             }
-        }
+        }, 500);
     }
 
     @Override
@@ -206,6 +190,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void checkPermissions() {
+        int result;
+        permissionList = new ArrayList<>();
+        for (String pm : permissions) {
+            result = ContextCompat.checkSelfPermission(this, pm);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(pm);
+            }
+        }
+        if (!permissionList.isEmpty()) {
+            Intent in_permission = new Intent(MainActivity.this, PopupPermissionActivity.class);
+            in_permission.putStringArrayListExtra("permissionList", permissionList);
+            startActivityForResult(in_permission, -1);
+        }
+    }
+
     /* DB-서버 통신 파트 */
     // 관람 시작이 되었는지 여부 받아오는 메소드
     public void getStartState() {
@@ -215,12 +215,14 @@ public class MainActivity extends AppCompatActivity {
             String result = startTask.execute(GET_ISSTART, s_id).get();
             is_start = !result.equals("0");
             if (is_start) {
-                SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
                 startDate = df.parse(result).getTime();
+                connectState = true;
             }
             Log.d("ISSTART", String.valueOf(startDate));
         } catch (Exception e) {
             e.printStackTrace();
+            connectState = false;
         }
     }
 
@@ -234,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             is_login = false;
         }
+
         /* 액티비티 화면 내용 설정 */
         // 최초 등록 버튼 활성화 및 비활성화
         if (is_login) {
@@ -375,6 +378,12 @@ public class MainActivity extends AppCompatActivity {
                 is_menuOpen = false;
             }
         }
+
+//        // 권한 요청 결과
+//        if (requestCode == -1) {
+//            if (resultCode == RESULT_CANCELED) {
+//            }
+//        }
     }
 
     // 메인 화면 버튼
@@ -434,7 +443,6 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(getApplicationContext(), "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
 
-//            resumeActivity();
             onRestart();
         }
     }

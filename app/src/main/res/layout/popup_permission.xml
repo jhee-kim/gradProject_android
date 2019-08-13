@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FCFCFC">
+
+    <LinearLayout
+        android:id="@+id/layout_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textAlignment="center"
+            android:text="앱 이용을 위해"
+            android:textSize="16sp"
+            android:fontFamily="@font/m_gothic_normal"
+            android:textColor="@color/focusText"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:text="권한 제공 동의"
+                android:textSize="16sp"
+                android:fontFamily="@font/m_gothic_bold"
+                android:textColor="@color/focusText"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:textAlignment="center"
+                android:text="가 필요합니다."
+                android:textSize="16sp"
+                android:fontFamily="@font/m_gothic_normal"
+                android:textColor="@color/focusText"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:textAlignment="center"
+            android:text="거부시 앱 이용이 불가합니다."
+            android:textSize="14sp"
+            android:fontFamily="@font/m_gothic_bold"
+            android:textColor="@color/red"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0.3dp"
+        android:layout_below="@id/layout_text"
+        android:background="@color/unfocusText"/>
+
+    <LinearLayout
+        android:id="@+id/layout_permissions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_text"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="8dp"
+            android:text="필수 권한"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:fontFamily="@font/m_gothic_extrabold"
+            android:textColor="@color/unfocusText" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:text="위치정보"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:fontFamily="@font/m_gothic_normal"
+            android:textColor="@color/unfocusText" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:text="카메라"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:fontFamily="@font/m_gothic_normal"
+            android:textColor="@color/unfocusText" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="블루투스"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:fontFamily="@font/m_gothic_normal"
+            android:textColor="@color/unfocusText" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/layout_permissions"
+        android:background="@color/disableButton">
+
+        <Button
+            android:id="@+id/bt_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/cancelButton"
+            android:text="거부"
+            android:textColor="@color/unfocusText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
+        <Button
+            android:id="@+id/bt_apply"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/applyButton"
+            android:text="동의하러 가기"
+            android:textColor="@color/focusText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -50,6 +50,9 @@
         <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".PopupPermissionActivity" android:theme="@android:style/Theme.Dialog"
+            android:screenOrientation="portrait">
+        </activity>
         <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.popup_Map_Theme"
             android:screenOrientation="portrait">
         </activity>
