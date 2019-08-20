@@ -11,6 +11,7 @@
     <color name="unfocusText">#707070</color>
     <color name="disableText">#B4B4B4</color>
     <color name="disableButton">#E0E0E0</color>
+    <color name="white">#FCFCFC</color>
     <color name="timeColor">#78468c</color>
     <color name="applyButton">#91CFFF</color>
     <color name="cancelButton">#FAC9C6</color>

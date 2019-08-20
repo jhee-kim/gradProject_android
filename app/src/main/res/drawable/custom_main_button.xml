@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="false" android:state_focused="false">
+
+    <item android:state_pressed="false" android:state_focused="false"
+        android:state_enabled="true">
         <shape>
             <stroke
                 android:width="2dip" android:color="#555555"/>
-
             <corners android:radius="2dip"/>
-
             <solid
                 android:color="@color/transparent" />
-
             <padding
                 android:left="7dip"
                 android:right="7dip"
@@ -17,16 +16,15 @@
                 android:bottom="7dip" />
         </shape>
     </item>
-    <item android:state_pressed="false" android:state_focused="true">
+
+    <item android:state_pressed="false" android:state_focused="true"
+        android:state_enabled="true">
         <shape>
             <stroke
                 android:width="2dip" android:color="#555555"/>
-
             <corners android:radius="2dip"/>
-
             <solid
                 android:color="@color/transparent" />
-
             <padding
                 android:left="7dip"
                 android:right="7dip"
@@ -34,17 +32,15 @@
                 android:bottom="7dip" />
         </shape>
     </item>
-    <item android:state_pressed="true">
+
+    <item android:state_pressed="true"
+        android:state_enabled="true">
         <shape>
             <stroke
                 android:width="2dip" android:color="#555555"/>
-
             <corners android:radius="2dip"/>
-
             <solid
-                android:color="#1A000000" />
-
-
+                android:color="#80BBB7B7" />
             <padding
                 android:left="7dip"
                 android:right="7dip"
@@ -52,14 +48,14 @@
                 android:bottom="7dip" />
         </shape>
     </item>
+
     <item android:state_enabled="false">
         <shape>
+            <stroke
+                android:width="2dip" android:color="#C9C9C9"/>
             <corners android:radius="2dip"/>
-
-            <gradient
-                android:startColor="#F5F5F5" android:endColor="#F5F5F5"
-                android:angle="270" />
-
+            <solid
+                android:color="@color/transparent" />
             <padding
                 android:left="7dip"
                 android:right="7dip"

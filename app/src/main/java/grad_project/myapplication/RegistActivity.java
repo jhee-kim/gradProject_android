@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -87,12 +89,48 @@ public class RegistActivity extends AppCompatActivity {
             }
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+//        군번 8자리 입력하면 자동으로 폰번호 입력으로 커서 넘어가는 코드인데
+//        굳이 필요할까 싶음
+//        et_number_1.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if (et_number_1.length() >= 8) {
+//                    et_phone_1.requestFocus();
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
+
         sp_phone_0.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 s_phone_0 = parent.getItemAtPosition(position).toString();
             }
             public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        et_phone_1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (et_phone_1.length() >= 4) {
+                    et_phone_2.requestFocus();
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         sp_division.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -220,8 +258,12 @@ public class RegistActivity extends AppCompatActivity {
                 InsertData task = new InsertData(this);
                 try {
                     String result = task.execute(ADD_AUDIENCE, s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination).get();
+                    Log.d("REGIST", result);
                     if (result.equals("0")) {
                         Toast.makeText(RegistActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (result.equals("ERROR")) {
+                        Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                     } else {
                         s_id = result;
                         Toast.makeText(RegistActivity.this, "등록 완료되었습니다.", Toast.LENGTH_SHORT).show();
@@ -312,7 +354,7 @@ public class RegistActivity extends AppCompatActivity {
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return "Error: " + e.getMessage();
+                return "ERROR";
             }
         }
     }

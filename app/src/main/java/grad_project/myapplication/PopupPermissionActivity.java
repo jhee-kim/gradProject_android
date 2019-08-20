@@ -22,9 +22,9 @@ public class PopupPermissionActivity extends Activity {
 
     /***** 권한 *****/
     private String[] permissions = {
+            Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.BLUETOOTH
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
     static final int MULTIPLE_PERMISSION = 1;
     ArrayList<String> permissionList;

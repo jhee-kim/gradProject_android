@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FCFCFC">
+
+    <LinearLayout
+        android:id="@+id/layout_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="설문조사"
+                android:textSize="16sp"
+                android:fontFamily="@font/m_gothic_bold"
+                android:textColor="@color/focusText"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="에 참여해주세요!"
+                android:textSize="16sp"
+                android:fontFamily="@font/m_gothic_normal"
+                android:textColor="@color/focusText"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/layout_text"
+        android:background="@color/disableButton">
+
+        <Button
+            android:id="@+id/bt_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/cancelButton"
+            android:text="@string/cancel_str"
+            android:textColor="@color/unfocusText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
+        <Button
+            android:id="@+id/bt_apply"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/applyButton"
+            android:text="@string/apply_str"
+            android:textColor="@color/focusText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

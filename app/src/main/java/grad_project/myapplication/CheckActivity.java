@@ -1,11 +1,8 @@
 package grad_project.myapplication;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,11 +34,11 @@ import java.util.Locale;
 
 public class CheckActivity extends AppCompatActivity {
     private SharedPreferences infoData;
-    long l_nowTime, l_startTime, l_endTime, l_elapseTime;
+    long l_nowTime, l_startTime, l_endTime, l_elapseTime, l_finishTime;
     long l_delayTime = 0;
-    String s_nowTime, s_startTime, s_endTime, s_elapseTime, s_id;
-    boolean is_start, is_finish;
-    TextView tv_nowTime, tv_startTime, tv_endTime, tv_elapsedTime;
+    String s_nowTime, s_startTime, s_endTime, s_elapseTime, s_finishTime, s_id;
+    boolean is_start;
+    TextView tv_nowTime, tv_startTime, tv_endTime, tv_elapsedTime, tv_endTimeText, tv_elapsedTimeText;
     private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
     LinearLayout[] ll_ex = new LinearLayout[6];
     ImageView[] iv_ex = new ImageView[6];
@@ -52,6 +49,7 @@ public class CheckActivity extends AppCompatActivity {
     TimerHandler timerhandler;
     private static int MESSAGE_TIMER_START = 100;
     private static int REFRESH_TIMER_START = 200;
+    private static int NOWTIME_REFRESH_TIMER_START = 199;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -87,6 +85,8 @@ public class CheckActivity extends AppCompatActivity {
         tv_startTime = findViewById(R.id.tv_startTime);
         tv_endTime = findViewById(R.id.tv_endTime);
         tv_elapsedTime = findViewById(R.id.tv_elapsedTime);
+        tv_endTimeText = findViewById(R.id.tv_endTimeText);
+        tv_elapsedTimeText = findViewById(R.id.tv_elapsedTimeText);
         ll_ex[0] = findViewById(R.id.layout_ex_1);
         ll_ex[1] = findViewById(R.id.layout_ex_2);
         ll_ex[2] = findViewById(R.id.layout_ex_3);
@@ -105,7 +105,10 @@ public class CheckActivity extends AppCompatActivity {
         l_startTime = getStartTime();
         getTimeRefresh();
         getTimeData();
-        getExhibitionData();
+        if (!getExhibitionData()) {
+            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         timerhandler = new TimerHandler();
     }
@@ -116,9 +119,11 @@ public class CheckActivity extends AppCompatActivity {
 
         loadData();
 
-        String endResult = isAlreadyEnd();
-
-        if (endResult.equals("0")) {
+        String endResult = getEndTime();
+        if (endResult.equals("ERROR")) {
+            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+            finish();
+        } else if (endResult.equals("0")) {
             if (connectState) {
                 if (is_start) {
                     timerhandler.sendEmptyMessage(MESSAGE_TIMER_START);
@@ -174,6 +179,31 @@ public class CheckActivity extends AppCompatActivity {
             }
         } else {
             Toast.makeText(getApplicationContext(), "이미 관람 완료된 사용자입니다.", Toast.LENGTH_SHORT).show();
+            timerhandler.sendEmptyMessage(NOWTIME_REFRESH_TIMER_START);
+            try {
+                SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+                l_finishTime = df.parse(endResult).getTime();
+                Date finishTime = new Date(l_finishTime);
+                SimpleDateFormat sdfFinish = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
+                s_finishTime = sdfFinish.format(finishTime);
+                l_elapseTime = l_finishTime - l_startTime - 32400000;
+                Date elapseDate = new Date(l_elapseTime);
+                SimpleDateFormat sdfElapse = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
+                s_elapseTime = sdfElapse.format(elapseDate);
+                Log.d("ELAPSE TIME", s_elapseTime);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv_endTimeText.setText("관람 종료 시간");
+                        tv_endTime.setText(s_finishTime);
+                        tv_elapsedTimeText.setText("총 관람 시간");
+                        tv_elapsedTime.setText(s_elapseTime);
+                        bt_finish.setText("관람 종료되었습니다");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             for (int i = 0; i < 6; i++) {
                 iv_ex[i].setImageResource(R.drawable.complete);
                 ll_ex[i].setOnClickListener(new View.OnClickListener() {
@@ -193,23 +223,7 @@ public class CheckActivity extends AppCompatActivity {
 
         timerhandler.removeMessages(MESSAGE_TIMER_START);
         timerhandler.removeMessages(REFRESH_TIMER_START);
-    }
-
-    // 설문조사 요청
-    public void surveyDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("설문조사에 참여해주세요!");
-        builder.setPositiveButton("확인",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.i815.or.kr/"));
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-        builder.setCancelable(false);
-        builder.show();
+        timerhandler.removeMessages(NOWTIME_REFRESH_TIMER_START);
     }
 
 
@@ -245,7 +259,8 @@ public class CheckActivity extends AppCompatActivity {
                         else if (result.equals("1")) {
                             Toast.makeText(getApplicationContext(), "관람 종료 확인이 되었습니다.", Toast.LENGTH_SHORT).show();
                             connectState = true;
-                            surveyDialog();
+                            Intent in_survey = new Intent(CheckActivity.this, PopupSurveyActivity.class);
+                            startActivityForResult(in_survey, 0);
                             break;
                         }
                     } catch (Exception e) {
@@ -259,15 +274,28 @@ public class CheckActivity extends AppCompatActivity {
         }
     }
 
-    public String isAlreadyEnd() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // 설문조사 팝업 닫혔을 때
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                Intent intent = new Intent(CheckActivity.this, ConfirmActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }
+    }
+
+    public String getEndTime() {
         FinishTask finishTask = new FinishTask(this);
         try {
             return finishTask.execute(GET_ISEND, s_id).get();
         } catch (Exception e) {
             e.printStackTrace();
-            connectState = false;
+            return "ERROR";
         }
-        return "-1";
     }
 
     public void getTimeData() {
@@ -299,23 +327,33 @@ public class CheckActivity extends AppCompatActivity {
                 }
             });
         }
+    }
 
+    public void nowTimeRefresh() {
+        getNowTime();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tv_nowTime.setText(s_nowTime);
+            }
+        });
     }
 
     public void getTimeRefresh() {
-        getNowTime();
+//        getNowTime();
+        nowTimeRefresh();
 
         if (is_start) {
             l_elapseTime = l_nowTime - l_startTime - 32400000;
-            Date ElapseDate = new Date(l_elapseTime);
+            Date elapseDate = new Date(l_elapseTime);
             SimpleDateFormat sdfElapse = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
-            s_elapseTime = sdfElapse.format(ElapseDate);
+            s_elapseTime = sdfElapse.format(elapseDate);
             Log.d("ELAPSE TIME", s_elapseTime);
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    tv_nowTime.setText(s_nowTime);
+//                    tv_nowTime.setText(s_nowTime);
                     tv_elapsedTime.setText(s_elapseTime);
                 }
             });
@@ -323,7 +361,7 @@ public class CheckActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    tv_nowTime.setText(s_nowTime);
+//                    tv_nowTime.setText(s_nowTime);
                     tv_elapsedTime.setText("");
                 }
             });
@@ -337,6 +375,7 @@ public class CheckActivity extends AppCompatActivity {
         s_nowTime = sdfNow.format(nowDate);
         Log.d("CURRENT TIME", s_nowTime);
     }
+
     // 3초 단위로 시작 여부 서버에서 받아옴
     private class TimerHandler extends Handler {
         @Override
@@ -346,26 +385,39 @@ public class CheckActivity extends AppCompatActivity {
                 this.sendEmptyMessageDelayed(MESSAGE_TIMER_START, 1000);
             }
             else if (msg.what == REFRESH_TIMER_START) {
-                GetIsStartTask startTask = new GetIsStartTask(CheckActivity.this);
-                try {
-                    String result = startTask.execute(GET_ISSTART, s_id).get();
-                    is_start = !result.equals("0");
-                    getTimeRefresh();
+                if (getStartState()) {
                     if (is_start) {
                         timerhandler.removeMessages(REFRESH_TIMER_START);
                         onPause();
                         l_startTime = getStartTime();
                         getTimeData();
                         onResume();
-                        Log.d("REFRESH","RUNNING");
+                        Log.d("REFRESH", "RUNNING");
                     } else {
                         this.sendEmptyMessageDelayed(REFRESH_TIMER_START, 1000);
                     }
-                    Log.d("ISSTART", Boolean.toString(is_start));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } else {
+                    Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
+            } else if (msg.what == NOWTIME_REFRESH_TIMER_START) {
+                nowTimeRefresh();
+                this.sendEmptyMessageDelayed(NOWTIME_REFRESH_TIMER_START, 1000);
             }
+        }
+    }
+
+    public boolean getStartState() {
+        GetIsStartTask startTask = new GetIsStartTask(CheckActivity.this);
+        try {
+            String result = startTask.execute(GET_ISSTART, s_id).get();
+            is_start = !result.equals("0");
+            getTimeRefresh();
+            Log.d("ISSTART", Boolean.toString(is_start));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -383,7 +435,6 @@ public class CheckActivity extends AppCompatActivity {
                 }
             }
         }
-
         return state;
     }
 
@@ -416,7 +467,7 @@ public class CheckActivity extends AppCompatActivity {
         return -1;
     }
     // DB 전시관 데이터 받아오기
-    public void getExhibitionData() {
+    public boolean getExhibitionData() {
         // 전시관 오픈 여부
         GetExhibitionTask task = new GetExhibitionTask(this);
         try {
@@ -429,11 +480,11 @@ public class CheckActivity extends AppCompatActivity {
                 JSONObject jObject = jArray.getJSONObject(i);
                 exhibitionState[i] = jObject.getString("isOpen");
                 Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
-                connectState = true;
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            connectState = false;
+            return false;
         }
     }
     /***** 서버 통신 *****/
@@ -602,7 +653,7 @@ public class CheckActivity extends AppCompatActivity {
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return "Error: " + e.getMessage();
+                return "ERROR";
             }
         }
     }

@@ -2,17 +2,22 @@ package grad_project.myapplication;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -71,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout bt_viewtime, bt_myinfo, bt_certificate_2, bt_registration_2, bt_homepage, bt_information;
     Long startDate;
     private boolean is_start = false;
-    boolean connectState = false;
+    private boolean is_end = false;
 
     public static Activity A_MainActivity;
 
@@ -79,12 +84,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
     public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
+    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
 
     /***** 권한 *****/
     private String[] permissions = {
+            Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.BLUETOOTH
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
     ArrayList<String> permissionList;
 
@@ -206,36 +212,91 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean getNetworkInfo() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null) {
+            return networkInfo.isConnected();
+        } else {
+            return false;
+        }
+    }
+
     /* DB-서버 통신 파트 */
-    // 관람 시작이 되었는지 여부 받아오는 메소드
-    public void getStartState() {
+    // 관람 시작이 되었는지 여부 받아오는 메소드(연결 상태 return)
+    public boolean getStartState() {
         // 관람 시작 여부
         GetIsStartTask startTask = new GetIsStartTask(this);
         try {
             String result = startTask.execute(GET_ISSTART, s_id).get();
-            is_start = !result.equals("0");
-            if (is_start) {
-                SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
-                startDate = df.parse(result).getTime();
-                connectState = true;
+            if (result.equals("ERROR")) {
+                return false;
+            } else {
+                is_start = !result.equals("0");
+                if (is_start) {
+                    SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+                    startDate = df.parse(result).getTime();
+                }
+                Log.d("ISSTART", String.valueOf(startDate));
+                return true;
             }
-            Log.d("ISSTART", String.valueOf(startDate));
         } catch (Exception e) {
             e.printStackTrace();
-            connectState = false;
+        }
+        return false;
+    }
+
+
+    public boolean isEnd() {
+        FinishTask finishTask = new FinishTask(this);
+        try {
+            String result = finishTask.execute(GET_ISEND, s_id).get();
+            Log.d("ISEND RESULT", result);
+            if (result.equals("ERROR")) {
+                return false;
+            } else if (result.equals("0")) {
+                is_end = false;
+                return true;
+            } else {
+                is_end = true;
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
         final ImageView iv_registration = findViewById(R.id.iv_registration);
+
+        if (!getNetworkInfo()) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("앱 사용을 위해서 네트워크 연결이 필요합니다.");
+            builder.setPositiveButton("설정",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                            startActivity(intent);
+                        }
+                    });
+            builder.setNegativeButton("종료",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            finish();
+                        }
+                    });
+            builder.setCancelable(false);
+            builder.show();
+        }
+
         loadInfo();
 
-        if (is_autoLogin) {
-            is_login = true;
-        } else {
-            is_login = false;
-        }
+        is_login = is_autoLogin;
 
         /* 액티비티 화면 내용 설정 */
         // 최초 등록 버튼 활성화 및 비활성화
@@ -327,8 +388,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (is_login) {
-                    Intent intent = new Intent(MainActivity.this, ConfirmActivity.class);
-                    startActivity(intent);
+                    if (isEnd()) {
+                        if (is_end) {
+                            Intent intent = new Intent(MainActivity.this, ConfirmActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "아직 관람이 완료되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivityForResult(intent, 0);
@@ -362,14 +431,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
-
         // 최초 등록 완료했을 경우(자동 로그인 됨)
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 is_login = true;
             }
         }
-
         // 관람 완료 후 메인 액티비티로 자동 진입할 때
         if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
@@ -378,28 +445,25 @@ public class MainActivity extends AppCompatActivity {
                 is_menuOpen = false;
             }
         }
-
-//        // 권한 요청 결과
-//        if (requestCode == -1) {
-//            if (resultCode == RESULT_CANCELED) {
-//            }
-//        }
     }
 
     // 메인 화면 버튼
     public void onClick(View v) {
         // 관람하기 버튼
         if (v == bt_openMap) {
-            getStartState();
             if (is_login) {
-                if (is_start) {
-                    Intent intent = new Intent(MainActivity.this, NormalActivity.class);
-                    intent.putExtra("Time", startDate);
+                if (getStartState()) {
+                    if (is_start) {
+                        Intent intent = new Intent(MainActivity.this, NormalActivity.class);
+                        intent.putExtra("Time", startDate);
 
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(MainActivity.this, HelpActivity.class);
-                    startActivity(intent);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(MainActivity.this, HelpActivity.class);
+                        startActivity(intent);
+                    }
+                } else {    // 네트워크 통신 오류 예외처리
+                    Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -416,8 +480,16 @@ public class MainActivity extends AppCompatActivity {
         // 확인증 발급 버튼
         if (v == bt_certificate) {
             if (is_login) {
-                Intent intent = new Intent(MainActivity.this, ConfirmActivity.class);
-                startActivity(intent);
+                if (isEnd()) {
+                    if (is_end) {
+                        Intent intent = new Intent(MainActivity.this, ConfirmActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "아직 관람이 완료되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivityForResult(intent, 0);
@@ -428,22 +500,39 @@ public class MainActivity extends AppCompatActivity {
     // 메뉴 내부에 있는 로그아웃 버튼
     public void onLogout(View v) {
         if (v == findViewById(R.id.bt_logout)) {
-            is_login = false;
-            is_start = false;
-            is_autoLogin = false;
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("로그아웃하면 관람 진행 정보가 모두 삭제됩니다.\n정말 로그아웃 하시겠습니까?");
+            builder.setPositiveButton("네",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            is_login = false;
+                            is_start = false;
+                            is_autoLogin = false;
 
-            SharedPreferences.Editor editor = infoData.edit();
-            editor.clear();
-            editor.putBoolean("IS_AUTOLOGIN", false);
-            editor.apply();
+                            SharedPreferences.Editor editor = infoData.edit();
+                            editor.clear();
+                            editor.putBoolean("IS_AUTOLOGIN", false);
+                            editor.apply();
 
-            final DrawerLayout drawerLayout = findViewById(R.id.layout_main);
-            final View slideView = findViewById(R.id.layout_slide);
-            drawerLayout.closeDrawer(slideView);
+                            final DrawerLayout drawerLayout = findViewById(R.id.layout_main);
+                            final View slideView = findViewById(R.id.layout_slide);
+                            drawerLayout.closeDrawer(slideView);
 
-            Toast.makeText(getApplicationContext(), "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
 
-            onRestart();
+                            onRestart();
+                        }
+                    });
+            builder.setNegativeButton("아니오",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.setCancelable(false);
+            builder.show();
         }
     }
 
@@ -513,12 +602,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-/*  차후 구현 예정  // 관람 종료 여부 받아오는 부분
-    public static class PutFinishTask extends AsyncTask<String, Void, String> {
+    // 관람 종료 여부 정보 받아오기
+    public static class FinishTask extends AsyncTask<String, Void, String> {
         private WeakReference<MainActivity> activityReference;
         ProgressDialog progressDialog;
 
-        PutFinishTask(MainActivity context) {
+        FinishTask(MainActivity context) {
             activityReference = new WeakReference<>(context);
         }
         @Override
@@ -566,10 +655,9 @@ public class MainActivity extends AppCompatActivity {
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return "Error: " + e.getMessage();
+                return "ERROR";
             }
         }
     }
-*/
 }
 

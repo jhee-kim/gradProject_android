@@ -1,9 +1,7 @@
 package grad_project.myapplication;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -11,9 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,15 +23,12 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.ForkJoinPool;
 
 public class ConfirmActivity extends AppCompatActivity {
-    private SharedPreferences infoData;
     String s_id, s_name, s_number, s_phone, s_temper, s_destination, s_participation, s_division, s_startDate;
     TextView tv_participation, tv_name, tv_start, tv_date1, tv_date2;
 
@@ -62,36 +57,42 @@ public class ConfirmActivity extends AppCompatActivity {
         });
 
 
+        SharedPreferences infoData;
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
         s_id = infoData.getString("ID", "");
-        getUserData();
-        getStartState();
-        SharedPreferences.Editor editor = infoData.edit();
-        editor.putString("NAME", s_name);
-        editor.apply();
-
-        tv_participation = findViewById(R.id.tv_participation);
-        tv_name = findViewById(R.id.tv_name);
-        tv_start = findViewById(R.id.tv_start);
-        tv_date1 = findViewById(R.id.tv_date1);
-        tv_date2  = findViewById(R.id.tv_date2);
-        if(s_number.length() > 3) {
-            s_number = s_number.substring(0, 2) + "-" + s_number.substring(3, s_number.length());
+        if (getStartState()) {
+            if(getUserData()) {
+                tv_participation = findViewById(R.id.tv_participation);
+                tv_name = findViewById(R.id.tv_name);
+                tv_start = findViewById(R.id.tv_start);
+                tv_date1 = findViewById(R.id.tv_date1);
+                tv_date2 = findViewById(R.id.tv_date2);
+                if (s_number.length() > 3) {
+                    s_number = s_number.substring(0, 2) + "-" + s_number.substring(2);
+                }
+                String temp_name = s_name + "\n(" + s_number + ")";
+                tv_name.setText(temp_name);
+                switch (s_participation) {
+                    case "0":
+                        tv_participation.setText("전시 관람");
+                        break;
+                    case "1":
+                        tv_participation.setText("전시 해설");
+                        break;
+                    default:
+                        tv_participation.setText("E");
+                }
+                tv_start.setText(s_startDate);
+                tv_date1.setText(DateFormat.format("yyyy년 MM월 dd일", Calendar.getInstance(Locale.KOREA)));
+                tv_date2.setText(DateFormat.format("yyyy. MM. dd", Calendar.getInstance(Locale.KOREA)));
+            } else {    // 네트워크 통신 오류 예외처리
+                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        } else {    // 네트워크 통신 오류 예외처리
+            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+            finish();
         }
-        tv_name.setText(s_name+"\n("+s_number+")");
-        switch (s_participation) {
-            case "0":
-                tv_participation.setText("전시 관람");
-                break;
-            case "1":
-                tv_participation.setText("전시 해설");
-                break;
-            default :
-                tv_participation.setText("E");
-        }
-        tv_start.setText(s_startDate);
-        tv_date1.setText(DateFormat.format("yyyy년 MM월 dd일", Calendar.getInstance(Locale.KOREA)));
-        tv_date2.setText(DateFormat.format("yyyy. MM. dd", Calendar.getInstance(Locale.KOREA)));
     }
 
     public void onBack(View v) {
@@ -99,50 +100,54 @@ public class ConfirmActivity extends AppCompatActivity {
             finish();
         }
     }
+
     // DB에서 데이터 새로 받아오는 메소드
-    public void getUserData() {
+    public boolean getUserData() {
         GetUserData task = new GetUserData(this);
         try {
             String result = task.execute(GET_AUDIENCE, s_id).get();
-            JSONObject jResult = new JSONObject(result);
-            JSONArray jArray = jResult.getJSONArray("result");
-            JSONObject jObject = jArray.getJSONObject(0);
-            s_number = jObject.getString("number");
-            s_name = jObject.getString("name");
-            s_phone = jObject.getString("phone");
-            s_participation = jObject.getString("participation");
-            s_division = jObject.getString("division");
-            s_temper = jObject.getString("temper");
-            s_destination = jObject.getString("destination");
+            if (result.equals("ERROR")) {
+                return false;
+            } else {
+                JSONObject jResult = new JSONObject(result);
+                JSONArray jArray = jResult.getJSONArray("result");
+                JSONObject jObject = jArray.getJSONObject(0);
+                s_number = jObject.getString("number");
+                s_name = jObject.getString("name");
+                s_phone = jObject.getString("phone");
+                s_participation = jObject.getString("participation");
+                s_division = jObject.getString("division");
+                s_temper = jObject.getString("temper");
+                s_destination = jObject.getString("destination");
+            }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
     /* DB-서버 통신 파트 */
     // 관람 시작이 되었는지 여부 받아오는 메소드
-    public void getStartState() {
+    public boolean getStartState() {
         // 관람 시작 여부
         GetIsStartTask startTask = new GetIsStartTask(this);
         try {
-            s_startDate = startTask.execute(GET_ISSTART, s_id).get();
-            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(s_startDate);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd\n(HH:mm)");
-            s_startDate = sdf.format(date);
+            String result = startTask.execute(GET_ISSTART, s_id).get();
+            Log.d("CONFIRM result", result);
+            if (result.equals("ERROR")) {
+                return false;
+            } else if (!result.equals("0")) {
+                Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).parse(result);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd\n(HH:mm)", Locale.KOREA);
+                s_startDate = sdf.format(date);
+                return true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d("CONNECTION ERROR", "start state");
         }
+        return false;
     }
-
-//    // 저장된 값 가져오기
-//    private void loadInfo() {
-//        s_number = infoData.getString("NUMBER", "");
-//        s_name = infoData.getString("NAME", "");
-//        s_phone = infoData.getString("PHONE", "");
-//        s_division = infoData.getString("DIVISION", "");
-//        s_temper = infoData.getString("TEMPER", "");
-//        s_destination = infoData.getString("DESTINATION", "");
-//        s_participation = infoData.getString("PARTICIPATION", "");
-//    }
 
     /***** 서버 통신 *****/
     // 사용자 데이터 받아오는 부분
@@ -178,7 +183,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.connect();
                 OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes(StandardCharsets.UTF_8));
+                outputStream.write(postParameters.getBytes("UTF-8"));
                 outputStream.flush();
                 outputStream.close();
                 int responseStatusCode = httpURLConnection.getResponseCode();
@@ -189,7 +194,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 else{
                     inputStream = httpURLConnection.getErrorStream();
                 }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -199,7 +204,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return "Error: " + e.getMessage();
+                return "ERROR";
             }
         }
     }
@@ -237,7 +242,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.connect();
                 OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes(StandardCharsets.UTF_8));
+                outputStream.write(postParameters.getBytes("UTF-8"));
                 outputStream.flush();
                 outputStream.close();
                 int responseStatusCode = httpURLConnection.getResponseCode();
@@ -248,7 +253,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 else{
                     inputStream = httpURLConnection.getErrorStream();
                 }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -258,7 +263,7 @@ public class ConfirmActivity extends AppCompatActivity {
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return "Error: " + e.getMessage();
+                return "ERROR";
             }
         }
     }

@@ -97,18 +97,39 @@
                 android:text="@string/number_str"
                 android:textSize="20sp"
                 android:fontFamily="@font/m_gothic_bold" />
-            <EditText
-                android:hint="@string/number_hint_str"
-                android:id="@+id/et_login_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_gravity="center_vertical"
-                android:textSize="16sp"
-                android:inputType="number"
-                android:background="@drawable/custom_edittext"
-                android:fontFamily="@font/m_gothic_normal" />
 
+                <Spinner
+                    android:id="@+id/sp_login_number_0"
+                    android:layout_width="60dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center_vertical"
+                    android:spinnerMode="dropdown"
+                    android:entries="@array/number_head"
+                    android:textSize="16sp"
+                    android:background="@drawable/spinner_background"
+                    android:fontFamily="@font/m_gothic_normal"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/hyphen"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/m_gothic_bold"/>
+                <EditText
+                    android:id="@+id/et_login_number_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center_vertical"
+                    android:textColorHint="@color/hintText"
+                    android:textSize="16sp"
+                    android:inputType="number"
+                    android:maxLength="8"
+                    android:background="@drawable/custom_edittext"
+                    android:fontFamily="@font/m_gothic_normal"/>
         </LinearLayout>
         <Button
             android:id="@+id/bt_login"

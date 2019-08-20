@@ -9,9 +9,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -25,8 +27,11 @@ import java.net.URL;
 public class LoginActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     private boolean is_correct = false;
-    private String s_id;
-
+    private String s_id, input_name;
+    Button bt_login, bt_registration;
+    Spinner sp_number_0;
+    EditText et_name, et_number_1;
+    String s_number_0, s_number_1;
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
     public static final String GET_ID = BASE_PATH + "login.php";             //로그인(성공 id, 실패 0 반환)
@@ -52,6 +57,20 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        bt_login = findViewById(R.id.bt_login);
+        bt_registration = findViewById(R.id.bt_registration);
+        et_name = findViewById(R.id.et_login_name);
+        sp_number_0 = findViewById(R.id.sp_login_number_0);
+        et_number_1 = findViewById(R.id.et_login_number_1);
+
+        sp_number_0.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                s_number_0 = parent.getItemAtPosition(position).toString();
+            }
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
     }
 
     public void onBack(View v) {
@@ -61,35 +80,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
-        Button bt_login = findViewById(R.id.bt_login);
-        Button bt_registration = findViewById(R.id.bt_registration);
         if (v == bt_login) {
-            EditText et_name = findViewById(R.id.et_login_name);
-            EditText et_number = findViewById(R.id.et_login_number);
-            String input_name = et_name.getText().toString();
-            String input_number = et_number.getText().toString();
-
-            if (input_name.equals("") || input_number.equals("")) {
-                Toast.makeText(getApplicationContext(), "정보를 올바르게 입력하세요.", Toast.LENGTH_SHORT).show();
-            } else {
-                LoginTask task = new LoginTask(this);
-                try {
-                    String result = task.execute(GET_ID, input_number, input_name).get();
-                    Log.d("LOGIN RESULT", result);
-                    if(result.equals("0")) {
-                        is_correct = false;
-                    } else {
-                        try {
-                            s_id = result;
-                            is_correct = true;
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+            if (tryLogin()) {
                 if (is_correct) {
                     Intent in_login = new Intent(LoginActivity.this, MainActivity.class);
                     setResult(RESULT_OK, in_login);
@@ -103,6 +95,8 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(LoginActivity.this, "로그인 정보를 확인해주세요.", Toast.LENGTH_SHORT).show();
                 }
+            } else {    // 네트워크 통신 오류 예외처리
+                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             }
         }
         if (v == bt_registration) {
@@ -110,6 +104,35 @@ public class LoginActivity extends AppCompatActivity {
             startActivityForResult(intent, 0);
             finish();
         }
+    }
+
+    public boolean tryLogin() {
+        input_name = et_name.getText().toString();
+        s_number_1 = et_number_1.getText().toString();
+
+        String input_number = s_number_0 + s_number_1;
+        Log.d("INPUT NUMBER", input_number);
+        if (input_name.equals("") || input_number.equals("")) {
+            Toast.makeText(getApplicationContext(), "정보를 올바르게 입력하세요.", Toast.LENGTH_SHORT).show();
+        } else {
+            LoginTask task = new LoginTask(this);
+            try {
+                String result = task.execute(GET_ID, input_number, input_name).get();
+                Log.d("LOGIN RESULT", result);
+                if (result.equals("ERROR")) {
+                    return false;
+                } else if (result.equals("0")) {
+                    is_correct = false;
+                } else {
+                    s_id = result;
+                    is_correct = true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
     }
 
     /***** 서버 통신 *****/
@@ -167,7 +190,7 @@ public class LoginActivity extends AppCompatActivity {
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return "Error: " + e.getMessage();
+                return "ERROR";
             }
         }
     }
