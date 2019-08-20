@@ -117,8 +117,7 @@
         android:layout_width="250dp"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
-        android:background="#ffffff"
-        android:layout_gravity="start">
+        android:background="#ffffff">
 
         <!-- 슬라이드 메뉴 닫기 버튼 -->
         <RelativeLayout
@@ -141,7 +140,7 @@
         <!-- 로그아웃 버튼 -->
         <RelativeLayout
             android:id="@+id/bt_logout"
-            android:layout_width="100dp"
+            android:layout_width="110dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
@@ -155,7 +154,7 @@
                 android:background="@drawable/logout"
                 android:scaleType="fitCenter"/>
             <TextView
-                android:layout_width="60dp"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
                 android:layout_centerVertical="true"
