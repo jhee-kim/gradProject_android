@@ -73,39 +73,39 @@
             android:textSize="14sp"
             android:textColor="@color/unfocusText"
             android:fontFamily="@font/m_gothic_bold"
-            android:background="@drawable/custom_button"
+            android:background="@drawable/custom_main_button"
             style="?android:attr/borderlessButtonStyle"/>
 
         <Button
             android:id="@+id/bt_certificate"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
             android:layout_marginBottom="15dp"
             android:onClick="onClick"
             android:text="@string/certificate_str"
             android:textSize="18sp"
             android:textColor="@color/unfocusText"
             android:fontFamily="@font/m_gothic_bold"
-            android:background="@drawable/custom_button"
+            android:background="@drawable/custom_main_button"
             style="?android:attr/borderlessButtonStyle"/>
 
         <Button
             android:id="@+id/bt_registration"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_above="@+id/bt_certificate"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="20dp"
             android:onClick="onClick"
             android:text="@string/registration_str"
             android:textSize="18sp"
             android:textColor="@color/unfocusText"
             android:fontFamily="@font/m_gothic_bold"
-            android:background="@drawable/custom_button"
+            android:background="@drawable/custom_main_button"
             style="?android:attr/borderlessButtonStyle"/>
 
     </RelativeLayout>
@@ -141,18 +141,29 @@
         <!-- 로그아웃 버튼 -->
         <RelativeLayout
             android:id="@+id/bt_logout"
-            android:layout_width="40dp"
+            android:layout_width="110dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:layout_margin="10dp">
-
             <ImageView
+                android:id="@+id/iv_logout"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/logout"
                 android:scaleType="fitCenter"/>
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/iv_logout"
+                android:text="로그아웃"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:fontFamily="@font/m_gothic_bold"/>
         </RelativeLayout>
 
         <!-- 이름 표시되는 곳 -->
@@ -204,7 +215,9 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:text="@string/check_str"
-                        android:textAlignment="center"/>
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
                 </LinearLayout>
 
                 <!-- 내 정보 버튼 -->
@@ -228,7 +241,9 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:text="@string/myinfo_str"
-                        android:textAlignment="center"/>
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
                 </LinearLayout>
 
                 <!-- 확인증 버튼 -->
@@ -252,7 +267,9 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:text="@string/certificate_str"
-                        android:textAlignment="center"/>
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -285,7 +302,9 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:text="@string/registration_str"
-                        android:textAlignment="center"/>
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
                 </LinearLayout>
 
                 <!-- 홈페이지 버튼 -->
@@ -309,7 +328,9 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:text="@string/homepage_str"
-                        android:textAlignment="center"/>
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
                 </LinearLayout>
 
                 <!-- 도움말 버튼 -->
@@ -333,7 +354,9 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:text="@string/help_str"
-                        android:textAlignment="center"/>
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

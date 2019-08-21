@@ -3,6 +3,7 @@
     package="grad_project.myapplication">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
@@ -47,7 +48,16 @@
         <activity android:name=".CheckActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".PopupAgreementActivity" android:theme="@android:style/Theme.Dialog"
+            android:screenOrientation="portrait">
+        </activity>
         <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".PopupPermissionActivity" android:theme="@android:style/Theme.Dialog"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".PopupSurveyActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.popup_Map_Theme"

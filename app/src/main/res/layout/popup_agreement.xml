@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="340dp"
+    android:layout_height="450dp"
+    android:orientation="vertical"
+    android:background="#FCFCFC">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:text="개인정보 수집 및 이용에 대한 동의"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:fontFamily="@font/m_gothic_bold"
+        android:textColor="@color/focusText"/>
+
+    <ScrollView
+        android:id="@+id/sv_contents"
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:layout_below="@id/tv_title"
+        android:layout_margin="20dp"
+        android:padding="8dp"
+        android:background="@drawable/tv_border_thin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="독립기념관은 국군병사 휴가 프로그램 접수 및 확인증 발급을 위해 다음과 개인정보를 수집하고 있습니다."
+                android:textSize="14sp"
+                android:textColor="@color/unfocusText"
+                android:fontFamily="@font/m_gothic_normal"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="5dp"
+                android:text="개인정보 수집 및 이용동의"
+                android:textSize="16sp"
+                android:textColor="@color/unfocusText"
+                android:fontFamily="@font/m_gothic_bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="- "
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="수집목적 : 국군병사 휴가 프로그램 접수 및 확인증 발급"
+                        android:textSize="14sp"
+                        android:textColor="@color/unfocusText"
+                        android:fontFamily="@font/m_gothic_normal"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="- "
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="수집항목 : 성명, 휴대전화, 군번"
+                        android:textSize="14sp"
+                        android:textColor="@color/unfocusText"
+                        android:fontFamily="@font/m_gothic_normal"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="- "
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="보유 및 이용기간 : 1년(1년 후 파기)"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_bold"
+                        android:textColor="@color/red"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="- "
+                        android:textSize="14sp"
+                        android:fontFamily="@font/m_gothic_normal"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="동의 거부 권리 : 개인정보보호법 제15조 제2항 제4조(동의를 거부할 권리가 있다는 사실 확인 및 동의 거부에 따른 불이익이 있는 경우에는 그 불이익의 내용)에 따라서 동의를 거부할 수 있으나 동의 거부 시 서비스 이용에 제한이 있을 수 있습니다."
+                        android:textSize="14sp"
+                        android:textColor="@color/unfocusText"
+                        android:fontFamily="@font/m_gothic_normal"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/ll_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/bt_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/cancelButton"
+            android:text="거부"
+            android:textColor="@color/unfocusText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
+        <Button
+            android:id="@+id/bt_apply"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/applyButton"
+            android:text="동의"
+            android:textColor="@color/focusText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
+    </LinearLayout>
+</RelativeLayout>

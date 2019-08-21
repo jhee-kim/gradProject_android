@@ -62,7 +62,6 @@
                 android:layout_marginEnd="5dp"
                 android:gravity="center_vertical"
                 android:layout_alignParentEnd="true"
-                android:text="test"
                 android:textSize="14sp"
                 android:fontFamily="@font/m_gothic_bold"/>
             <TextView
@@ -89,7 +88,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:layout_marginStart="5dp"
-                android:text="관람 시작"
+                android:text="@string/time_start_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -100,7 +99,6 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="end|center_vertical"
-                android:text="test"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_bold"/>
         </LinearLayout>
@@ -112,11 +110,12 @@
             android:orientation="horizontal"
             android:background="@drawable/tv_border_center">
             <TextView
+                android:id="@+id/tv_endTimeText"
                 android:layout_width="120dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:layout_marginStart="5dp"
-                android:text="관람 종료 예정"
+                android:text="@string/time_end_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -128,7 +127,6 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="end"
-                android:text="test"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_bold"/>
         </LinearLayout>
@@ -140,11 +138,12 @@
             android:orientation="horizontal"
             android:background="@drawable/tv_border_bottom">
             <TextView
+                android:id="@+id/tv_elapsedTimeText"
                 android:layout_width="120dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:layout_marginStart="5dp"
-                android:text="경과 시간"
+                android:text="@string/time_elapsed_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -156,7 +155,6 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="end"
-                android:text="test"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_bold"/>
         </LinearLayout>
@@ -180,7 +178,7 @@
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|center_vertical"
-                android:text="1 전시관"
+                android:text="@string/ex1_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -206,7 +204,7 @@
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|center_vertical"
-                android:text="2 전시관"
+                android:text="@string/ex2_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -231,7 +229,7 @@
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|center_vertical"
-                android:text="3 전시관"
+                android:text="@string/ex3_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -258,7 +256,7 @@
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|center_vertical"
-                android:text="4 전시관"
+                android:text="@string/ex4_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -283,7 +281,7 @@
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|center_vertical"
-                android:text="5 전시관"
+                android:text="@string/ex5_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -310,7 +308,7 @@
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|center_vertical"
-                android:text="6 전시관"
+                android:text="@string/ex6_str"
                 android:textSize="16sp"
                 android:fontFamily="@font/m_gothic_normal"
                 android:background="@drawable/tv_border_title"/>
@@ -336,7 +334,7 @@
         android:layout_marginEnd="20dp"
         android:layout_below="@id/layout_exhibition"
         android:onClick="onClick"
-        android:text="지도 열기"
+        android:text="@string/openMap_str"
         android:textSize="16sp"
         android:fontFamily="@font/m_gothic_normal"
         android:background="@drawable/custom_button"
@@ -351,7 +349,7 @@
         android:layout_marginEnd="20dp"
         android:layout_below="@id/bt_toMap"
         android:onClick="onClick"
-        android:text="관람 종료하기"
+        android:text="@string/finish_str"
         android:textSize="16sp"
         android:fontFamily="@font/m_gothic_normal"
         android:background="@drawable/custom_button"

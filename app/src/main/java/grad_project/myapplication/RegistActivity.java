@@ -7,11 +7,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -43,7 +46,9 @@ public class RegistActivity extends AppCompatActivity {
     EditText et_name, et_temper, et_number_1, et_phone_1, et_phone_2, et_destination;
     Spinner sp_number_0, sp_phone_0, sp_division;
     CheckBox cb_check;
+    boolean check_temp;
     RadioGroup rg_participation, rg_division;
+    LinearLayout ll_agreement;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -72,6 +77,10 @@ public class RegistActivity extends AppCompatActivity {
         cb_check = findViewById(R.id.cb_check);
         sp_division = findViewById(R.id.sp_division);
         rg_participation = findViewById(R.id.rg_participation);
+        ll_agreement = findViewById(R.id.ll_agreement);
+
+        check_temp = false;
+        cb_check.setChecked(false);
 
         sp_number_0.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -80,12 +89,48 @@ public class RegistActivity extends AppCompatActivity {
             }
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+//        군번 8자리 입력하면 자동으로 폰번호 입력으로 커서 넘어가는 코드인데
+//        굳이 필요할까 싶음
+//        et_number_1.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if (et_number_1.length() >= 8) {
+//                    et_phone_1.requestFocus();
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
+
         sp_phone_0.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 s_phone_0 = parent.getItemAtPosition(position).toString();
             }
             public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        et_phone_1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (et_phone_1.length() >= 4) {
+                    et_phone_2.requestFocus();
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         sp_division.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -95,6 +140,29 @@ public class RegistActivity extends AppCompatActivity {
             }
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+        ll_agreement.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RegistActivity.this, PopupAgreementActivity.class);
+                startActivityForResult(intent, 1);
+            }
+        });
+
+        cb_check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!check_temp) {
+                    cb_check.setChecked(false);
+                    Intent intent = new Intent(RegistActivity.this, PopupAgreementActivity.class);
+                    startActivityForResult(intent, 1);
+                } else {
+                    Toast.makeText(getApplicationContext(), "개인정보 수집 및 이용에 거부하셨습니다.", Toast.LENGTH_SHORT).show();
+                    check_temp = false;
+                }
+            }
+        });
+
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
@@ -104,7 +172,6 @@ public class RegistActivity extends AppCompatActivity {
                 finish();
             }
         });
-
     }
 
     public void onBack(View v) {
@@ -166,7 +233,7 @@ public class RegistActivity extends AppCompatActivity {
             Toast.makeText(RegistActivity.this,"행선지를 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_temper.requestFocus();
         } else if (!b_check) {
-            Toast.makeText(RegistActivity.this,"개인정보 수집 활용에 동의해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistActivity.this,"개인정보 수집 및 이용에 동의해주세요.", Toast.LENGTH_SHORT).show();
         } else {
             Intent intent = new Intent(RegistActivity.this, PopupRegistActivity.class);
             intent.putExtra("NAME", s_name);
@@ -191,8 +258,12 @@ public class RegistActivity extends AppCompatActivity {
                 InsertData task = new InsertData(this);
                 try {
                     String result = task.execute(ADD_AUDIENCE, s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination).get();
+                    Log.d("REGIST", result);
                     if (result.equals("0")) {
                         Toast.makeText(RegistActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (result.equals("ERROR")) {
+                        Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                     } else {
                         s_id = result;
                         Toast.makeText(RegistActivity.this, "등록 완료되었습니다.", Toast.LENGTH_SHORT).show();
@@ -207,6 +278,18 @@ public class RegistActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        }
+
+        // 개인정보 수집 활용 동의/미동의시
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                cb_check.setChecked(true);
+                check_temp = true;
+            }
+            else if (resultCode == RESULT_CANCELED) {
+                cb_check.setChecked(false);
+                check_temp = false;
             }
         }
     }
@@ -271,7 +354,7 @@ public class RegistActivity extends AppCompatActivity {
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return "Error: " + e.getMessage();
+                return "ERROR";
             }
         }
     }
