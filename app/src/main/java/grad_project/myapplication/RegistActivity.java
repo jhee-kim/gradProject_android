@@ -172,6 +172,9 @@ public class RegistActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        Intent in_ocr = new Intent(RegistActivity.this, PopupOcrActivity.class);
+        startActivityForResult(in_ocr, 2);
     }
 
     public void onBack(View v) {
@@ -290,6 +293,29 @@ public class RegistActivity extends AppCompatActivity {
             else if (resultCode == RESULT_CANCELED) {
                 cb_check.setChecked(false);
                 check_temp = false;
+            }
+        }
+
+        // OCR 이벤트 처리
+        if (requestCode == 2) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(getApplicationContext(), "사용 완료!", Toast.LENGTH_SHORT).show();
+//                String o_name, o_number, o_number_0 = "", o_number_1 = "";
+//                Intent in_ocr = new Intent(RegistActivity.this, OcrActivity.class);
+//                o_name = in_ocr.getStringExtra("NAME");
+//                o_number = in_ocr.getStringExtra("NUMBER");
+//                if (s_number.length() > 3) {
+//                    o_number_0 = o_number.substring(0, 2);
+//                    o_number_1 = o_number.substring(2);
+//                }
+//                et_name.setText(o_name);
+//                for (int i = 0; i < sp_number_0.getCount(); i++) {
+//                    if (o_number_0.equals(sp_number_0.getItemAtPosition(i))) {
+//                        sp_number_0.setSelection(i);
+//                        break;
+//                    }
+//                }
+//                et_number_1.setText(o_number_1);
             }
         }
     }

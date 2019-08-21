@@ -120,6 +120,7 @@ public class CheckActivity extends AppCompatActivity {
         loadData();
 
         String endResult = getEndTime();
+        Log.d("CHECK_ENDRESULT", endResult);
         if (endResult.equals("ERROR")) {
             Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             finish();
@@ -424,14 +425,16 @@ public class CheckActivity extends AppCompatActivity {
     public boolean getFinish() {
         boolean state = false;
 
-        if (l_endTime <= l_nowTime) {
-            state = true;
-        }
-        for (int i = 0; i < 6; i++) {
-            if (exhibitionState[i].equals("1")) {
-                if (!is_success[i]) {
-                    state = false;
-                    break;
+        if (is_start) {
+            if (l_endTime <= l_nowTime) {
+                state = true;
+            }
+            for (int i = 0; i < 6; i++) {
+                if (exhibitionState[i].equals("1")) {
+                    if (!is_success[i]) {
+                        state = false;
+                        break;
+                    }
                 }
             }
         }

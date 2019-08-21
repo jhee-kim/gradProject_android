@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FCFCFC">
+
+    <LinearLayout
+        android:id="@+id/layout_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="사진 인식"
+                android:textSize="16sp"
+                android:fontFamily="@font/m_gothic_bold"
+                android:textColor="@color/focusText"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="으로"
+                android:textSize="16sp"
+                android:fontFamily="@font/m_gothic_normal"
+                android:textColor="@color/focusText"/>
+
+        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="center"
+            android:text="정보를 간편하게 등록해 보세요."
+            android:textSize="16sp"
+            android:fontFamily="@font/m_gothic_normal"
+            android:textColor="@color/focusText"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="휴가증을 카메라로 촬영하면"
+            android:textSize="16sp"
+            android:fontFamily="@font/m_gothic_normal"
+            android:textColor="@color/focusText"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_gravity="center"
+            android:text="자동으로 정보를 입력합니다."
+            android:textSize="16sp"
+            android:fontFamily="@font/m_gothic_normal"
+            android:textColor="@color/focusText"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/layout_text"
+        android:background="@color/disableButton">
+
+        <Button
+            android:id="@+id/bt_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/cancelButton"
+            android:text="직접 입력"
+            android:textColor="@color/focusText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
+        <Button
+            android:id="@+id/bt_apply"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/applyButton"
+            android:text="기능 사용"
+            android:textColor="@color/focusText"
+            android:onClick="onClick"
+            android:fontFamily="@font/m_gothic_normal"
+            style="?android:attr/buttonBarButtonStyle"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

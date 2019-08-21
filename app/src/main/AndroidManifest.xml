@@ -51,6 +51,9 @@
         <activity android:name=".PopupAgreementActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".PopupOcrActivity" android:theme="@android:style/Theme.Dialog"
+            android:screenOrientation="portrait">
+        </activity>
         <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
