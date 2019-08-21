@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/museumTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="15"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="150dp"
+        android:layout_marginEnd="10dp"
+        android:background="@null"
+        android:textSize="18sp"
+        android:text="건물이름" />
+
+    <TextView
+        android:id="@+id/museumSub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="15"
+        android:singleLine = "false"
+        android:layout_marginTop="35dp"
+        android:layout_marginStart="150dp"
+        android:layout_marginEnd="40dp"
+        android:background="@null"
+        android:textSize="12sp"
+        android:text="건물설명" />
+</RelativeLayout>
