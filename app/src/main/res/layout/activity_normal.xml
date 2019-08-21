@@ -47,6 +47,15 @@
             android:background="@drawable/round_button"
             android:onClick="timeOn"/>
 
+        <ImageButton
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_parking_24dp"
+            android:layout_alignParentRight="true"
+            android:onClick="onStatus"/>
+
     </RelativeLayout>
 
     <ImageView
@@ -70,6 +79,44 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title_normal"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/standard"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_museum_24dp"
+            android:onClick="onMuseum"/>
+
+        <ImageButton
+            android:id="@+id/outisde"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_walk_24dp"
+            android:onClick="onOutside"/>
+
+        <ImageButton
+            android:id="@+id/facilities"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_restaurant_24dp"
+            android:onClick="onShop"/>
+
+        <ImageButton
+            android:id="@+id/parking"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_parking_24dp"
+            android:onClick="onPark"/>
+
+    </LinearLayout>
 
     <com.ssomai.android.scalablelayout.ScalableLayout
         android:layout_width="match_parent"

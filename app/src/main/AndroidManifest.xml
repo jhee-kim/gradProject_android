@@ -53,6 +53,9 @@
         <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.popup_Map_Theme"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".PopupCategory" android:theme="@style/AppTheme.popup_Map_Theme"
+            android:screenOrientation="portrait">
+        </activity>
         <activity android:name=".PopupTimeActivity" android:theme="@style/AppTheme.popup_Time_Theme"
             android:screenOrientation="portrait">
         </activity>

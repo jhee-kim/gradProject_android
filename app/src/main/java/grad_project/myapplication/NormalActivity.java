@@ -37,17 +37,19 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     Long startDate;
     private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
     private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
-//    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
-    private MapPOIItem[] markerArr = new MapPOIItem[6];
+    //    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
+    private MapPOIItem[] markerArr = new MapPOIItem[14];
     private boolean isShowTutorial;
     private ViewGroup mapViewContainer;
     private MapView mapView;
+    private int MarkerState = 0; // 마커 표시 (0 1 2 3)
 
     private MapPoint curPosition = MapPoint.mapPointWithGeoCoord(0, 0);
     private float accuracyDis;
 
     private Timer timer = new Timer();
     private TimerTask TT;
+
 
     Long time = 0L;
 
@@ -92,19 +94,23 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         getExhibitionData();
         loadInfo();
         setMuseMarkers(mapView);
+        //ShowMarkerSet(mapView);
 
 /*
-        if(!isContain && accuracyDis <= 3.0){
-            TT = new TimerTask() {
-                @Override
-                public void run() {
-                    mapView.setCurrentLocationTrackingMode(MapView);
-                }
-            };
-            timer.schedule(TT, 0, 1000);
-        } else
-            timer.cancel();
- */
+//        if(!isContain && accuracyDis <= 3.0){
+        TT = new TimerTask() {
+            @Override
+            public void run() {
+                //Looper.prepare();
+                checkBoundary();
+                //Looper.loop();
+                //mapView.setCurrentLocationTrackingMode(MapView);
+            }
+        };
+        timer.schedule(TT, 0, 1000);
+        //       } else
+        //           timer.cancel();
+*/
         //checkBoundary();
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
@@ -114,29 +120,29 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 finish();
             }
         });
-        if(isShowTutorial == false) {       //처음 지도를 보는 거면(튜토리얼을 본 적이 없으면) 튜토리얼을 보여줌
+        if (isShowTutorial == false) {       //처음 지도를 보는 거면(튜토리얼을 본 적이 없으면) 튜토리얼을 보여줌
             intent = new Intent(NormalActivity.this, TutorialActivity.class);
-            startActivityForResult(intent,3000);
+            startActivityForResult(intent, 3000);
         }
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {     //보낸 Intent 정보 받음
-        if(resultCode == RESULT_OK){
-            switch (requestCode){   // NormalActivity에서 TutorialActivity로 요청할 때 보낸 요청 코드 (3000)
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {   // NormalActivity에서 TutorialActivity로 요청할 때 보낸 요청 코드 (3000)
                 case 3000:  //TutorialActivity에서 돌아왔을 때
                     break;
                 case 2000:  //PopupMapActivity에서 돌아왔을 때
                     int result = intent.getIntExtra("finish_exhibition_num", -1);
                     boolean isAlreadyCheckQr = false;
-                    if(result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
-                        for(int i = 0 ; i < 6 ; i++) {
-                            if(isCheckQrArr[result - 1] == true) {
+                    if (result >= 1 && result <= 6) {        //전시관의 QR코드를 찍었으면
+                        for (int i = 0; i < 6; i++) {
+                            if (isCheckQrArr[result - 1] == true) {
                                 Toast.makeText(getApplicationContext(), "이미 찍은 QR코드 입니다.", Toast.LENGTH_LONG).show();
                                 isAlreadyCheckQr = true;
                                 break;
                             }
                         }
-                        if(isAlreadyCheckQr == false) {
+                        if (isAlreadyCheckQr == false) {
                             Toast.makeText(getApplicationContext(), result + "전시관의 QR코드와 일치합니다!", Toast.LENGTH_LONG).show();
                             SharedPreferences.Editor editor = infoData.edit();  //해당 전시관에 대한 정보를 공유변수에 저장
                             editor.putBoolean("IS_CHECK_" + result, true);
@@ -149,7 +155,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                             break;
                         }
                     }
-                    for(int i = 0 ; i < 6 ; i++) {
+                    for (int i = 0; i < 6; i++) {
                         Log.d((i + 1) + "전시관_QR체크여부 : ", isCheckQrArr[i] + "");
                     }
             }
@@ -158,7 +164,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
     // 저장된 값 가져오기 - 각 전시관 QR코드 체크 여부, 튜토리얼 여부
     public void loadInfo() {
-        for(int i = 0 ; i < 6 ; i++) {
+        for (int i = 0; i < 6; i++) {
             int num = i + 1;
             isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);    //true 없으면 false로
         }
@@ -180,7 +186,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 exhibitionState[i] = jObject.getString("isOpen");
                 Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -195,21 +201,21 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 exhibitionQrCode[i] = jObject.getString("address");
                 Log.d("EXHIBITION_QRCODE", exhibitionQrCode[i]);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setMuseMarkers(MapView mapView){
+    public void setMuseMarkers(MapView mapView) {
 
         mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
-        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 0, true);
+        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 3, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
         mapView.setCurrentLocationEventListener(this);
 
-        MapPoint centerPoint;
-        centerPoint = MapPoint.mapPointWithGeoCoord(36.783564, 127.223225);
+        //MapPoint centerPoint;
+        //centerPoint = MapPoint.mapPointWithGeoCoord(36.783564, 127.223225);
 
         //MapCircle mapCircle = new MapCircle(centerPoint, 380, Color.RED, 0);
 
@@ -223,19 +229,19 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         mapPointArr[4] = MapPoint.mapPointWithGeoCoord(36.785034, 127.221573);
         mapPointArr[5] = MapPoint.mapPointWithGeoCoord(36.784982, 127.222463);
 
-        for(int i = 0 ; i < 6 ; i++) {
+        for (int i = 0; i < 6; i++) {
             markerArr[i] = new MapPOIItem();
             markerArr[i].setItemName("제" + (i + 1) + "전시관");        //눌렀을때 말풍선
             markerArr[i].setTag(i + 1);
             markerArr[i].setMapPoint(mapPointArr[i]);
 
-            if(exhibitionState[i].equals("1") && isCheckQrArr[i] == false) {
+            if (exhibitionState[i].equals("1") && isCheckQrArr[i] == false) {
                 markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                 markerArr[i].setCustomImageResourceId(R.drawable.open_marker);
-            } else if(exhibitionState[i].equals("1") && isCheckQrArr[i] == true){
+            } else if (exhibitionState[i].equals("1") && isCheckQrArr[i] == true) {
                 markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                 markerArr[i].setCustomImageResourceId(R.drawable.qr_marker);
-            } else if(exhibitionState[i].equals("0")) {
+            } else if (exhibitionState[i].equals("0")) {
                 markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                 markerArr[i].setCustomImageResourceId(R.drawable.closed_marker);
             }
@@ -249,7 +255,156 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
+    public void setOutLookMarkers(MapView mapView) {
+        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 3, true);
+        mapViewContainer.addView(mapView);
+        mapView.setPOIItemEventListener(this);
+        mapView.setCurrentLocationEventListener(this);
 
+        MapPoint[] mapPointArr = new MapPoint[14];
+        mapPointArr[0] = MapPoint.mapPointWithGeoCoord(36.780471, 127.227635);
+        mapPointArr[1] = MapPoint.mapPointWithGeoCoord(36.782636, 127.224867);
+        mapPointArr[2] = MapPoint.mapPointWithGeoCoord(36.783212, 127.223740);
+        mapPointArr[3] = MapPoint.mapPointWithGeoCoord(36.783721, 127.223193);
+        mapPointArr[4] = MapPoint.mapPointWithGeoCoord(36.785332, 127.219999);
+        mapPointArr[5] = MapPoint.mapPointWithGeoCoord(36.786663, 127.218276);
+        mapPointArr[6] = MapPoint.mapPointWithGeoCoord(36.780123, 127.222143);
+        mapPointArr[7] = MapPoint.mapPointWithGeoCoord(36.782238, 127.229518);
+        mapPointArr[8] = MapPoint.mapPointWithGeoCoord(36.783914, 127.224861);
+        mapPointArr[9] = MapPoint.mapPointWithGeoCoord(36.782167, 127.226047);
+        mapPointArr[10] = MapPoint.mapPointWithGeoCoord(36.778860, 127.222339);
+        mapPointArr[11] = MapPoint.mapPointWithGeoCoord(36.781928, 127.226287);
+        mapPointArr[12] = MapPoint.mapPointWithGeoCoord(36.781927, 127.220236);
+        mapPointArr[13] = MapPoint.mapPointWithGeoCoord(36.785811, 127.217168);
+
+        for (int i = 0; i < 14; i++) {
+            markerArr[i] = new MapPOIItem();
+            markerArr[i].setItemName("제" + (i + 1) + "전시관");        //눌렀을때 말풍선
+            markerArr[i].setTag(i + 1);
+            markerArr[i].setMapPoint(mapPointArr[i]);
+
+            markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
+            markerArr[i].setCustomImageResourceId(R.drawable.open_marker);
+
+            // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+            markerArr[i].setShowCalloutBalloonOnTouch(false);
+
+            mapView.addPOIItem(markerArr[i]);
+        }
+    }
+
+    public void setSnackMarkers(MapView mapView) {
+        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 3, true);
+        mapViewContainer.addView(mapView);
+        mapView.setPOIItemEventListener(this);
+        mapView.setCurrentLocationEventListener(this);
+
+        MapPoint[] mapPointArr = new MapPoint[10];
+        mapPointArr[0] = MapPoint.mapPointWithGeoCoord(36.779057, 127.229849);
+        mapPointArr[1] = MapPoint.mapPointWithGeoCoord(36.779917, 127.229098);
+        mapPointArr[2] = MapPoint.mapPointWithGeoCoord(36.781910, 127.225719);
+        mapPointArr[3] = MapPoint.mapPointWithGeoCoord(36.782821, 127.223723);
+        mapPointArr[4] = MapPoint.mapPointWithGeoCoord(36.783345, 127.223025);
+        mapPointArr[5] = MapPoint.mapPointWithGeoCoord(36.783912, 127.222242);
+        mapPointArr[6] = MapPoint.mapPointWithGeoCoord(36.783766, 127.221051);
+        mapPointArr[7] = MapPoint.mapPointWithGeoCoord(36.784162, 127.220880);
+        mapPointArr[8] = MapPoint.mapPointWithGeoCoord(36.784626, 127.221008);
+        mapPointArr[9] = MapPoint.mapPointWithGeoCoord(36.784918, 127.221341);
+
+        for (int i = 0; i < 10; i++) {
+            markerArr[i] = new MapPOIItem();
+            markerArr[i].setItemName("제" + (i + 1) + "전시관");        //눌렀을때 말풍선
+            markerArr[i].setTag(i + 1);
+            markerArr[i].setMapPoint(mapPointArr[i]);
+
+            markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
+            markerArr[i].setCustomImageResourceId(R.drawable.open_marker);
+
+            // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+            markerArr[i].setShowCalloutBalloonOnTouch(false);
+
+            mapView.addPOIItem(markerArr[i]);
+        }
+    }
+
+    public void setParkMarkers(MapView mapView) {
+        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 3, true);
+        mapViewContainer.addView(mapView);
+        mapView.setPOIItemEventListener(this);
+        mapView.setCurrentLocationEventListener(this);
+
+        MapPoint[] mapPointArr = new MapPoint[3];
+        mapPointArr[0] = MapPoint.mapPointWithGeoCoord(36.779075, 127.230364);
+        mapPointArr[1] = MapPoint.mapPointWithGeoCoord(36.783354, 127.223025);
+        mapPointArr[2] = MapPoint.mapPointWithGeoCoord(36.778104, 127.231426);
+
+        for (int i = 0; i < 3; i++) {
+            markerArr[i] = new MapPOIItem();
+            markerArr[i].setItemName("제" + (i + 1) + "전시관");        //눌렀을때 말풍선
+            markerArr[i].setTag(i + 1);
+            markerArr[i].setMapPoint(mapPointArr[i]);
+
+            markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
+            markerArr[i].setCustomImageResourceId(R.drawable.open_marker);
+
+            // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+            markerArr[i].setShowCalloutBalloonOnTouch(false);
+
+            mapView.addPOIItem(markerArr[i]);
+        }
+    }
+
+//    public void ShowMarkerSet(MapView mapView) {
+//        switch (MarkerState) {
+//            case 0:
+//                setMuseMarkers(mapView);
+//                break;
+//            case 1:
+//                setOutLookMarkers(mapView);
+//                break;
+//            case 2:
+//                setSnackMarkers(mapView);
+//                break;
+//            case 3:
+//                setParkMarkers(mapView);
+//                break;
+//        }
+//    }
+
+    public void onMuseum(View view) {
+        mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
+        mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
+        setMuseMarkers(mapView);
+        MarkerState = 0;
+        Log.d("Marker상태", "이게 상태다" + MarkerState);
+    }
+
+    public void onOutside(View view) {
+        mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
+        mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
+        setOutLookMarkers(mapView);
+        MarkerState = 1;
+        Log.d("Marker상태", "이게 상태다" + MarkerState);
+    }
+
+    public void onShop(View view) {
+        mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
+        mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
+        setSnackMarkers(mapView);
+        MarkerState = 2;
+        Log.d("Marker상태", "이게 상태다" + MarkerState);
+    }
+
+    public void onPark(View view) {
+        mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
+        mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
+        setParkMarkers(mapView);
+        MarkerState = 3;
+        Log.d("Marker상태", "이게 상태다" + MarkerState);
+    }
 
     public void onBack(View v) {
         if (v == findViewById(R.id.bt_back)) {
@@ -257,28 +412,63 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
-    public void onLocation (View view) {
+    public void onLocation(View view) {
         //MapView mapView = new MapView(this);
-        ToggleCheck = ((ToggleButton)view).isChecked();
-        if(ToggleCheck && accuracyDis <= 10.0){
+        ToggleCheck = ((ToggleButton) view).isChecked();
+        if (ToggleCheck && accuracyDis <= 10.0) {
             mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
         } else {
             mapView.setShowCurrentLocationMarker(false);
         }
     }
+
     //마커 선택시의 액션
     //팝업 띄우기
     @Override
     public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
         int tagNum = mapPOIItem.getTag();
-        if(exhibitionState[(tagNum-1)].equals("1")) {
+        Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
+        Intent intent2 = new Intent(NormalActivity.this, PopupCategory.class);
+
+        switch (MarkerState) {
+            case 0:
+                if (exhibitionState[(tagNum - 1)].equals("1")) {
+                    intent.putExtra("TagNum", tagNum);
+                    intent.putExtra("exhibitionQrCode", exhibitionQrCode);
+                    intent.putExtra("exhibitionState", exhibitionState[tagNum - 1]);
+                    startActivityForResult(intent, 2000);
+                } else
+                    Toast.makeText(getApplicationContext(), "아직 개장 중 입니다.", Toast.LENGTH_LONG).show();
+                break;
+            case 1:
+                intent2.putExtra("MarkerState", MarkerState);
+                intent2.putExtra("TagNum", tagNum);
+                startActivityForResult(intent2, 2000);
+                break;
+            case 2:
+                //Intent intent = new Intent(NormalActivity.this, PopupCategory.class);
+                intent2.putExtra("MarkerState", MarkerState);
+                intent2.putExtra("TagNum", tagNum);
+                startActivityForResult(intent2, 2000);
+                break;
+            case 3:
+                //Intent intent = new Intent(NormalActivity.this, PopupCategory.class);
+                intent2.putExtra("MarkerState", MarkerState);
+                intent2.putExtra("TagNum", tagNum);
+                startActivityForResult(intent2, 2000);
+                break;
+        }
+        /*
+        if (exhibitionState[(tagNum - 1)].equals("1")) {
             Intent intent = new Intent(NormalActivity.this, PopupMapActivity.class);
             intent.putExtra("TagNum", tagNum);
             intent.putExtra("exhibitionQrCode", exhibitionQrCode);
             intent.putExtra("exhibitionState", exhibitionState[tagNum - 1]);
-            startActivityForResult(intent,2000);
+            startActivityForResult(intent, 2000);
         } else
             Toast.makeText(getApplicationContext(), "아직 개장 중 입니다.", Toast.LENGTH_LONG).show();
+            */
+
     }
 
     @Override
@@ -303,6 +493,11 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
     }
 
+    public void onStatus(View view) {
+        Intent intent = new Intent(NormalActivity.this, CheckActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     //현재 위치 좌표 받아오기
     public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float accuracyInMeters) {
@@ -312,40 +507,45 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
         Log.d("Accuracy", "정확도 " + accuracyDis);
 
-        if(!ToggleCheck)
+        if (!ToggleCheck)
             mapView.setShowCurrentLocationMarker(false);
 
-        checkBoundary();
+        //checkBoundary();
     }
 
-    public void checkBoundary(){
+    public void checkBoundary() {
         boolean isContain;
         MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.780428, 127.218812);
         MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.786404, 127.226782);
 
+        //MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.765944, 127.280900);
+        //MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.767190, 127.282336);
+
         MapPointBounds boundary = new MapPointBounds(leftB, RightT);
         isContain = boundary.contains(curPosition);
 
-        time += 1;
-        Log.d("MyTag", "현재 time " + time);
+        //time += 1;
+        //Log.d("MyTag", "현재 time " + time);
 
-        if(!isContain && accuracyDis <= 3.0){
-            TT = new TimerTask() {
-                @Override
-                public void run() {
-                    time += 1;
-                    Log.d("MyTag", "현재 time " + time);
-                }
-            };
-            timer.schedule(TT, 0, 1000);
-        } else
-            timer.cancel();
+        if (!isContain && accuracyDis <= 30.0) {
+            time += 1;
+            Log.d("MyTag", "현재 time " + time);
 
+            if ((time % 10) == 0) {
+                //Looper.prepare();
+                Toast.makeText(getApplicationContext(), "위치를 이탈하였습니다." + time, Toast.LENGTH_SHORT).show();
+                //Looper.loop();
+            }
 
+        }
+        if (isContain && accuracyDis <= 30.0)
+            Log.d("Enter", "현재 위치 내에 들어옴");
+        //Toast.makeText(getApplicationContext(), "위치 안에 들어왔습니다.", Toast.LENGTH_LONG).show();
 
         SharedPreferences.Editor editor = infoData.edit();
         editor.putLong("OutTime", time);
         editor.apply();
+
     }
 
     @Override
@@ -371,18 +571,21 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         GetExhibitionTask(NormalActivity context) {
             activityReference = new WeakReference<>(context);
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             progressDialog = ProgressDialog.show(activityReference.get(),
                     "Please Wait", null, true, true);
         }
+
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             progressDialog.dismiss();
             /*출력값*/
         }
+
         @Override
         protected String doInBackground(String... params) {
             String serverURL = params[0];
@@ -395,17 +598,16 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 httpURLConnection.connect();
                 int responseStatusCode = httpURLConnection.getResponseCode();
                 InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
-                }
-                else{
+                } else {
                     inputStream = httpURLConnection.getErrorStream();
                 }
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 StringBuilder sb = new StringBuilder();
                 String line;
-                while((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
                 bufferedReader.close();
@@ -424,18 +626,21 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         GetExhibitionQrTask(NormalActivity context) {
             activityReference = new WeakReference<>(context);
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             progressDialog = ProgressDialog.show(activityReference.get(),
                     "Please Wait", null, true, true);
         }
+
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             progressDialog.dismiss();
             /*출력값*/
         }
+
         @Override
         protected String doInBackground(String... params) {
             String serverURL = params[0];
@@ -448,17 +653,16 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
                 httpURLConnection.connect();
                 int responseStatusCode = httpURLConnection.getResponseCode();
                 InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
-                }
-                else{
+                } else {
                     inputStream = httpURLConnection.getErrorStream();
                 }
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 StringBuilder sb = new StringBuilder();
                 String line;
-                while((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
                 bufferedReader.close();
