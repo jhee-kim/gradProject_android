@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "grad_project.i815"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 5
         versionName "0.21"
@@ -20,6 +20,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'x86', 'x86_64', 'armeabi-v7a', 'armeabi'
+            universalApk false
+        }
+    }
 }
 
 dependencies {
@@ -28,6 +36,7 @@ dependencies {
     implementation files('libs/libDaumMapAndroid.jar')
 
     implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:2.0.0-beta2'
     testImplementation 'junit:junit:4.13-beta-3'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -35,4 +44,9 @@ dependencies {
 
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
     implementation 'com.romandanylyk:pageindicatorview:1.0.3@aar'
+
+    implementation 'com.google.api-client:google-api-client-android:1.23.0' exclude module: 'httpclient'
+    implementation 'com.google.http-client:google-http-client-gson:1.23.0' exclude module: 'httpclient'
+    implementation 'com.google.apis:google-api-services-vision:v1-rev9-1.21.0'
+    implementation project(path: ':opencv')
 }

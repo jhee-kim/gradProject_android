@@ -54,4 +54,12 @@
     <string name="temper_popup_str">소속 : </string>
     <string name="destination_popup_str">행선지 : </string>
     <string name="question_popup_str">정확히 입력하셨나요?</string>
+
+    <!-- test -->
+    <string name="hello">Hello World, CamTestActivity!</string>
+    <!-- UI Elements -->
+    <string name="btn_capture">Click</string>
+    <!-- Toast Messages -->
+    <string name="camera_not_found">No camera harware found</string>
+    <string name="take_photo_help">Touch anywhere on screen to take picture</string>
 </resources>

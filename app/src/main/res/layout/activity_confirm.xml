@@ -166,7 +166,6 @@
                     android:layout_marginRight="0.5dp"
                     android:padding="3dp"
                     android:textSize="14sp"
-                    android:text="전시관람"
                     android:background="#FFFFFF"
                     android:textColor="@color/focusText"/>
 
@@ -179,7 +178,6 @@
                     android:layout_marginRight="0.5dp"
                     android:padding="3dp"
                     android:textSize="14sp"
-                    android:text="한동곤\n(16-7300612)"
                     android:background="#FFFFFF"
                     android:textColor="@color/focusText"/>
 
@@ -192,7 +190,6 @@
                     android:layout_marginRight="0.5dp"
                     android:padding="3dp"
                     android:textSize="14sp"
-                    android:text="2016-12-17\n(09:53)"
                     android:background="#FFFFFF"
                     android:textColor="@color/focusText"/>
 
@@ -232,7 +229,6 @@
             android:layout_below="@+id/tv_2"
             android:layout_marginTop="50dp"
             android:fontFamily="@font/m_gothic_bold"
-            android:text="2019년 08월 03일"
             android:textSize="20sp"
             android:textColor="@color/focusText"/>
 
@@ -273,7 +269,6 @@
             android:layout_marginStart="10dp"
             android:fontFamily="@font/m_gothic_bold"
             android:textSize="5dp"
-            android:text="2019. 08. 03"
             android:textColor="@color/focusText"/>
 
     </RelativeLayout>
