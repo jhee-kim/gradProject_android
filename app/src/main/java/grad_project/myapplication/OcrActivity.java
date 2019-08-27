@@ -1,6 +1,7 @@
 package grad_project.myapplication;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -56,6 +58,7 @@ public class OcrActivity  extends Activity {
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";
     private static final int MAX_LABEL_RESULTS = 10;
     private static final String TAG = OcrActivity.class.getSimpleName();
+    private long mLastClickTime = 0;
 
     Preview preview;
     Camera camera;
@@ -81,6 +84,10 @@ public class OcrActivity  extends Activity {
         shutter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 10000){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
                 camera.takePicture(shutterCallback, rawCallback, jpegCallback);
             }
         });
@@ -176,44 +183,36 @@ public class OcrActivity  extends Activity {
         }
     }
 
-    private Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
-
-        int originalWidth = bitmap.getWidth();
-        int originalHeight = bitmap.getHeight();
-        int resizedWidth = maxDimension;
-        int resizedHeight = maxDimension;
-
-        if (originalHeight > originalWidth) {
-            resizedHeight = maxDimension;
-            resizedWidth = (int) (resizedHeight * (float) originalWidth / (float) originalHeight);
-        } else if (originalWidth > originalHeight) {
-            resizedWidth = maxDimension;
-            resizedHeight = (int) (resizedWidth * (float) originalHeight / (float) originalWidth);
-        } else if (originalHeight == originalWidth) {
-            resizedHeight = maxDimension;
-            resizedWidth = maxDimension;
-        }
-        return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
-    }
-
     private void callCloudVision(final Bitmap bitmap) {
         // Do the real work in an async task, because we need to use the network anyway
         try {
-            AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(this, prepareAnnotationRequest(bitmap));
-            labelDetectionTask.execute();
+            AsyncTask<Object, Void, String> textDetectionTask = new TextDetectionTask(this, prepareAnnotationRequest(bitmap));
+            textDetectionTask.execute();
         } catch (IOException e) {
             Log.d(TAG, "failed to make API request because of other IOException " +
                     e.getMessage());
         }
     }
-
-    private static class LableDetectionTask extends AsyncTask<Object, Void, String> {
+    /*2*/
+    private class TextDetectionTask extends AsyncTask<Object, Void, String> {
         private final WeakReference<OcrActivity> mActivityWeakReference;
         private Vision.Images.Annotate mRequest;
+        ProgressDialog asyncDialog = new ProgressDialog(OcrActivity.this);
 
-        LableDetectionTask(OcrActivity activity, Vision.Images.Annotate annotate) {
+        TextDetectionTask(OcrActivity activity, Vision.Images.Annotate annotate) {
             mActivityWeakReference = new WeakReference<>(activity);
             mRequest = annotate;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            asyncDialog.setCancelable(false);
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setMessage("인식중입니다..");
+
+            // show dialog
+            asyncDialog.show();
+            super.onPreExecute();
         }
 
         @Override
@@ -222,7 +221,6 @@ public class OcrActivity  extends Activity {
                 Log.d(TAG, "created Cloud Vision request object, sending request");
                 BatchAnnotateImagesResponse response = mRequest.execute();
                 return convertResponseToString(response);
-
             } catch (GoogleJsonResponseException e) {
                 Log.d(TAG, "failed to make API request because " + e.getContent());
             } catch (IOException e) {
@@ -233,14 +231,16 @@ public class OcrActivity  extends Activity {
         }
 
         protected void onPostExecute(String result) {
+            asyncDialog.dismiss();
             OcrActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
-                //TextView imageDetail = activity.findViewById(R.id.image_details);
-                //imageDetail.setText(result);
+                Intent intent = new Intent(OcrActivity.this, RegistActivity.class);
+                intent.putExtra("result", result);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         }
     }
-
     private Vision.Images.Annotate prepareAnnotationRequest(final Bitmap bitmap) throws IOException {
         HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
@@ -303,14 +303,13 @@ public class OcrActivity  extends Activity {
 
         return annotateRequest;
     }
-
+    /*3*/
     private static String convertResponseToString(BatchAnnotateImagesResponse response) {
-        StringBuilder message = new StringBuilder("I found these things:\n\n");
-        Log.d("text", String.valueOf(response));
-        List<EntityAnnotation> labels = response.getResponses().get(0).getTextAnnotations();
-        if (labels != null) {
-            for (EntityAnnotation label : labels) {
-                message.append(String.format(Locale.KOREA, "%s", label.getDescription()));
+        StringBuilder message = new StringBuilder();
+        List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations();
+        if (texts != null) {
+            for (EntityAnnotation text : texts) {
+                message.append(String.format(Locale.KOREA, "%s", text.getDescription()));
                 message.append("\n");
             }
         } else {
@@ -347,17 +346,6 @@ public class OcrActivity  extends Activity {
         super.onPause();
     }
 
-    private void resetCam() {
-        camera.startPreview();
-        preview.setCamera(camera);
-    }
-
-    private void refreshGallery(File file) {
-        Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        mediaScanIntent.setData(Uri.fromFile(file));
-        sendBroadcast(mediaScanIntent);
-    }
-
     Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
         public void onShutter() {
             //			 Log.d(TAG, "onShutter'd");
@@ -378,37 +366,4 @@ public class OcrActivity  extends Activity {
             }
         }
     };
-
-    private class SaveImageTask extends AsyncTask<byte[], Void, Void> {
-
-        @Override
-        protected Void doInBackground(byte[]... data) {
-            FileOutputStream outStream = null;
-
-            // Write to SD Card
-            try {
-                File sdCard = Environment.getExternalStorageDirectory();
-                File dir = new File (sdCard.getAbsolutePath() + "/camtest");
-                dir.mkdirs();
-
-                String fileName = String.format("%d.jpg", System.currentTimeMillis());
-                File outFile = new File(dir, fileName);
-
-                outStream = new FileOutputStream(outFile);
-                outStream.write(data[0]);
-                outStream.flush();
-                outStream.close();
-
-                Log.d(TAG, "onPictureTaken - wrote bytes: " + data.length + " to " + outFile.getAbsolutePath());
-
-                refreshGallery(outFile);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-            }
-            return null;
-        }
-    }
 }

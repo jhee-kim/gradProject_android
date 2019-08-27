@@ -2,8 +2,10 @@ package grad_project.myapplication;
 
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
@@ -17,6 +19,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -56,7 +61,6 @@ public class ConfirmActivity extends AppCompatActivity {
             }
         });
 
-
         SharedPreferences infoData;
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
         s_id = infoData.getString("ID", "");
@@ -93,6 +97,35 @@ public class ConfirmActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             finish();
         }
+    }
+    public void onDownload(View v) {
+        findViewById(R.id.content_confirm).setDrawingCacheEnabled(true);
+        findViewById(R.id.content_confirm).buildDrawingCache();
+        Bitmap saveBitmap =  findViewById(R.id.content_confirm).getDrawingCache();
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_hhmmss");
+
+        String namePostfix = format.format(new Date());
+        String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String basePath = sdPath + File.separator;
+        File dir = new File(basePath);
+        if(!dir.exists()) {
+            dir.mkdirs();
+        }
+        File saveFile = new File(basePath + File.separator + "foru_" + namePostfix + ".jpg");
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(saveFile);
+            saveBitmap.compress(Bitmap.CompressFormat.JPEG, 70, output);
+            Toast.makeText(getApplicationContext(), "저장되었습니다.", Toast.LENGTH_SHORT).show();
+        } catch(IOException e) {
+            Toast.makeText(getApplicationContext(), "저장 실패", Toast.LENGTH_SHORT).show();
+        } finally {
+            if(output!=null) { try{output.close();}catch(Exception e){e.printStackTrace();}}
+        }
+    }
+
+    public void onShare(View v) {
+
     }
 
     public void onBack(View v) {

@@ -53,6 +53,7 @@ public class PopupOcrActivity extends Activity {
             if (resultCode == RESULT_OK) {
                 Intent intent = new Intent(PopupOcrActivity.this, RegistActivity.class);
                 setResult(RESULT_OK, intent);
+                intent.putExtra("result", data.getStringExtra("result"));
                 finish();
             }
             // 사용자가 인식 기능 사용 취소하면

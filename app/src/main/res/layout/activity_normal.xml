@@ -48,97 +48,140 @@
             android:onClick="timeOn"/>
 
         <ImageButton
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/ic_parking_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:onClick="onStatus"/>
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/tutorial"
+            android:onClick="onTutorial" />
 
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/menubar"
-        android:layout_below="@id/title_normal"/>
+    <RelativeLayout
+        android:id="@+id/menu_normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_normal" >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/menubar" />
+
+        <TableLayout
+            android:id="@+id/category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:gravity="center">
+                    <ImageButton
+                        android:id="@+id/in_museum"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/in_museum_off"
+                        android:onClick="onMuseum" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:gravity="center">
+                    <ImageButton
+                        android:id="@+id/out_museum"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/out_museum_off"
+                        android:onClick="onOutside"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:gravity="center">
+                    <ImageButton
+                        android:id="@+id/restaurant"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/restaurant_off"
+                        android:onClick="onShop"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:gravity="center">
+                    <ImageButton
+                        android:id="@+id/parking"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/parking_off"
+                        android:onClick="onPark"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:gravity="center">
+                    <ImageButton
+                        android:id="@+id/check"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/check_off"
+                        android:onClick="oncheck"/>
+                </RelativeLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent">
+
+
+            </TableRow>
+        </TableLayout>
+
+    </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:id="@+id/content_normal"
-        android:layout_marginTop="70dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="2dp"
+        android:orientation="horizontal"
+        android:layout_below="@id/menu_normal">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/menubar" />
 
         <RelativeLayout
             android:id="@+id/map_view"
+            android:layout_marginTop="1dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
         </RelativeLayout>
 
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/category"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title_normal"
-        android:gravity="center"
-        android:orientation="horizontal">
-
         <ImageButton
-            android:id="@+id/standard"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/ic_museum_24dp"
-            android:onClick="onMuseum"/>
-
-        <ImageButton
-            android:id="@+id/outisde"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/ic_walk_24dp"
-            android:onClick="onOutside"/>
-
-        <ImageButton
-            android:id="@+id/facilities"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/ic_restaurant_24dp"
-            android:onClick="onShop"/>
-
-        <ImageButton
-            android:id="@+id/parking"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/ic_parking_24dp"
-            android:onClick="onPark"/>
-
-    </LinearLayout>
-
-    <com.ssomai.android.scalablelayout.ScalableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/content_normal"
-        sl:scale_base_width="1080"
-        sl:scale_base_height="500">
-
-        <ToggleButton
-            android:id="@+id/myLocation"
+            android:id="@+id/location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/location_selector"
-            android:layout_marginTop="450dp"
-            android:scaleX="1"
-            android:scaleY="1"
-            android:textOn=""
-            android:textOff=""
+            android:background="@drawable/gps_off"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="20dp"
             android:onClick="onLocation" />
 
-    </com.ssomai.android.scalablelayout.ScalableLayout>
-
-
+    </RelativeLayout>
 
 </RelativeLayout>

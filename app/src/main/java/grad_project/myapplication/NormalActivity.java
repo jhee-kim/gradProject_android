@@ -3,6 +3,7 @@ package grad_project.myapplication;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -31,13 +33,14 @@ import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static grad_project.myapplication.R.drawable.in_museum_on;
+
 public class NormalActivity extends AppCompatActivity implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
     private SharedPreferences infoData;
     private boolean[] isCheckQrArr = new boolean[6];
     Long startDate;
     private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
     private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
-    //    String[] exhibitionRssId = new String[6];    // 차후 구현 예정
     private MapPOIItem[] markerArr = new MapPOIItem[14];
     private boolean isShowTutorial;
     private ViewGroup mapViewContainer;
@@ -47,31 +50,26 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
     private MapPoint curPosition = MapPoint.mapPointWithGeoCoord(0, 0);
     private float accuracyDis;
 
-    private Timer timer = new Timer();
-    private TimerTask TT;
-
-
     Long time = 0L;
 
-    //private boolean showLoc = false;
-    private boolean ToggleCheck;
+    private boolean ToggleGps = false;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
     public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";          //각 전시관 별 개설 여부(JSON 형식) - ex) { "number": "1", "isOpen": "1" }
     public static final String GET_QR = BASE_PATH + "get_qr.php";                              //각 전시관 별 qr코드 파일 위치(JSON 형식) - ex) { "number": "1", "address": "http://35.221.108.183/QR/1.png" }
-//    public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";            //관람등록시 전시해설 on/oof 여부(해설자 스케줄 확인)  - 미구현
 //    public static final String GET_RSSID = BASE_PATH + "get_mac.php";                        //각 전시관 별 RSSI(JSON 형식) - ex) { "number": "1", "mac": "00:70:69:47:2F:30" }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_normal);
+        mapViewContainer = (ViewGroup)findViewById(R.id.map_view);
+
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
         ActionBar actionBar = getSupportActionBar();
-
         if (actionBar == null) {
             throw new NullPointerException("Null ActionBar");
         } else {
@@ -79,39 +77,11 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
 
         Intent intent = getIntent();
-//        exhibitState = intent.getStringArrayExtra("MuseumState");
         startDate = intent.getLongExtra("Time", 0);
-
         mapView = new MapView(this);
-        ViewGroup mapViewContainer = findViewById(R.id.map_view);
-
-
-        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
-
-
-        MapPointBounds mapPointBounds = new MapPointBounds();
-
         getExhibitionData();
         loadInfo();
-        setMuseMarkers(mapView);
-        //ShowMarkerSet(mapView);
-
-/*
-//        if(!isContain && accuracyDis <= 3.0){
-        TT = new TimerTask() {
-            @Override
-            public void run() {
-                //Looper.prepare();
-                checkBoundary();
-                //Looper.loop();
-                //mapView.setCurrentLocationTrackingMode(MapView);
-            }
-        };
-        timer.schedule(TT, 0, 1000);
-        //       } else
-        //           timer.cancel();
-*/
-        //checkBoundary();
+        setMuseMarkers();
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
         bt_back_layout.setOnClickListener(new View.OnClickListener() {
@@ -151,7 +121,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
                             mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
                             mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
-                            setMuseMarkers(mapView);
+                            setMuseMarkers();
                             break;
                         }
                     }
@@ -206,20 +176,16 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
-    public void setMuseMarkers(MapView mapView) {
-
-        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+    public void setMuseMarkers() {
+        findViewById(R.id.in_museum).setBackgroundResource(R.drawable.in_museum_on);
+        findViewById(R.id.out_museum).setBackgroundResource(R.drawable.out_museum_off);
+        findViewById(R.id.restaurant).setBackgroundResource(R.drawable.restaurant_off);
+        findViewById(R.id.parking).setBackgroundResource(R.drawable.parking_off);
+        findViewById(R.id.check).setBackgroundResource(R.drawable.check_off);
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 3, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
         mapView.setCurrentLocationEventListener(this);
-
-        //MapPoint centerPoint;
-        //centerPoint = MapPoint.mapPointWithGeoCoord(36.783564, 127.223225);
-
-        //MapCircle mapCircle = new MapCircle(centerPoint, 380, Color.RED, 0);
-
-        //mapView.addCircle(mapCircle);
 
         MapPoint[] mapPointArr = new MapPoint[6];
         mapPointArr[0] = MapPoint.mapPointWithGeoCoord(36.783323, 127.221605);
@@ -250,13 +216,15 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
             mapView.addPOIItem(markerArr[i]);
 
-            //mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
-
         }
     }
 
-    public void setOutLookMarkers(MapView mapView) {
-        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+    public void setOutLookMarkers() {
+        findViewById(R.id.in_museum).setBackgroundResource(R.drawable.in_museum_off);
+        findViewById(R.id.out_museum).setBackgroundResource(R.drawable.out_museum_on);
+        findViewById(R.id.restaurant).setBackgroundResource(R.drawable.restaurant_off);
+        findViewById(R.id.parking).setBackgroundResource(R.drawable.parking_off);
+        findViewById(R.id.check).setBackgroundResource(R.drawable.check_off);
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 3, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
@@ -294,8 +262,12 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
-    public void setSnackMarkers(MapView mapView) {
-        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+    public void setSnackMarkers() {
+        findViewById(R.id.in_museum).setBackgroundResource(R.drawable.in_museum_off);
+        findViewById(R.id.out_museum).setBackgroundResource(R.drawable.out_museum_off);
+        findViewById(R.id.restaurant).setBackgroundResource(R.drawable.restaurant_on);
+        findViewById(R.id.parking).setBackgroundResource(R.drawable.parking_off);
+        findViewById(R.id.check).setBackgroundResource(R.drawable.check_off);
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 3, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
@@ -329,8 +301,12 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
-    public void setParkMarkers(MapView mapView) {
-        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+    public void setParkMarkers() {
+        findViewById(R.id.in_museum).setBackgroundResource(R.drawable.in_museum_off);
+        findViewById(R.id.out_museum).setBackgroundResource(R.drawable.out_museum_off);
+        findViewById(R.id.restaurant).setBackgroundResource(R.drawable.restaurant_off);
+        findViewById(R.id.parking).setBackgroundResource(R.drawable.parking_on);
+        findViewById(R.id.check).setBackgroundResource(R.drawable.check_off);
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784271, 127.221704), 3, true);
         mapViewContainer.addView(mapView);
         mapView.setPOIItemEventListener(this);
@@ -357,68 +333,66 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         }
     }
 
-//    public void ShowMarkerSet(MapView mapView) {
-//        switch (MarkerState) {
-//            case 0:
-//                setMuseMarkers(mapView);
-//                break;
-//            case 1:
-//                setOutLookMarkers(mapView);
-//                break;
-//            case 2:
-//                setSnackMarkers(mapView);
-//                break;
-//            case 3:
-//                setParkMarkers(mapView);
-//                break;
-//        }
-//    }
+    public void timeOn(View view) {
+        Intent intent = new Intent(NormalActivity.this, PopupTimeActivity.class);
+        intent.putExtra("Time", startDate);
+        startActivity(intent);
+        overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
+    }
 
     public void onMuseum(View view) {
-        mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
-        mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
-        setMuseMarkers(mapView);
+        mapViewContainer.removeView(mapView);
+        mapView = new MapView(this);
+        setMuseMarkers();
         MarkerState = 0;
-        Log.d("Marker상태", "이게 상태다" + MarkerState);
     }
 
     public void onOutside(View view) {
-        mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
-        mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
-        setOutLookMarkers(mapView);
+        mapViewContainer.removeView(mapView);
+        mapView = new MapView(this);
+        setOutLookMarkers();
         MarkerState = 1;
-        Log.d("Marker상태", "이게 상태다" + MarkerState);
     }
 
     public void onShop(View view) {
-        mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
-        mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
-        setSnackMarkers(mapView);
+        mapViewContainer.removeView(mapView);
+        mapView = new MapView(this);
+        setSnackMarkers();
         MarkerState = 2;
-        Log.d("Marker상태", "이게 상태다" + MarkerState);
     }
 
     public void onPark(View view) {
-        mapViewContainer.removeView(mapView);       //원래 설정해뒀떤 mapView를 삭제해고
-        mapView = new MapView(this);        //새로 띄워줌(찍은 QR 적용해 맵을 띄우기 위함)
-        setParkMarkers(mapView);
+        mapViewContainer.removeView(mapView);
+        mapView = new MapView(this);
+        setParkMarkers();
         MarkerState = 3;
-        Log.d("Marker상태", "이게 상태다" + MarkerState);
+    }
+    public void oncheck(View view) {
+        findViewById(R.id.in_museum).setBackgroundResource(R.drawable.in_museum_off);
+        findViewById(R.id.out_museum).setBackgroundResource(R.drawable.out_museum_off);
+        findViewById(R.id.restaurant).setBackgroundResource(R.drawable.restaurant_off);
+        findViewById(R.id.parking).setBackgroundResource(R.drawable.parking_off);
+        findViewById(R.id.check).setBackgroundResource(R.drawable.check_on);
+        Intent intent = new Intent(NormalActivity.this, CheckActivity.class);
+        startActivity(intent);
+    }
+    public void onTutorial(View v) {
+        Intent intent = new Intent(NormalActivity.this, TutorialActivity.class);
+        startActivityForResult(intent, 3000);
+    }
+
+    public void onLocation(View view) {
+        if (ToggleGps) {
+            findViewById(R.id.location).setBackgroundResource(R.drawable.gps_on);
+        } else {
+            findViewById(R.id.location).setBackgroundResource(R.drawable.gps_off);
+        }
+        ToggleGps = !ToggleGps;
     }
 
     public void onBack(View v) {
         if (v == findViewById(R.id.bt_back)) {
             finish();
-        }
-    }
-
-    public void onLocation(View view) {
-        //MapView mapView = new MapView(this);
-        ToggleCheck = ((ToggleButton) view).isChecked();
-        if (ToggleCheck && accuracyDis <= 10.0) {
-            mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
-        } else {
-            mapView.setShowCurrentLocationMarker(false);
         }
     }
 
@@ -486,33 +460,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
 
     }
 
-    public void timeOn(View view) {
-        Intent intent = new Intent(NormalActivity.this, PopupTimeActivity.class);
-        intent.putExtra("Time", startDate);
-        startActivity(intent);
-        overridePendingTransition(R.anim.anim_slide_in_top, R.anim.anim_slide_out_top);
-    }
-
-    public void onStatus(View view) {
-        Intent intent = new Intent(NormalActivity.this, CheckActivity.class);
-        startActivity(intent);
-    }
-
-    @Override
-    //현재 위치 좌표 받아오기
-    public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float accuracyInMeters) {
-        MapPoint mapPointCurrent = mapPoint;
-        curPosition = mapPointCurrent;
-        accuracyDis = accuracyInMeters;
-
-        Log.d("Accuracy", "정확도 " + accuracyDis);
-
-        if (!ToggleCheck)
-            mapView.setShowCurrentLocationMarker(false);
-
-        //checkBoundary();
-    }
-
     public void checkBoundary() {
         boolean isContain;
         MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.780428, 127.218812);
@@ -545,6 +492,11 @@ public class NormalActivity extends AppCompatActivity implements MapView.POIItem
         SharedPreferences.Editor editor = infoData.edit();
         editor.putLong("OutTime", time);
         editor.apply();
+
+    }
+
+    @Override
+    public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float v) {
 
     }
 

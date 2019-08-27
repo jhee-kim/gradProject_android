@@ -1,12 +1,16 @@
 package grad_project.myapplication;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,6 +31,9 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class RegistActivity extends AppCompatActivity {
     private SharedPreferences infoData;
@@ -87,7 +94,9 @@ public class RegistActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 s_number_0 = parent.getItemAtPosition(position).toString();
             }
-            public void onNothingSelected(AdapterView<?> parent) {}
+
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
 //        군번 8자리 입력하면 자동으로 폰번호 입력으로 커서 넘어가는 코드인데
@@ -114,7 +123,9 @@ public class RegistActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 s_phone_0 = parent.getItemAtPosition(position).toString();
             }
-            public void onNothingSelected(AdapterView<?> parent) {}
+
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
         et_phone_1.addTextChangedListener(new TextWatcher() {
@@ -128,6 +139,7 @@ public class RegistActivity extends AppCompatActivity {
                     et_phone_2.requestFocus();
                 }
             }
+
             @Override
             public void afterTextChanged(Editable s) {
             }
@@ -138,7 +150,9 @@ public class RegistActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 i_division = position;
             }
-            public void onNothingSelected(AdapterView<?> parent) {}
+
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
         ll_agreement.setOnClickListener(new View.OnClickListener() {
@@ -217,26 +231,26 @@ public class RegistActivity extends AppCompatActivity {
         Log.i("PHONE", s_phone);
 
         if (s_name.equals("")) {
-            Toast.makeText(RegistActivity.this,"이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistActivity.this, "이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_name.requestFocus();
         } else if (s_number.equals("")) {
-            Toast.makeText(RegistActivity.this,"군번을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistActivity.this, "군번을 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_number_1.requestFocus();
         } else if (s_phone.equals("")) {
-            Toast.makeText(RegistActivity.this,"휴대폰 번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistActivity.this, "휴대폰 번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_phone_1.requestFocus();
         } else if (i_participation == -1) {
             Toast.makeText(RegistActivity.this, "관람 방법을 선택해주세요.", Toast.LENGTH_SHORT).show();
-        } else if(i_division == -1) {
-            Toast.makeText(RegistActivity.this,"구분을 선택해주세요.", Toast.LENGTH_SHORT).show();
+        } else if (i_division == -1) {
+            Toast.makeText(RegistActivity.this, "구분을 선택해주세요.", Toast.LENGTH_SHORT).show();
         } else if (s_temper.equals("")) {
-            Toast.makeText(RegistActivity.this,"소속 부대를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistActivity.this, "소속 부대를 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_temper.requestFocus();
         } else if (s_destination.equals("")) {
-            Toast.makeText(RegistActivity.this,"행선지를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistActivity.this, "행선지를 입력해주세요.", Toast.LENGTH_SHORT).show();
             et_temper.requestFocus();
         } else if (!b_check) {
-            Toast.makeText(RegistActivity.this,"개인정보 수집 및 이용에 동의해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistActivity.this, "개인정보 수집 및 이용에 동의해주세요.", Toast.LENGTH_SHORT).show();
         } else {
             Intent intent = new Intent(RegistActivity.this, PopupRegistActivity.class);
             intent.putExtra("NAME", s_name);
@@ -264,8 +278,7 @@ public class RegistActivity extends AppCompatActivity {
                     Log.d("REGIST", result);
                     if (result.equals("0")) {
                         Toast.makeText(RegistActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                    }
-                    else if (result.equals("ERROR")) {
+                    } else if (result.equals("ERROR")) {
                         Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                     } else {
                         s_id = result;
@@ -289,8 +302,7 @@ public class RegistActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 cb_check.setChecked(true);
                 check_temp = true;
-            }
-            else if (resultCode == RESULT_CANCELED) {
+            } else if (resultCode == RESULT_CANCELED) {
                 cb_check.setChecked(false);
                 check_temp = false;
             }
@@ -299,23 +311,58 @@ public class RegistActivity extends AppCompatActivity {
         // OCR 이벤트 처리
         if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
-                Toast.makeText(getApplicationContext(), "사용 완료!", Toast.LENGTH_SHORT).show();
-//                String o_name, o_number, o_number_0 = "", o_number_1 = "";
-//                Intent in_ocr = new Intent(RegistActivity.this, OcrActivity.class);
-//                o_name = in_ocr.getStringExtra("NAME");
-//                o_number = in_ocr.getStringExtra("NUMBER");
-//                if (s_number.length() > 3) {
-//                    o_number_0 = o_number.substring(0, 2);
-//                    o_number_1 = o_number.substring(2);
-//                }
-//                et_name.setText(o_name);
-//                for (int i = 0; i < sp_number_0.getCount(); i++) {
-//                    if (o_number_0.equals(sp_number_0.getItemAtPosition(i))) {
-//                        sp_number_0.setSelection(i);
-//                        break;
-//                    }
-//                }
-//                et_number_1.setText(o_number_1);
+                if (data.getStringExtra("result") != null) {
+                    Hangul hangul = new Hangul();
+                    String[] st1 = data.getStringExtra("result").split("\n");
+                    ArrayList<String> results = new ArrayList<String>();
+                    for (String str2 : st1) {
+                        String[] st3 = str2.split("\n");
+                        for (String str4 : st3) {
+                            String[] st5 = str4.split(" : ");
+                            for (String str6 : st5) {
+                                String[] st7 = str6.split(" ");
+                                for (String str8 : st7) {
+                                    results.add(str8);
+                                }
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < results.size(); i++) {
+                        if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("성명"))) {
+                            Log.d("성명", results.get(i+1));
+                            break;
+                        }
+                    }
+                    for (int i = 0; i < results.size(); i++) {
+                        if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("군번"))) {
+                            Log.d("군번", results.get(i+1));
+                            break;
+                        }
+                    }
+                    for (int i = 0; i < results.size(); i++) {
+                        if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("행선지"))) {
+                            Log.d("행선지", results.get(i+1));
+                            break;
+                        }
+                    }
+                    for (int i = 0; i < results.size(); i++) {
+                        if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("소속"))) {
+                            Log.d("소속", results.get(i+1));
+                            break;
+                        }
+                    }
+                    /*핸드폰 번호 가져오기*/
+                    TelephonyManager telManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    String PhoneNum = telManager.getLine1Number();
+                    if(PhoneNum.startsWith("+82")){
+                        PhoneNum = PhoneNum.replace("+82", "0");
+                    }
+                    Log.d("핸드폰", PhoneNum);
+                }
             }
         }
     }
@@ -382,6 +429,55 @@ public class RegistActivity extends AppCompatActivity {
             } catch (Exception e) {
                 return "ERROR";
             }
+        }
+    }
+
+    public class Hangul {
+        final char[] ChoSung   = { 0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139,
+                0x3141, 0x3142, 0x3143, 0x3145, 0x3146, 0x3147,
+                0x3148, 0x3149, 0x314a, 0x314b, 0x314c, 0x314d,
+                0x314e };
+        final char[] JwungSung = { 0x314f, 0x3150, 0x3151, 0x3152, 0x3153, 0x3154,
+                0x3155, 0x3156, 0x3157, 0x3158, 0x3159, 0x315a,
+                0x315b, 0x315c, 0x315d, 0x315e, 0x315f, 0x3160,
+                0x3161, 0x3162, 0x3163 };
+        final char[] JongSung  = { 0,      0x3131, 0x3132, 0x3133, 0x3134, 0x3135,
+                0x3136, 0x3137, 0x3139, 0x313a, 0x313b, 0x313c,
+                0x313d, 0x313e, 0x313f, 0x3140, 0x3141, 0x3142,
+                0x3144, 0x3145, 0x3146, 0x3147, 0x3148, 0x314a,
+                0x314b, 0x314c, 0x314d, 0x314e };
+
+        public String hangulToJaso(String s) {
+            int a, b, c; // 자소 버퍼: 초성/중성/종성 순
+            String result = "";
+            for (int i = 0; i < s.length(); i++) {
+                char ch = s.charAt(i);
+                if (ch >= 0xAC00 && ch <= 0xD7A3) {
+                    c = ch - 0xAC00;
+                    a = c / (21 * 28);
+                    c = c % (21 * 28);
+                    b = c / 28;
+                    c = c % 28;
+                    result = result + ChoSung[a] + JwungSung[b];
+                    if (c != 0) result = result + JongSung[c] ;
+                } else {
+                    result = result + ch;
+                }
+            }
+            return result;
+        }
+        public boolean jasoEqual(String s1, String s2) {
+            int count = 0;
+            int length = s1.length() > s2.length() ? s2.length() : s1.length();
+            for(int i = 0; i < length; i++) {
+                if(s1.charAt(i) != s2.charAt(i)) {
+                    count++;
+                }
+            }
+            if(count < length/4) {
+                return true;
+            }
+            return false;
         }
     }
 }
