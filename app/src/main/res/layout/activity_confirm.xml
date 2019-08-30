@@ -42,18 +42,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
-            android:layout_marginEnd="60dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/download"
             android:onClick="onDownload" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/share"
-            android:onClick="onShare" />
 
     </RelativeLayout>
 

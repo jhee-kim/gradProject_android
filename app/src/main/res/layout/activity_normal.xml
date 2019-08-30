@@ -52,9 +52,18 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="50dp"
             android:background="@drawable/tutorial"
             android:onClick="onTutorial" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/check"
+            android:onClick="onCheck" />
 
     </RelativeLayout>
 
@@ -71,11 +80,13 @@
 
         <TableLayout
             android:id="@+id/category"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:stretchColumns="1">
 
             <TableRow
                 android:layout_width="wrap_content"
@@ -83,70 +94,135 @@
                 android:gravity="center">
 
                 <RelativeLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:gravity="center">
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:layout_weight="1">
                     <ImageButton
-                        android:id="@+id/in_museum"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/in_museum_off"
-                        android:onClick="onMuseum" />
+                        android:id="@+id/in_exhibition"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/in_exhibition_off"
+                        android:onClick="onIn_exhibition" />
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:gravity="center">
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:layout_weight="1">
                     <ImageButton
-                        android:id="@+id/out_museum"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/out_museum_off"
-                        android:onClick="onOutside"/>
+                        android:id="@+id/out_exhibition"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/out_exhibition_off"
+                        android:onClick="onOut_exhibition"/>
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:gravity="center">
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:layout_weight="1">
                     <ImageButton
-                        android:id="@+id/restaurant"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/restaurant_off"
-                        android:onClick="onShop"/>
+                        android:id="@+id/facilities"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/facilities_off"
+                        android:onClick="onFacilities"/>
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:gravity="center">
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:layout_weight="1">
                     <ImageButton
-                        android:id="@+id/parking"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/parking_off"
-                        android:onClick="onPark"/>
+                        android:id="@+id/store"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/store_off"
+                        android:onClick="onStore"/>
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:gravity="center">
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:layout_weight="1">
                     <ImageButton
-                        android:id="@+id/check"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/check_off"
-                        android:onClick="oncheck"/>
+                        android:id="@+id/list"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/list_off"
+                        android:onClick="onList"/>
                 </RelativeLayout>
             </TableRow>
 
             <TableRow
-                android:layout_width="match_parent">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center">
 
+                <TextView
+                    android:id="@+id/tv_in_exhibition"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="전시관"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:textColor="#000000">
+                </TextView>
 
+                <TextView
+                    android:id="@+id/tv_out_exhibition"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="야외전시"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:textColor="#000000">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/tv_facilities"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="편의시설"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:textColor="#000000">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/tv_store"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="판매시설"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:textColor="#000000">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/tv_list"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="관람확인"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:textColor="#000000">
+                </TextView>
             </TableRow>
         </TableLayout>
 
