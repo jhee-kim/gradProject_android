@@ -3,7 +3,10 @@ package grad_project.myapplication;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -28,6 +32,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ActionBar actionBar = getSupportActionBar();
         if (actionBar == null) {
             throw new NullPointerException("Null ActionBar");
@@ -168,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         resumeActivity();
+//        notification();
     }
 
     @Override
@@ -664,5 +669,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+//    public void notification() {
+//        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
+//        contentView.setImageViewResource(R.id.image, R.mipmap.ic_launcher);
+//        contentView.setTextViewText(R.id.title, "Custom notification");
+//        contentView.setTextViewText(R.id.text, "This is a custom layout");
+//
+//        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+//                .setSmallIcon(R.drawable.logo)
+//                .setContent(contentView);
+//
+//        Notification notification = mBuilder.build();
+//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+//        notification.defaults |= Notification.DEFAULT_SOUND;
+//        notification.defaults |= Notification.DEFAULT_VIBRATE;
+//
+//        NotificationManager notificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager.notify(1, mBuilder.build());
+//    }
 }
 
