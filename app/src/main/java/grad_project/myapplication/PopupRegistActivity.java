@@ -68,7 +68,7 @@ public class PopupRegistActivity extends Activity {
                 s_participation = "일반 관람";
                 break;
             case 1 :
-                s_participation = "전시 해설";
+                s_participation = "해설 관람";
                 break;
             case -1 :
                 s_participation = "오류";

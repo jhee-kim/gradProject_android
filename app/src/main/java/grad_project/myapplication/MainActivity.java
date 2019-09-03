@@ -53,7 +53,7 @@ import java.util.Locale;
 * (주요 변수)
 *   - name : 사용자 이름
 *   - number : 군번
-*   - participation : 참여 구분(0:전시관람 / 1:전시 해설)
+*   - participation : 참여 구분(0:일반 관람 / 1:해설 관람)
 *   - division : 군종 구분(0:육군 / 1:해군 / 2:공군 / 3:해병대)
 *   - temper : 부대명
 *   - phone : 휴대폰 번호
@@ -72,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     View slideView;
     Button bt_openMap, bt_registration, bt_certificate;
-    RelativeLayout bt_openMenu, bt_closeMenu;
-    LinearLayout bt_viewtime, bt_myinfo, bt_certificate_2, bt_registration_2, bt_homepage, bt_information;
+    RelativeLayout bt_openMenu, bt_closeMenu, bt_information;
+    LinearLayout bt_viewtime, bt_myinfo, bt_homepage, bt_route;
     Long startDate;
     private boolean is_start = false;
     private boolean is_end = false;
@@ -145,9 +145,8 @@ public class MainActivity extends AppCompatActivity {
         // 메뉴 버튼 id 불러오기
         bt_viewtime = findViewById(R.id.bt_viewtime);
         bt_myinfo = findViewById(R.id.bt_myinfo);
-        bt_certificate_2 = findViewById(R.id.bt_certificate_2);
-        bt_registration_2 = findViewById(R.id.bt_registration_2);
         bt_homepage = findViewById(R.id.bt_homepage);
+        bt_route = findViewById(R.id.bt_route);
         bt_information = findViewById(R.id.bt_information);
 
         /* 메뉴 버튼 온클릭리스너 설정 */
@@ -164,6 +163,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), "도움말 버튼 눌림", Toast.LENGTH_SHORT).show();
+            }
+        });
+        // 오시는길 버튼
+        bt_route.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://i815.or.kr/2018/tour/location.do"));
+                startActivity(intent);
             }
         });
 
@@ -274,7 +281,6 @@ public class MainActivity extends AppCompatActivity {
 
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
-        final ImageView iv_registration = findViewById(R.id.iv_registration);
 
         if (!getNetworkInfo()) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -283,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                            Intent intent = new Intent(Settings.ACTION_DATA_USAGE_SETTINGS);
                             startActivity(intent);
                         }
                     });
@@ -309,8 +315,6 @@ public class MainActivity extends AppCompatActivity {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(false);
             bt_registration.setTextColor(getResources().getColor(R.color.disableButton));
-            iv_registration.setEnabled(false);
-            iv_registration.setColorFilter(Color.parseColor("#ffE0E0E0"), PorterDuff.Mode.SRC_IN);
 
             // 메뉴 맨 위에 표시되는 사용자 이름 설정
             Button bt_personal = findViewById(R.id.bt_personal);
@@ -341,8 +345,6 @@ public class MainActivity extends AppCompatActivity {
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(true);
             bt_registration.setTextColor(getResources().getColor(R.color.unfocusText));
-            iv_registration.setEnabled(true);
-            iv_registration.setColorFilter(null);
 
             // 메뉴 맨 위에 표시되는 사용자 이름 설정
             Button bt_personal = findViewById(R.id.bt_personal);
@@ -365,16 +367,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("STATE", Boolean.toString(is_start));
 
         /* 메뉴 버튼 온클릭리스너 설정 */
-        // 최초 등록 버튼
-        bt_registration_2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!is_login) {
-                    Intent intent = new Intent(MainActivity.this, RegistActivity.class);
-                    startActivityForResult(intent, 1);
-                }
-            }
-        });
+
         // 내 정보 버튼
         bt_myinfo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -382,27 +375,6 @@ public class MainActivity extends AppCompatActivity {
                 if (is_login) {
                     Intent intent = new Intent(MainActivity.this, PersonalActivity.class);
                     startActivity(intent);
-                } else {
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivityForResult(intent, 0);
-                }
-            }
-        });
-        // 확인증 버튼
-        bt_certificate_2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (is_login) {
-                    if (isEnd()) {
-                        if (is_end) {
-                            Intent intent = new Intent(MainActivity.this, ConfirmActivity.class);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "아직 관람이 완료되지 않았습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
-                    }
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivityForResult(intent, 0);

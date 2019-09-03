@@ -114,7 +114,7 @@
     <!-- 슬라이드 메뉴 레이아웃 -->
     <RelativeLayout
         android:id="@+id/layout_slide"
-        android:layout_width="250dp"
+        android:layout_width="220dp"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:background="#ffffff"
@@ -136,6 +136,24 @@
                 android:background="@drawable/close"
                 android:scaleType="fitCenter"/>
 
+        </RelativeLayout>
+
+        <!-- 로그아웃 버튼 -->
+        <RelativeLayout
+            android:id="@+id/bt_information"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="5dp">
+            <ImageView
+                android:id="@+id/iv_information"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/information"
+                android:scaleType="fitCenter"/>
         </RelativeLayout>
 
         <!-- 로그아웃 버튼 -->
@@ -174,7 +192,7 @@
             android:layout_below="@id/bt_close_menu"
             android:layout_marginTop="0dp"
             android:layout_marginStart="30dp"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textAlignment="viewStart"
             android:textAllCaps="false"
             android:fontFamily="@font/m_gothic_bold"
@@ -246,32 +264,6 @@
                         android:fontFamily="@font/m_gothic_normal"/>
                 </LinearLayout>
 
-                <!-- 확인증 버튼 -->
-                <LinearLayout
-                    android:id="@+id/bt_certificate_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="5dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/stamp"/>
-
-                    <TextView
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:text="@string/certificate_str"
-                        android:textAlignment="center"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/m_gothic_normal"/>
-                </LinearLayout>
-
             </LinearLayout>
 
             <LinearLayout
@@ -279,33 +271,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!-- 최초 등록 버튼 -->
-                <LinearLayout
-                    android:id="@+id/bt_registration_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="5dp">
-
-                    <ImageView
-                        android:id="@+id/iv_registration"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/edit"/>
-
-                    <TextView
-                        android:id="@+id/tv_registration"
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:text="@string/registration_str"
-                        android:textAlignment="center"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/m_gothic_normal"/>
-                </LinearLayout>
 
                 <!-- 홈페이지 버튼 -->
                 <LinearLayout
@@ -333,9 +298,9 @@
                         android:fontFamily="@font/m_gothic_normal"/>
                 </LinearLayout>
 
-                <!-- 도움말 버튼 -->
+                <!-- 오시는길 버튼 -->
                 <LinearLayout
-                    android:id="@+id/bt_information"
+                    android:id="@+id/bt_route"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -346,14 +311,14 @@
                         android:layout_height="40dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="10dp"
-                        android:background="@drawable/information"/>
+                        android:background="@drawable/route"/>
 
                     <TextView
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:text="@string/help_str"
+                        android:text="오시는 길"
                         android:textAlignment="center"
                         android:textSize="14sp"
                         android:fontFamily="@font/m_gothic_normal"/>
