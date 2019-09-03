@@ -44,7 +44,8 @@ public class CheckActivity extends AppCompatActivity {
     ImageView[] iv_ex = new ImageView[6];
     boolean[] is_success = new boolean[6];
     Button bt_toMap, bt_finish;
-    boolean connectState = true;
+    boolean surveyState = false;
+    String surveyUrl = "";
 
     TimerHandler timerhandler;
     private static int MESSAGE_TIMER_START = 100;
@@ -58,6 +59,7 @@ public class CheckActivity extends AppCompatActivity {
     public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";          //각 전시관 별 개설 여부(JSON 형식) - ex) { "number": "1", "isOpen": "1" }
     public static final String SET_ISEND = BASE_PATH + "set_isEnd.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
     public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
+    public static final String GET_SURVEY = BASE_PATH + "get_survey.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,57 +127,55 @@ public class CheckActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             finish();
         } else if (endResult.equals("0")) {
-            if (connectState) {
-                if (is_start) {
-                    timerhandler.sendEmptyMessage(MESSAGE_TIMER_START);
-                    for (int i = 0; i < 6; i++) {
-                        if (exhibitionState[i].equals("0")) {
-                            iv_ex[i].setImageResource(R.drawable.closed);
-                            ll_ex[i].setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Toast.makeText(getApplicationContext(), "개방되지 않은 전시관입니다.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        } else {
-                            if (is_success[i]) {
-                                iv_ex[i].setImageResource(R.drawable.complete);
-                                ll_ex[i].setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Toast.makeText(getApplicationContext(), "관람 완료된 전시관입니다.", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            } else {
-                                iv_ex[i].setImageResource(R.drawable.progress);
-                                ll_ex[i].setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Toast.makeText(getApplicationContext(), "관람하지 않은 전시관입니다.", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }
-                    }
-                } else {
-                    for (int i = 0; i < 6; i++) {
+            if (is_start) {
+                timerhandler.sendEmptyMessage(MESSAGE_TIMER_START);
+                for (int i = 0; i < 6; i++) {
+                    if (exhibitionState[i].equals("0")) {
+                        iv_ex[i].setImageResource(R.drawable.closed);
                         ll_ex[i].setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Toast.makeText(getApplicationContext(), "관람 시작 전입니다.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "개방되지 않은 전시관입니다.", Toast.LENGTH_SHORT).show();
                             }
                         });
+                    } else {
+                        if (is_success[i]) {
+                            iv_ex[i].setImageResource(R.drawable.complete);
+                            ll_ex[i].setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getApplicationContext(), "관람 완료된 전시관입니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            iv_ex[i].setImageResource(R.drawable.progress);
+                            ll_ex[i].setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getApplicationContext(), "관람하지 않은 전시관입니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
-                    timerhandler.sendEmptyMessage(REFRESH_TIMER_START);
                 }
-
-                if (getFinish()) {
-                    bt_finish.setEnabled(true);
-                } else {
-                    bt_finish.setEnabled(false);
-                }
+                bt_finish.setText("관람 종료하기");
             } else {
-                Toast.makeText(getApplicationContext(), "서버와의 통신에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                for (int i = 0; i < 6; i++) {
+                    ll_ex[i].setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getApplicationContext(), "관람 시작 전입니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                timerhandler.sendEmptyMessage(REFRESH_TIMER_START);
+                bt_finish.setText("관람 시작 전입니다.");
+                bt_finish.setEnabled(false);
+            }
+
+            if (getFinish()) {
+                bt_finish.setEnabled(true);
+            } else {
                 bt_finish.setEnabled(false);
             }
         } else {
@@ -237,36 +237,39 @@ public class CheckActivity extends AppCompatActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_toMap :
-                if (is_start) {
-                    Intent intent = new Intent(CheckActivity.this, NormalActivity.class);
-                    intent.putExtra("Time", l_startTime);
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(CheckActivity.this, HelpActivity.class);
-                    startActivity(intent);
+                if (getStartState()) {
+                    if (is_start) {
+                        Intent intent = new Intent(CheckActivity.this, NormalActivity.class);
+                        intent.putExtra("Time", l_startTime);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(CheckActivity.this, HelpActivity.class);
+                        startActivity(intent);
+                    }
+                } else {    // 네트워크 통신 오류 예외처리
+                    Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                 }
 //                finish();
                 break;
             case R.id.bt_finish :
                 if (getFinish()) {
-                    FinishTask finishTask = new FinishTask(this);
-                    try {
-                        String result = finishTask.execute(SET_ISEND, s_id).get();
-                        if (result.equals("0")) {
+                    if (setFinish()) {
+                        surveyUrl = getSurveyUrl();
+                        if (surveyUrl.equals("ERROR")) {
                             Toast.makeText(getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
-                            connectState = true;
-                            break;
                         }
-                        else if (result.equals("1")) {
-                            Toast.makeText(getApplicationContext(), "관람 종료 확인이 되었습니다.", Toast.LENGTH_SHORT).show();
-                            connectState = true;
+                        else if (!surveyUrl.equals("0")) {
                             Intent in_survey = new Intent(CheckActivity.this, PopupSurveyActivity.class);
+                            in_survey.putExtra("URL", surveyUrl);
                             startActivityForResult(in_survey, 0);
-                            break;
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        connectState = false;
+                        else if (surveyUrl.equals("0")) {
+                            Intent intent = new Intent(CheckActivity.this, ConfirmActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "아직 관람이 끝나지 않았습니다.", Toast.LENGTH_SHORT).show();
@@ -412,14 +415,18 @@ public class CheckActivity extends AppCompatActivity {
         GetIsStartTask startTask = new GetIsStartTask(CheckActivity.this);
         try {
             String result = startTask.execute(GET_ISSTART, s_id).get();
-            is_start = !result.equals("0");
-            getTimeRefresh();
-            Log.d("ISSTART", Boolean.toString(is_start));
-            return true;
+            if (result.equals("ERROR")) {
+                return false;
+            } else {
+                is_start = !result.equals("0");
+                getTimeRefresh();
+                Log.d("ISSTART", Boolean.toString(is_start));
+                return true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     public boolean getFinish() {
@@ -456,18 +463,40 @@ public class CheckActivity extends AppCompatActivity {
         try {
             String result = startTask.execute(GET_ISSTART, s_id).get();
             is_start = !result.equals("0");
+            if (result.equals("ERROR")) {
+                is_start = false;
+            }
             if (is_start) {
                 SimpleDateFormat sdfStart = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
                 long time = sdfStart.parse(result).getTime();
                 Log.d("ISSTART", Long.toString(time));
-                connectState = true;
                 return time;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            connectState = false;
         }
         return -1;
+    }
+
+    // 관람 종료 설정하는 메소드
+    public boolean setFinish() {
+        FinishTask finishTask = new FinishTask(this);
+        try {
+            String result = finishTask.execute(SET_ISEND, s_id).get();
+            if (result.equals("0")) {
+                Toast.makeText(getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            else if (result.equals("1")) {
+                Toast.makeText(getApplicationContext(), "관람 종료 확인이 되었습니다.", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
     // DB 전시관 데이터 받아오기
     public boolean getExhibitionData() {
@@ -488,6 +517,27 @@ public class CheckActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+    // 설문조사 주소 받아오기
+    public String getSurveyUrl() {
+        // 전시관 오픈 여부
+        GetSurveyTask task = new GetSurveyTask(this);
+        try {
+            String result = task.execute(GET_SURVEY).get();
+            Log.d("SURVEY", result);
+            JSONObject jResult = new JSONObject(result);
+            JSONArray jArray = jResult.getJSONArray("result");
+            JSONObject jObject = jArray.getJSONObject(0);
+            surveyState = jObject.getString("is_exist").equals("1");
+            if (surveyState) {
+                return jObject.getString("url");
+            } else {
+                return "0";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERROR";
         }
     }
     /***** 서버 통신 *****/
@@ -545,7 +595,7 @@ public class CheckActivity extends AppCompatActivity {
                 bufferedReader.close();
                 return sb.toString();
             } catch (Exception e) {
-                return "Error: " + e.getMessage();
+                return "ERROR";
             }
         }
     }
@@ -638,6 +688,58 @@ public class CheckActivity extends AppCompatActivity {
                 outputStream.write(postParameters.getBytes("UTF-8"));
                 outputStream.flush();
                 outputStream.close();
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+                bufferedReader.close();
+                return sb.toString();
+            } catch (Exception e) {
+                return "ERROR";
+            }
+        }
+    }
+
+    // 설문조사 여부 및 주소 받아오기
+    public static class GetSurveyTask extends AsyncTask<String, Void, String> {
+        private WeakReference<CheckActivity> activityReference;
+        ProgressDialog progressDialog;
+
+        GetSurveyTask(CheckActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activityReference.get(),
+                    "Please Wait", null, true, true);
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            String serverURL = params[0];
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
                 int responseStatusCode = httpURLConnection.getResponseCode();
                 InputStream inputStream;
                 if(responseStatusCode == HttpURLConnection.HTTP_OK) {

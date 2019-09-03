@@ -18,13 +18,16 @@ import java.util.ArrayList;
 
 public class PopupSurveyActivity extends Activity {
     Button bt_apply, bt_cancel;
-    private static String SURVEY_LINK = "https://www.i815.or.kr/";
+    private String SURVEY_LINK = "www.i815.or.kr/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.popup_survey);
+
+        Intent intent = getIntent();
+        SURVEY_LINK = intent.getStringExtra("URL");
 
         bt_apply = findViewById(R.id.bt_apply);
         bt_cancel = findViewById(R.id.bt_cancel);
@@ -39,7 +42,7 @@ public class PopupSurveyActivity extends Activity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_apply :
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(SURVEY_LINK));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + SURVEY_LINK));
                 startActivity(intent);
                 setResult(RESULT_OK);
                 finish();

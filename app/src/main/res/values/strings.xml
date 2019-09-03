@@ -19,8 +19,8 @@
     <string name="personaldata_str">개인 정보</string>
     <string name="additiondata_str">추가 정보</string>
     <string name="participate_str">관람 구분</string>
-    <string name="normal_part_str">전시 관람</string>
-    <string name="explan_part_str">전시 해설</string>
+    <string name="normal_part_str">일반 관람</string>
+    <string name="explan_part_str">해설 관람</string>
     <string name="temper_str">소속</string>
     <string name="temper_hint_str">소속 부대를 자세히 입력하세요.</string>
     <string name="army_str">육군</string>
@@ -46,7 +46,7 @@
     <string name="ex5_str">5 전시관</string>
     <string name="ex6_str">6 전시관</string>
     <string name="openMap_str">지도 열기</string>
-    <string name="finish_str">관람 종료</string>
+    <string name="finish_str">관람 종료하기</string>
 
     <string name="name_popup_str">이름 : </string>
     <string name="number_popup_str">군번 : </string>

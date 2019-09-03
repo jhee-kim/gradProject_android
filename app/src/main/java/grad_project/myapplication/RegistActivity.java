@@ -99,8 +99,8 @@ public class RegistActivity extends AppCompatActivity {
             }
         });
 
-//        군번 8자리 입력하면 자동으로 폰번호 입력으로 커서 넘어가는 코드인데
-//        굳이 필요할까 싶음
+//        // 군번 8자리 입력하면 자동으로 폰번호 입력으로 커서 넘어가는 코드인데
+//        // 굳이 필요할까 싶음
 //        et_number_1.addTextChangedListener(new TextWatcher() {
 //            @Override
 //            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -331,24 +331,39 @@ public class RegistActivity extends AppCompatActivity {
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("성명"))) {
                             Log.d("성명", results.get(i+1));
+                            et_name.setText(results.get(i+1));
                             break;
                         }
                     }
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("군번"))) {
                             Log.d("군번", results.get(i+1));
+                            String temp_num[] = results.get(i+1).split("-");
+                            boolean is_success_sp = false;
+                            for (int j = 0; j < sp_number_0.getCount(); j++) {
+                                if (sp_number_0.getItemAtPosition(j).equals(temp_num[0])) {
+                                    sp_number_0.setSelection(j);
+                                    is_success_sp = true;
+                                }
+                            }
+                            if (!is_success_sp) {
+                                Toast.makeText(getApplicationContext(), "텍스트 읽어오기 오류!", Toast.LENGTH_SHORT).show();
+                            }
+                            et_number_1.setText(temp_num[1]);
                             break;
                         }
                     }
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("행선지"))) {
                             Log.d("행선지", results.get(i+1));
+                            et_destination.setText(results.get(i+1));
                             break;
                         }
                     }
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("소속"))) {
                             Log.d("소속", results.get(i+1));
+                            et_temper.setText(results.get(i+1));
                             break;
                         }
                     }
@@ -360,6 +375,19 @@ public class RegistActivity extends AppCompatActivity {
                     String PhoneNum = telManager.getLine1Number();
                     if(PhoneNum.startsWith("+82")){
                         PhoneNum = PhoneNum.replace("+82", "0");
+                        String temp_phone[] = PhoneNum.split("-");
+                        boolean is_success_sp = false;
+                        for (int j = 0; j < sp_phone_0.getCount(); j++) {
+                            if (sp_phone_0.getItemAtPosition(j).equals(temp_phone[0])) {
+                                sp_phone_0.setSelection(j);
+                                is_success_sp = true;
+                            }
+                        }
+                        if (!is_success_sp) {
+                            Toast.makeText(getApplicationContext(), "텍스트 읽어오기 오류!", Toast.LENGTH_SHORT).show();
+                        }
+                        et_phone_1.setText(temp_phone[1]);
+                        et_phone_2.setText(temp_phone[2]);
                     }
                     Log.d("핸드폰", PhoneNum);
                 }
