@@ -7,6 +7,12 @@
     <SurfaceView
         android:id="@+id/surfaceView"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"/>
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
     <ImageButton
@@ -17,16 +23,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="25dp"
         android:src="@drawable/capture"
-        android:background="@null" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginBottom="200dp"
-        android:src="@drawable/ocr_img"
         android:background="@null" />
 
 </RelativeLayout>

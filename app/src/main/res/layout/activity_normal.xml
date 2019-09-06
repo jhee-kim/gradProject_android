@@ -145,18 +145,33 @@
                         android:onClick="onStore"/>
                 </RelativeLayout>
 
-                <RelativeLayout
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="50dp"
                     android:gravity="center"
                     android:layout_weight="1">
+
                     <ImageButton
                         android:id="@+id/list"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
+                        android:layout_gravity="center"
                         android:background="@drawable/list_off"
                         android:onClick="onList"/>
-                </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/list_count_tv"
+                        android:background="@drawable/round_tv"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginBottom="15dp"
+                        android:visibility="invisible"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/m_gothic_bold"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center"/>
+                </FrameLayout>
             </TableRow>
 
             <TableRow
@@ -247,6 +262,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </RelativeLayout>
+
+        <ListView
+            android:id="@+id/questList"
+            android:layout_marginTop="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible">
+        </ListView>
 
         <ImageButton
             android:id="@+id/location"

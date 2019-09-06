@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -40,6 +42,11 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.ByteArrayOutputStream;
@@ -65,9 +72,13 @@ public class OcrActivity  extends Activity {
     Activity act;
     Context ctx;
 
+    ImageView img;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.activity_regist);
+
         ctx = this;
         act = this;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -76,6 +87,8 @@ public class OcrActivity  extends Activity {
         setContentView(R.layout.activity_ocr);
 
         preview = new Preview(this, (SurfaceView)findViewById(R.id.surfaceView));
+        img = (ImageView)findViewById(R.id.img);
+
         preview.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
         ((RelativeLayout) findViewById(R.id.layout)).addView(preview);
         preview.setKeepScreenOn(true);
@@ -96,86 +109,33 @@ public class OcrActivity  extends Activity {
 
     public void uploadImage(Bitmap bitmap) {
         if (bitmap != null) {
-
             OpenCVLoader.initDebug();
-            Mat grayImage =  new Mat(0,0, CvType.CV_32FC2);
+            Mat grayImage = new Mat(0, 0, CvType.CV_32FC2);
             Utils.bitmapToMat(bitmap, grayImage);
             Imgproc.cvtColor(grayImage.clone(), grayImage, Imgproc.COLOR_RGB2GRAY);
-            Imgproc.adaptiveThreshold(grayImage.clone(), grayImage, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 21, 10);
             Utils.matToBitmap(grayImage, bitmap);
-
-            /*
-            Imgproc.GaussianBlur(grayImage, grayImage, new Size(3, 3), 0);
-            Imgproc.Canny(grayImage, grayImage, 75, 200);
 
             ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
             Mat hierarchy = new Mat();
-
-            Imgproc.findContours(grayImage, contours, hierarchy,  Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(grayImage, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
             double maxArr = 0;
             MatOfPoint2f temp = new MatOfPoint2f();
-            for(MatOfPoint contour : contours) {
+            for (MatOfPoint contour : contours) {
                 MatOfPoint2f approx = new MatOfPoint2f();
                 MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
-                Imgproc.approxPolyDP(contour2f, approx, 0.02*Imgproc.arcLength(contour2f, true), true);
+                Imgproc.approxPolyDP(contour2f, approx, 0.02 * Imgproc.arcLength(contour2f, true), true);
 
-                if(approx.toArray().length == 4 && Imgproc.contourArea(contour) > maxArr) {
+                if (approx.toArray().length == 4 && Imgproc.contourArea(contour) > maxArr) {
                     maxArr = Imgproc.contourArea(contour);
                     temp = approx;
                 }
             }
-            if(temp != null) {
-                Rect rect1 = Imgproc.boundingRect(temp);
-                Bitmap result1 = Bitmap.createBitmap(bitmap, (int) rect1.tl().x, (int) rect1.tl().y, rect1.width, rect1.height);
-                Mat scaleImg = new Mat(0, 0, CvType.CV_32FC2);
-                Utils.bitmapToMat(result1, scaleImg);
-                Imgproc.cvtColor(scaleImg.clone(), scaleImg, Imgproc.COLOR_RGB2GRAY);
-                Imgproc.adaptiveThreshold(scaleImg.clone(), scaleImg, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 21, 10);
-                //Mat kernel =  new Mat(7,7,CvType.CV_8S);
-                //Imgproc.dilate(scaleImg.clone(), scaleImg, kernel);
-                //Imgproc.erode(scaleImg.clone(), scaleImg, kernel);
-                Utils.matToBitmap(scaleImg, result1);
-                ImageView mMainImage1 = findViewById(R.id.main_image1);
-                mMainImage1.setImageBitmap(result1);
-
-
-                Mat rect = new Mat(4, 1, CvType.CV_32FC2);
-                Mat dst = new Mat(4, 1, CvType.CV_32FC2);
-
-                Point topLeft = temp.toArray()[1];
-                Point topRight = temp.toArray()[0];
-                Point bottomRight = temp.toArray()[3];
-                Point bottomLeft = temp.toArray()[2];
-
-                double w1 = abs(bottomRight.x - bottomLeft.x);
-                double w2 = abs(topRight.x - topLeft.x);
-                double h1 = abs(bottomRight.y - topRight.y);
-                double h2 = abs(bottomLeft.y - topLeft.y);
-
-                double maxWidth = max(w1, w2);
-                double maxHeight = max(h1, h2);
-
-                rect.put(4, 1, topLeft.x, topLeft.y, topRight.x, topRight.y, bottomRight.x, bottomRight.y, bottomLeft.x, bottomLeft.y);
-                dst.put(4, 1, 0, 0, maxWidth, 0, maxWidth, maxHeight, 0, maxHeight);
-
-
-                Mat N = Imgproc.getPerspectiveTransform(rect, dst);
-
-                Imgproc.warpPerspective(imageCny, imageCny, N, new Size(maxWidth, maxHeight));
-                Log.d("test-img", String.valueOf(imageCny));
-                //Imgproc.cvtColor(imageCny, imageCny,  Imgproc.COLOR_RGB2GRAY);
-                //Imgproc.adaptiveThreshold(imageCny, imageCny, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 21, 10);
-
-                Bitmap result2 = Bitmap.createBitmap(imageCny.cols(), imageCny.rows(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(imageCny, result2);
-
-                ImageView mMainImage2 = findViewById(R.id.main_image2);
-                mMainImage2.setImageBitmap(result2);
-
-                bitmap = result1;
+            if (temp != null) {
+                Rect rect = Imgproc.boundingRect(temp);
+                bitmap = Bitmap.createBitmap(bitmap, (int)rect.tl().x, (int)rect.tl().y, rect.width, rect.height);
             }
-            */
+            img.setImageBitmap(bitmap);
             callCloudVision(bitmap);
         }
         else {
@@ -193,7 +153,7 @@ public class OcrActivity  extends Activity {
                     e.getMessage());
         }
     }
-    /*2*/
+
     private class TextDetectionTask extends AsyncTask<Object, Void, String> {
         private final WeakReference<OcrActivity> mActivityWeakReference;
         private Vision.Images.Annotate mRequest;
@@ -210,8 +170,8 @@ public class OcrActivity  extends Activity {
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             asyncDialog.setMessage("인식중입니다..");
 
-            // show dialog
-            asyncDialog.show();
+            //show dialog
+            //asyncDialog.show();
             super.onPreExecute();
         }
 
@@ -231,13 +191,14 @@ public class OcrActivity  extends Activity {
         }
 
         protected void onPostExecute(String result) {
-            asyncDialog.dismiss();
+            //asyncDialog.dismiss();
             OcrActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 Intent intent = new Intent(OcrActivity.this, RegistActivity.class);
                 intent.putExtra("result", result);
                 setResult(RESULT_OK, intent);
-                finish();
+
+                //finish();
             }
         }
     }
@@ -303,7 +264,7 @@ public class OcrActivity  extends Activity {
 
         return annotateRequest;
     }
-    /*3*/
+
     private static String convertResponseToString(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder();
         List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations();
@@ -329,6 +290,7 @@ public class OcrActivity  extends Activity {
                 camera = Camera.open(0);
                 camera.startPreview();
                 preview.setCamera(camera);
+
             } catch (RuntimeException ex){
                 Toast.makeText(ctx, getString(R.string.camera_not_found), Toast.LENGTH_LONG).show();
             }
@@ -362,7 +324,10 @@ public class OcrActivity  extends Activity {
         public void onPictureTaken(byte[] data, Camera camera) {
             if(data != null) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                uploadImage(bitmap);
+                Matrix rotateMatrix = new Matrix();
+                rotateMatrix.postRotate(90);
+
+                uploadImage(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, false));
             }
         }
     };
