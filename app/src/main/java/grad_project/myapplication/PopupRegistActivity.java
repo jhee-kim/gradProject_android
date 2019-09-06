@@ -12,11 +12,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PopupRegistActivity extends Activity {
-    TextView tv_name, tv_number, tv_phone, tv_division, tv_temper, tv_participation, tv_destination, tv_question;
+    TextView tv_name, tv_number, tv_phone, tv_division, tv_temper, tv_participation, tv_expTime, tv_destination, tv_question;
     LinearLayout ll_buttons;
     Button bt_apply, bt_cancel;
-    String s_name, s_number, s_phone, s_division, s_temper, s_participation, s_destination;
-    int i_division, i_participation;
+    String s_name, s_number, s_phone, s_division, s_temper, s_participation, s_expTime, s_destination;
+    int i_division, i_participation, i_expTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +30,7 @@ public class PopupRegistActivity extends Activity {
         tv_division = findViewById(R.id.tv_division);
         tv_temper = findViewById(R.id.tv_temper);
         tv_participation = findViewById(R.id.tv_participation);
+        tv_expTime = findViewById(R.id.tv_expTime);
         tv_destination = findViewById(R.id.tv_destination);
         tv_question = findViewById(R.id.tv_question);
 
@@ -45,6 +46,7 @@ public class PopupRegistActivity extends Activity {
         s_destination = intent.getStringExtra("DESTINATION");
         i_division = intent.getIntExtra("DIVISION", -1);
         i_participation = intent.getIntExtra("PARTICIPATION", -1);
+        i_expTime = intent.getIntExtra("EXPTIME", -1);
 
         switch (i_division) {
             case 0 :
@@ -74,6 +76,20 @@ public class PopupRegistActivity extends Activity {
                 s_participation = "오류";
                 break;
         }
+        switch (i_expTime) {
+            case 0 :
+                s_expTime = "11:00";
+                break;
+            case 1 :
+                s_expTime = "13:00";
+                break;
+            case -1 :
+                s_expTime = "오류";
+                break;
+            case -100 :
+                s_expTime = "";
+                break;
+        }
 
         tv_name.setText(s_name);
         tv_number.setText(s_number);
@@ -81,6 +97,7 @@ public class PopupRegistActivity extends Activity {
         tv_division.setText(s_division);
         tv_temper.setText(s_temper);
         tv_participation.setText(s_participation);
+        tv_expTime.setText(s_expTime);
         tv_destination.setText(s_destination);
 
         bt_apply.setEnabled(false);

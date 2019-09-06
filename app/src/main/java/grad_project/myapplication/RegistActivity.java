@@ -1,12 +1,15 @@
 package grad_project.myapplication;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +19,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -41,6 +46,7 @@ public class RegistActivity extends AppCompatActivity {
     private String s_name = "";
     private int i_division = -1;
     private int i_participation = -1;
+    private int i_expTime = -1;
     private String s_temper = "";
     private String s_number = "";
     private String s_number_0 = "";
@@ -51,11 +57,16 @@ public class RegistActivity extends AppCompatActivity {
     private String s_phone_2 = "";
     private String s_destination = "";
     EditText et_name, et_temper, et_number_1, et_phone_1, et_phone_2, et_destination;
-    Spinner sp_number_0, sp_phone_0, sp_division;
+    Spinner sp_number_0, sp_phone_0, sp_division, sp_participation, sp_expTime;
     CheckBox cb_check;
     boolean check_temp;
     RadioGroup rg_participation, rg_division;
-    LinearLayout ll_agreement;
+    LinearLayout ll_agreement, bt_partHelp;
+
+    ArrayAdapter<String> timeAdapter;
+    List<String> timeList;
+    boolean[] b_expTime = {false, true, true};
+    boolean is_dialog = false;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
@@ -73,6 +84,7 @@ public class RegistActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
+
         et_name = findViewById(R.id.et_name);
         et_temper = findViewById(R.id.et_temper);
         sp_number_0 = findViewById(R.id.sp_number_0);
@@ -83,8 +95,11 @@ public class RegistActivity extends AppCompatActivity {
         et_destination = findViewById(R.id.et_destination);
         cb_check = findViewById(R.id.cb_check);
         sp_division = findViewById(R.id.sp_division);
-        rg_participation = findViewById(R.id.rg_participation);
+//        rg_participation = findViewById(R.id.rg_participation);
         ll_agreement = findViewById(R.id.ll_agreement);
+        bt_partHelp = findViewById(R.id.bt_partHelp);
+        sp_participation = findViewById(R.id.sp_participation);
+        sp_expTime = findViewById(R.id.sp_expTime);
 
         check_temp = false;
         cb_check.setChecked(false);
@@ -155,6 +170,103 @@ public class RegistActivity extends AppCompatActivity {
             }
         });
 
+        sp_participation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    i_participation = 0;
+                    i_expTime = -100;
+                    sp_expTime.setEnabled(false);
+                    sp_expTime.setVisibility(View.INVISIBLE);
+                }
+                else if (position == 1) {
+                    i_participation = 1;
+                    sp_expTime.setEnabled(true);
+                    sp_expTime.setVisibility(View.VISIBLE);
+                    sp_expTime.setSelection(0);
+                    if (sp_expTime.getItemAtPosition(0).toString().equals("없음")) {
+                        Toast.makeText(getApplicationContext(), "오늘 이용 가능한 시간이 없습니다.", Toast.LENGTH_SHORT).show();
+                        i_expTime = -101;
+                    }
+                } else {
+                    i_participation = -1;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        timeList = new ArrayList<String>();
+        if (b_expTime[0]) {
+            timeList.add("없음");
+        }
+        else {
+            timeList.add("시간");
+            if (b_expTime[1]) {
+                timeList.add("11:00");
+            }
+            if (b_expTime[2]) {
+                timeList.add("13:00");
+            }
+        }
+        timeAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                R.layout.spinner_item, timeList);
+        timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp_expTime.setAdapter(timeAdapter);
+
+        sp_expTime.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    i_expTime = -100;
+                } else {
+                    String temp = sp_expTime.getItemAtPosition(position).toString();
+                    if (temp.equals("없음")) {
+                        Toast.makeText(getApplicationContext(), "오늘 이용 가능한 시간이 없습니다.", Toast.LENGTH_SHORT).show();
+                        i_expTime = -100;
+                    } else {
+                        if (!is_dialog) {
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(RegistActivity.this);
+                            builder.setTitle("주의");
+                            builder.setMessage("해설 관람은 선착순입니다.\n\n앱에서 시간을 선택하셨더라도 반드시 안내센터에서 등록하셔야 하며,\n관람 인원이 초과되면 해설 관람 이용이 불가할 수 있습니다.");
+                            builder.setPositiveButton("확인",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            builder.setCancelable(false);
+                            builder.show();
+                            is_dialog = true;
+                        }
+                        if (temp.equals("11:00")) {
+                            i_expTime = 0;
+                        } else if (temp.equals("13:00")) {
+                            i_expTime = 1;
+                        } else {
+                            i_expTime = -100;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        bt_partHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "//관람 방법에 대한 설명 띄우기//", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         ll_agreement.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -198,7 +310,7 @@ public class RegistActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
-        int participation_selected = rg_participation.getCheckedRadioButtonId();
+//        int participation_selected = rg_participation.getCheckedRadioButtonId();
 
         s_name = et_name.getText().toString().trim();
         s_temper = et_temper.getText().toString().trim();
@@ -212,17 +324,17 @@ public class RegistActivity extends AppCompatActivity {
         String temp_phone = s_phone_0 + "-" + s_phone_1 + "-" + s_phone_2;
         String temp_number = s_number_0 + "-" + s_number_1;
 
-        switch (participation_selected) {
-            case R.id.rb_normal:
-                i_participation = 0;
-                break;
-            case R.id.rb_narr:
-                i_participation = 1;
-                break;
-            default:
-                i_participation = -1;
-                break;
-        }
+//        switch (participation_selected) {
+//            case R.id.rb_normal:
+//                i_participation = 0;
+//                break;
+//            case R.id.rb_narr:
+//                i_participation = 1;
+//                break;
+//            default:
+//                i_participation = -1;
+//                break;
+//        }
 
         Log.i("NAME", s_name);
         Log.i("DIVISION", Integer.toString(i_division));
@@ -251,12 +363,15 @@ public class RegistActivity extends AppCompatActivity {
             et_temper.requestFocus();
         } else if (!b_check) {
             Toast.makeText(RegistActivity.this, "개인정보 수집 및 이용에 동의해주세요.", Toast.LENGTH_SHORT).show();
+        } else if (i_expTime == -101) {
+            Toast.makeText(RegistActivity.this, "오늘 이용 가능한 해설 관람이 없습니다.", Toast.LENGTH_SHORT).show();
         } else {
             Intent intent = new Intent(RegistActivity.this, PopupRegistActivity.class);
             intent.putExtra("NAME", s_name);
             intent.putExtra("NUMBER", temp_number);
             intent.putExtra("PHONE", temp_phone);
             intent.putExtra("DIVISION", i_division);
+            intent.putExtra("EXPTIME", i_expTime);
             intent.putExtra("TEMPER", s_temper);
             intent.putExtra("DESTINATION", s_destination);
             intent.putExtra("PARTICIPATION", i_participation);
@@ -341,7 +456,7 @@ public class RegistActivity extends AppCompatActivity {
                             String temp_num[] = results.get(i+1).split("-");
                             boolean is_success_sp = false;
                             for (int j = 0; j < sp_number_0.getCount(); j++) {
-                                if (sp_number_0.getItemAtPosition(j).equals(temp_num[0])) {
+                                if (sp_number_0.getItemAtPosition(j).toString().equals(temp_num[0])) {
                                     sp_number_0.setSelection(j);
                                     is_success_sp = true;
                                 }
@@ -375,10 +490,20 @@ public class RegistActivity extends AppCompatActivity {
                     String PhoneNum = telManager.getLine1Number();
                     if(PhoneNum.startsWith("+82")){
                         PhoneNum = PhoneNum.replace("+82", "0");
-                        String temp_phone[] = PhoneNum.split("-");
+                        String[] temp_phone = new String[3];
+                        if (PhoneNum.length() == 10) {
+                            temp_phone[0] = PhoneNum.substring(0, 3);
+                            temp_phone[1] = PhoneNum.substring(3, 6);
+                            temp_phone[2] = PhoneNum.substring(6);
+                        }
+                        else {
+                            temp_phone[0] = PhoneNum.substring(0, 3);
+                            temp_phone[1] = PhoneNum.substring(3, 7);
+                            temp_phone[2] = PhoneNum.substring(7);
+                        }
                         boolean is_success_sp = false;
                         for (int j = 0; j < sp_phone_0.getCount(); j++) {
-                            if (sp_phone_0.getItemAtPosition(j).equals(temp_phone[0])) {
+                            if (sp_phone_0.getItemAtPosition(j).toString().equals(temp_phone[0])) {
                                 sp_phone_0.setSelection(j);
                                 is_success_sp = true;
                             }

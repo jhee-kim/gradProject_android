@@ -87,6 +87,8 @@
         <activity android:name=".TutorialActivity">
         </activity>
 
+        <service android:name=".NotiService"/>
+
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="63c2eeea64bff757d4f3fbb253f2ff59" />

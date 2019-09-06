@@ -45,11 +45,15 @@
         android:background="@color/menubar"
         android:layout_below="@id/title_registration"/>
     <!-- 기본 정보 입력 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/title_registration"
+        android:paddingTop="2dp"
+        android:layout_marginBottom="100dp">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title_registration"
-        android:layout_marginTop="20dp"
         android:paddingStart="20dp"
         android:paddingEnd="20dp">
 
@@ -57,8 +61,10 @@
         <TextView
             android:id="@+id/tv_personal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
             android:text="@string/personaldata_str"
             android:textSize="20sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
@@ -222,48 +228,108 @@
         <TextView
             android:id="@+id/tv_participation"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_below="@id/layout_phone"
+            android:gravity="center_vertical"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
             android:text="@string/participate_str"
             android:textSize="20sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
+        <LinearLayout
+            android:id="@+id/bt_partHelp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_toEndOf="@id/tv_participation"
+            android:layout_alignBottom="@id/tv_participation"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_margin="7dp"
+                android:alpha="0.8"
+                android:background="@drawable/regist_help"/>
+        </LinearLayout>
 
-        <RadioGroup
-            android:id="@+id/rg_participation"
+        <LinearLayout
+            android:id="@+id/layout_participation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_participation"
             android:orientation="horizontal"
-            android:weightSum="2"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp">
-            <RadioButton
-                android:id="@+id/rb_normal"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/normal_part_str"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
+                android:text="종류"
+                android:textSize="18sp"
+                android:fontFamily="@font/m_gothic_bold"/>
+            <Spinner
+                android:id="@+id/sp_participation"
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
+                android:spinnerMode="dropdown"
+                android:entries="@array/participation_head"
                 android:textSize="16sp"
-                android:fontFamily="@font/m_gothic_normal" />
-            <RadioButton
-                android:id="@+id/rb_narr"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/explan_part_str"
+                android:background="@drawable/spinner_background"
+                android:fontFamily="@font/m_gothic_normal"/>
+            <Spinner
+                android:id="@+id/sp_expTime"
+                android:layout_width="80dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
+                android:spinnerMode="dropdown"
+                android:entries="@array/explanation_head"
                 android:textSize="16sp"
-                android:fontFamily="@font/m_gothic_normal" />
-        </RadioGroup>
+                android:background="@drawable/spinner_background"
+                android:fontFamily="@font/m_gothic_normal"/>
+        </LinearLayout>
+
+<!--        <RadioGroup-->
+<!--            android:id="@+id/rg_participation"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@+id/tv_participation"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:weightSum="2"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_marginEnd="5dp">-->
+<!--            <RadioButton-->
+<!--                android:id="@+id/rb_normal"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="@string/normal_part_str"-->
+<!--                android:textSize="16sp"-->
+<!--                android:fontFamily="@font/m_gothic_normal" />-->
+<!--            <RadioButton-->
+<!--                android:id="@+id/rb_narr"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="@string/explan_part_str"-->
+<!--                android:textSize="16sp"-->
+<!--                android:fontFamily="@font/m_gothic_normal" />-->
+<!--        </RadioGroup>-->
 
         <!-- 추가 정보 입력 -->
         <TextView
             android:id="@+id/tv_addition"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/rg_participation"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:layout_below="@id/layout_participation"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"
             android:text="@string/additiondata_str"
             android:textSize="20sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
@@ -346,9 +412,11 @@
         <TextView
             android:id="@+id/tv_clause"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
             android:layout_below="@id/layout_destination"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"
             android:text="@string/clause_str"
             android:textSize="20sp"
             android:fontFamily="@font/m_gothic_extrabold"/>
@@ -360,7 +428,8 @@
             android:layout_below="@id/tv_clause"
             android:layout_marginTop="5dp"
             android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp">
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -386,7 +455,7 @@
 
         </LinearLayout>
     </RelativeLayout>
-
+    </ScrollView>
     <Button
         android:id="@+id/bt_regist"
         android:layout_width="match_parent"

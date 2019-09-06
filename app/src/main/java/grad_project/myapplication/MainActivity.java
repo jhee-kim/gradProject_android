@@ -4,15 +4,21 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,6 +26,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -77,11 +85,13 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     View slideView;
     Button bt_openMap, bt_registration, bt_certificate;
-    RelativeLayout bt_openMenu, bt_closeMenu, bt_information;
+    RelativeLayout bt_openMenu, bt_closeMenu, bt_information, bt_notificationOn;
     LinearLayout bt_viewtime, bt_myinfo, bt_homepage, bt_route;
     Long startDate;
     private boolean is_start = false;
     private boolean is_end = false;
+
+    boolean is_notiService = false;
 
     public static Activity A_MainActivity;
 
@@ -116,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         A_MainActivity = MainActivity.this;
+        infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
@@ -127,6 +138,74 @@ public class MainActivity extends AppCompatActivity {
         slideView = findViewById(R.id.layout_slide);
         bt_openMenu = findViewById(R.id.bt_open_menu);
         bt_closeMenu = findViewById(R.id.bt_close_menu);
+
+        bt_notificationOn = findViewById(R.id.bt_notification_on);
+        bt_notificationOn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("알림 켜기/끄기");
+                if (is_login) {
+                    String nowState = infoData.getBoolean("NOTIFICATION", false)? "ON":"OFF";
+                    builder.setMessage("관람 정보를 알림으로 항상 띄웁니다.\n현재 상태 : " + nowState);
+                    if (nowState.equals("OFF")) {
+                        builder.setPositiveButton("켜기",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        startNotiService();
+                                        Toast.makeText(getApplicationContext(), "알림 ON", Toast.LENGTH_SHORT).show();
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder.setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                    } else {
+                        builder.setPositiveButton("끄기",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        stopNotiService();
+                                        Toast.makeText(getApplicationContext(), "알림 OFF", Toast.LENGTH_SHORT).show();
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder.setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                    }
+                } else {
+                    builder.setMessage("관람 정보를 알림으로 항상 띄웁니다.\n현재 상태 : 로그아웃됨");
+                    builder.setPositiveButton("로그인",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                    startActivityForResult(intent, 0);
+                                    dialog.dismiss();
+                                }
+                            });
+                    builder.setNegativeButton("닫기",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                }
+                builder.setCancelable(false);
+                builder.show();
+            }
+        });
 
         bt_openMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,8 +222,6 @@ public class MainActivity extends AppCompatActivity {
                 is_menuOpen = false;
             }
         });
-
-        infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
         // 메뉴 버튼 id 불러오기
         bt_viewtime = findViewById(R.id.bt_viewtime);
@@ -179,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         resumeActivity();
-//        notification();
     }
 
     @Override
@@ -313,6 +389,12 @@ public class MainActivity extends AppCompatActivity {
         loadInfo();
 
         is_login = is_autoLogin;
+
+
+        is_notiService = infoData.getBoolean("NOTIFICATION", false);
+        if (is_notiService) {
+            startNotiService();
+        }
 
         /* 액티비티 화면 내용 설정 */
         // 최초 등록 버튼 활성화 및 비활성화
@@ -492,9 +574,11 @@ public class MainActivity extends AppCompatActivity {
                             is_start = false;
                             is_autoLogin = false;
 
+                            stopNotiService();
                             SharedPreferences.Editor editor = infoData.edit();
                             editor.clear();
                             editor.putBoolean("IS_AUTOLOGIN", false);
+                            editor.putBoolean("NOTIFICATION", false);
                             editor.apply();
 
                             final DrawerLayout drawerLayout = findViewById(R.id.layout_main);
@@ -523,6 +607,31 @@ public class MainActivity extends AppCompatActivity {
         is_autoLogin = infoData.getBoolean("IS_AUTOLOGIN", false);
         s_id = infoData.getString("ID", "");
         s_name = infoData.getString("NAME", "");
+        is_notiService = infoData.getBoolean("NOTIFICATION", false);
+    }
+
+    public void startNotiService() {
+        if (!is_notiService) {
+            Intent intent = new Intent(MainActivity.this, NotiService.class);
+            startService(intent);
+            is_notiService = true;
+
+            SharedPreferences.Editor editor = infoData.edit();
+            editor.putBoolean("NOTIFICATION", true);
+            editor.apply();
+        }
+    }
+
+    public void stopNotiService() {
+        if (is_notiService) {
+            Intent intent = new Intent(MainActivity.this, NotiService.class);
+            stopService(intent);
+            is_notiService = false;
+
+            SharedPreferences.Editor editor = infoData.edit();
+            editor.putBoolean("NOTIFICATION", false);
+            editor.apply();
+        }
     }
 
     /***** 서버 통신 *****/

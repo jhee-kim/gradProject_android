@@ -23,4 +23,15 @@
         <item>공군</item>
         <item>해병대</item>
     </string-array>
+
+    <string-array name="participation_head">
+        <item>일반 관람</item>
+        <item>해설 관람</item>
+    </string-array>
+
+    <string-array name="explanation_head">
+        <item>시간</item>
+        <item>11:00</item>
+        <item>13:00</item>
+    </string-array>
 </resources>
