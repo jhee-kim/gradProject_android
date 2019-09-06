@@ -9,19 +9,25 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +49,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class NormalActivity extends AppCompatActivity implements MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
     private SharedPreferences infoData;
@@ -52,7 +57,9 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
     private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
     private boolean isShowTutorial;
+    private TextView listCountTv;
     private ViewGroup mapViewContainer;
+    private ListView questViewContainer;
     private MapView mapView;
     private int Mode;
     private boolean ToggleGps = false;
@@ -64,9 +71,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     double latitude;   //경도
     double altitude;   //고도
 
-
     Bitmap gps_tracking;
-    Bitmap[] in_exhibition_marker = new Bitmap[3];
+    Bitmap[] in_exhibition_marker = new Bitmap[5];
     Bitmap[] out_exhibition_marker = new Bitmap[12];
     Bitmap[] facilities_market = new Bitmap[13];
     Bitmap[] store = new Bitmap[10];
@@ -80,11 +86,22 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public static final String GET_QR = BASE_PATH + "get_qr.php";                              //각 전시관 별 qr코드 파일 위치(JSON 형식) - ex) { "number": "1", "address": "http://35.221.108.183/QR/1.png" }
 //    public static final String GET_RSSID = BASE_PATH + "get_mac.php";                        //각 전시관 별 RSSI(JSON 형식) - ex) { "number": "1", "mac": "00:70:69:47:2F:30" }
 
+    /*** list test ***/
+    String qTitle[] = {"제1전시관", "제2전시관", "제3전시관", "제4전시관", "제5전시관", "제6전시관"};
+    String qDescription[] = {"제1전시관", "제2전시관", "제3전시관", "제4전시관", "제5전시관", "제6전시관"};
+    int images[] = {R.drawable.qr_img, R.drawable.qr_img, R.drawable.qr_img, R.drawable.qr_img, R.drawable.qr_img, R.drawable.qr_img};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_normal);
         mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+        questViewContainer = (ListView) findViewById(R.id.questList);
+        listCountTv = (TextView)findViewById(R.id.list_count_tv);
+
+        /*테스트*/
+        listCountTv.setText("10");
+        listCountTv.setVisibility(View.VISIBLE);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar == null) {
@@ -118,6 +135,10 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784116, 127.222147), 1, true);
         setIn_exhibition();
 
+        /*리스트 초기화*/
+        QuestAdapter adapter = new QuestAdapter(this, qTitle, qDescription, images);
+        questViewContainer.setAdapter(adapter);
+
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
         bt_back_layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +150,30 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             intent = new Intent(NormalActivity.this, TutorialActivity.class);
             startActivityForResult(intent, 3000);
         }
+
+        questViewContainer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    Toast.makeText(NormalActivity.this, "제1전시관", Toast.LENGTH_SHORT).show();
+                }
+                if (position == 1) {
+                    Toast.makeText(NormalActivity.this, "제2전시관", Toast.LENGTH_SHORT).show();
+                }
+                if (position == 2) {
+                    Toast.makeText(NormalActivity.this, "제3전시관", Toast.LENGTH_SHORT).show();
+                }
+                if (position == 3) {
+                    Toast.makeText(NormalActivity.this, "제4전시관", Toast.LENGTH_SHORT).show();
+                }
+                if (position == 4) {
+                    Toast.makeText(NormalActivity.this, "제5전시관", Toast.LENGTH_SHORT).show();
+                }
+                if (position == 5) {
+                    Toast.makeText(NormalActivity.this, "제6전시관", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {     //보낸 Intent 정보 받음
@@ -276,23 +321,24 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             markerArr[i].setTag(i);
             markerArr[i].setItemName("");
             markerArr[i].setShowCalloutBalloonOnTouch(false);
+            markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
 
             if (i < 6) {
                 if (exhibitionState[i].equals("1") && !isCheckQrArr[i]) {
-
-                    markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                     markerArr[i].setCustomImageBitmap(in_exhibition_marker[0]);
                 } else if (exhibitionState[i].equals("1") && isCheckQrArr[i]) {
-                    markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                     markerArr[i].setCustomImageBitmap(in_exhibition_marker[1]);
                 } else if (exhibitionState[i].equals("0")) {
-                    markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                     markerArr[i].setCustomImageBitmap(in_exhibition_marker[2]);
                 }
             }
             else {
-                markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
-                markerArr[i].setCustomImageBitmap(in_exhibition_marker[1]);
+                if(i == 7) {
+                    markerArr[i].setCustomImageBitmap(in_exhibition_marker[4]);
+                }
+                else {
+                    markerArr[i].setCustomImageBitmap(in_exhibition_marker[3]);
+                }
             }
             mapView.addPOIItem(markerArr[i]);
         }
@@ -392,7 +438,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
             markerArr[i].setItemName("open_marker");
             markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
-            markerArr[i].setCustomImageBitmap(store[0]);
+            markerArr[i].setCustomImageBitmap(store[i]);
 
             markerArr[i].setShowCalloutBalloonOnTouch(false);
             mapView.addPOIItem(markerArr[i]);
@@ -431,7 +477,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void onStore(View view) {
         Mode = 3;
         setTogglebut(Mode);
-        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.778816, 127.230159), 1, true);
+        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784116, 127.222147), 1, true);
         setStore();
     }
     public void onList(View view) {
@@ -466,6 +512,9 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     }
 
     public void setTogglebut(int Mode) {
+        mapViewContainer.setVisibility(View.GONE);
+        questViewContainer.setVisibility(View.GONE);
+
         ImageButton[] imgBut = new ImageButton[5];
         imgBut[0] = findViewById(R.id.in_exhibition);
         imgBut[1] =  findViewById(R.id.out_exhibition);
@@ -494,6 +543,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[2].setBackgroundResource(R.drawable.facilities_off);
                 imgBut[3].setBackgroundResource(R.drawable.store_off);
                 imgBut[4].setBackgroundResource(R.drawable.list_off);
+                mapViewContainer.setVisibility(View.VISIBLE);
                 break;
             }
             case 1 : {
@@ -502,6 +552,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[2].setBackgroundResource(R.drawable.facilities_off);
                 imgBut[3].setBackgroundResource(R.drawable.store_off);
                 imgBut[4].setBackgroundResource(R.drawable.list_off);
+                mapViewContainer.setVisibility(View.VISIBLE);
                 break;
             }
             case 2 : {
@@ -510,6 +561,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[2].setBackgroundResource(R.drawable.facilities_on);
                 imgBut[3].setBackgroundResource(R.drawable.store_off);
                 imgBut[4].setBackgroundResource(R.drawable.list_off);
+                mapViewContainer.setVisibility(View.VISIBLE);
                 break;
             }
             case 3 : {
@@ -518,6 +570,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[2].setBackgroundResource(R.drawable.facilities_off);
                 imgBut[3].setBackgroundResource(R.drawable.store_on);
                 imgBut[4].setBackgroundResource(R.drawable.list_off);
+                mapViewContainer.setVisibility(View.VISIBLE);
                 break;
             }
             case 4 : {
@@ -526,6 +579,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[2].setBackgroundResource(R.drawable.facilities_off);
                 imgBut[3].setBackgroundResource(R.drawable.store_off);
                 imgBut[4].setBackgroundResource(R.drawable.list_on);
+                questViewContainer.setVisibility(View.VISIBLE);
                 break;
             }
         }
@@ -736,6 +790,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         in_exhibition_marker[0] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker00);
         in_exhibition_marker[1] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker01);
         in_exhibition_marker[2] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker02);
+        in_exhibition_marker[3] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker03);
+        in_exhibition_marker[4] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker04);
         for(int i = 0; i < in_exhibition_marker.length; i++) {
             in_exhibition_marker[i] = Bitmap.createScaledBitmap(in_exhibition_marker[i], 110, 110, true);
         }
@@ -786,6 +842,38 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         for(int i = 0; i < store.length; i++) {
             store[i] = Bitmap.createScaledBitmap(store[i], 90, 90, true);
         }
+    }
+    class QuestAdapter extends ArrayAdapter<String> {
 
+        Context context;
+        String rTitle[];
+        String rDescription[];
+        int rImages[];
+
+        QuestAdapter(Context c, String title[], String description[], int images[]) {
+            super(c, R.layout.list_quest, R.id.QtextMain, title);
+            this.context = c;
+            this.rTitle = title;
+            this.rDescription = description;
+            this.rImages = images;
+
+        }
+
+        //list test
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            LayoutInflater layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View qcontents = layoutInflater.inflate(R.layout.list_quest, parent, false);
+            ImageView images = qcontents.findViewById(R.id.questImage);
+            TextView myTItle = qcontents.findViewById(R.id.QtextMain);
+            TextView myDescription = qcontents.findViewById(R.id.QtextSub);
+
+            images.setImageResource(rImages[position]);
+            myTItle.setText(rTitle[position]);
+            myDescription.setText(rDescription[position]);
+
+            return qcontents;
+        }
     }
 }

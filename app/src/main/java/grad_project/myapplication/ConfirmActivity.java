@@ -1,11 +1,16 @@
 package grad_project.myapplication;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
@@ -32,6 +37,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import static android.os.Environment.DIRECTORY_DCIM;
 
 public class ConfirmActivity extends AppCompatActivity {
     String s_id, s_name, s_number, s_phone, s_temper, s_destination, s_participation, s_division, s_startDate;
@@ -105,13 +112,13 @@ public class ConfirmActivity extends AppCompatActivity {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_hhmmss");
 
         String namePostfix = format.format(new Date());
-        String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String basePath = sdPath + File.separator;
+        String basePath = Environment.getExternalStoragePublicDirectory(DIRECTORY_DCIM).toString() + File.separator + "Screenshots";//sdPath + File.separator;
         File dir = new File(basePath);
         if(!dir.exists()) {
             dir.mkdirs();
         }
-        File saveFile = new File(basePath + File.separator + "foru_" + namePostfix + ".jpg");
+        File saveFile = new File(basePath + File.separator + "확인증_" + namePostfix + ".jpg");
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(saveFile)));
         FileOutputStream output = null;
         try {
             output = new FileOutputStream(saveFile);
@@ -122,10 +129,6 @@ public class ConfirmActivity extends AppCompatActivity {
         } finally {
             if(output!=null) { try{output.close();}catch(Exception e){e.printStackTrace();}}
         }
-    }
-
-    public void onShare(View v) {
-
     }
 
     public void onBack(View v) {

@@ -1,9 +1,11 @@
 package grad_project.myapplication;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -25,8 +27,7 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback {
         super(context);
 
         mSurfaceView = sv;
-//        addView(mSurfaceView);
-       
+
         mHolder = mSurfaceView.getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -36,7 +37,6 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback {
     	mCamera = camera;
     	if (mCamera != null) {
             mCamera.setDisplayOrientation(90);
-
 
     		mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
     		requestLayout();
@@ -160,5 +160,4 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback {
     		mCamera.startPreview();
     	}
     }
-
 }
