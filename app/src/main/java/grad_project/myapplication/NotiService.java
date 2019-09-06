@@ -101,6 +101,7 @@ public class NotiService extends Service {
         notiManager.cancel(NOTIFICATION_ID);
         stateTimerhandler.removeMessages(START_TIMER_START);
         stateTimerhandler.removeMessages(END_TIMER_START);
+        timeTimerHandler.removeMessages(NOWTIME_TIMER_START);
 
         super.onDestroy();
     }
