@@ -7,19 +7,8 @@ import org.opencv.video.DISOpticalFlow;
 import org.opencv.video.DenseOpticalFlow;
 
 // C++: class DISOpticalFlow
-/**
- * DIS optical flow algorithm.
- *
- * This class implements the Dense Inverse Search (DIS) optical flow algorithm. More
- * details about the algorithm can be found at CITE: Kroeger2016 . Includes three presets with preselected
- * parameters to provide reasonable trade-off between speed and quality. However, even the slowest preset is
- * still relatively fast, use DeepFlow if you need better quality and don't care about speed.
- *
- * This implementation includes several additional features compared to the algorithm described in the paper,
- * including spatial propagation of flow vectors (REF: getUseSpatialPropagation), as well as an option to
- * utilize an initial flow approximation passed to REF: calc (which is, essentially, temporal propagation,
- * if the previous frame's flow field is passed).
- */
+//javadoc: DISOpticalFlow
+
 public class DISOpticalFlow extends DenseOpticalFlow {
 
     protected DISOpticalFlow(long addr) { super(addr); }
@@ -38,23 +27,22 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++: static Ptr_DISOpticalFlow cv::DISOpticalFlow::create(int preset = DISOpticalFlow::PRESET_FAST)
     //
 
-    /**
-     * Creates an instance of DISOpticalFlow
-     *
-     *     @param preset one of PRESET_ULTRAFAST, PRESET_FAST and PRESET_MEDIUM
-     * @return automatically generated
-     */
-    public static DISOpticalFlow create(int preset) {
-        return DISOpticalFlow.__fromPtr__(create_0(preset));
+    //javadoc: DISOpticalFlow::create(preset)
+    public static DISOpticalFlow create(int preset)
+    {
+        
+        DISOpticalFlow retVal = DISOpticalFlow.__fromPtr__(create_0(preset));
+        
+        return retVal;
     }
 
-    /**
-     * Creates an instance of DISOpticalFlow
-     *
-     * @return automatically generated
-     */
-    public static DISOpticalFlow create() {
-        return DISOpticalFlow.__fromPtr__(create_1());
+    //javadoc: DISOpticalFlow::create()
+    public static DISOpticalFlow create()
+    {
+        
+        DISOpticalFlow retVal = DISOpticalFlow.__fromPtr__(create_1());
+        
+        return retVal;
     }
 
 
@@ -62,16 +50,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  bool cv::DISOpticalFlow::getUseMeanNormalization()
     //
 
-    /**
-     * Whether to use mean-normalization of patches when computing patch distance. It is turned on
-     *         by default as it typically provides a noticeable quality boost because of increased robustness to
-     *         illumination variations. Turn it off if you are certain that your sequence doesn't contain any changes
-     *         in illumination.
-     * SEE: setUseMeanNormalization
-     * @return automatically generated
-     */
-    public boolean getUseMeanNormalization() {
-        return getUseMeanNormalization_0(nativeObj);
+    //javadoc: DISOpticalFlow::getUseMeanNormalization()
+    public  boolean getUseMeanNormalization()
+    {
+        
+        boolean retVal = getUseMeanNormalization_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -79,16 +64,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  bool cv::DISOpticalFlow::getUseSpatialPropagation()
     //
 
-    /**
-     * Whether to use spatial propagation of good optical flow vectors. This option is turned on by
-     *         default, as it tends to work better on average and can sometimes help recover from major errors
-     *         introduced by the coarse-to-fine scheme employed by the DIS optical flow algorithm. Turning this
-     *         option off can make the output flow field a bit smoother, however.
-     * SEE: setUseSpatialPropagation
-     * @return automatically generated
-     */
-    public boolean getUseSpatialPropagation() {
-        return getUseSpatialPropagation_0(nativeObj);
+    //javadoc: DISOpticalFlow::getUseSpatialPropagation()
+    public  boolean getUseSpatialPropagation()
+    {
+        
+        boolean retVal = getUseSpatialPropagation_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -96,13 +78,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  float cv::DISOpticalFlow::getVariationalRefinementAlpha()
     //
 
-    /**
-     * Weight of the smoothness term
-     * SEE: setVariationalRefinementAlpha
-     * @return automatically generated
-     */
-    public float getVariationalRefinementAlpha() {
-        return getVariationalRefinementAlpha_0(nativeObj);
+    //javadoc: DISOpticalFlow::getVariationalRefinementAlpha()
+    public  float getVariationalRefinementAlpha()
+    {
+        
+        float retVal = getVariationalRefinementAlpha_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -110,13 +92,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  float cv::DISOpticalFlow::getVariationalRefinementDelta()
     //
 
-    /**
-     * Weight of the color constancy term
-     * SEE: setVariationalRefinementDelta
-     * @return automatically generated
-     */
-    public float getVariationalRefinementDelta() {
-        return getVariationalRefinementDelta_0(nativeObj);
+    //javadoc: DISOpticalFlow::getVariationalRefinementDelta()
+    public  float getVariationalRefinementDelta()
+    {
+        
+        float retVal = getVariationalRefinementDelta_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -124,13 +106,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  float cv::DISOpticalFlow::getVariationalRefinementGamma()
     //
 
-    /**
-     * Weight of the gradient constancy term
-     * SEE: setVariationalRefinementGamma
-     * @return automatically generated
-     */
-    public float getVariationalRefinementGamma() {
-        return getVariationalRefinementGamma_0(nativeObj);
+    //javadoc: DISOpticalFlow::getVariationalRefinementGamma()
+    public  float getVariationalRefinementGamma()
+    {
+        
+        float retVal = getVariationalRefinementGamma_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -138,14 +120,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  int cv::DISOpticalFlow::getFinestScale()
     //
 
-    /**
-     * Finest level of the Gaussian pyramid on which the flow is computed (zero level
-     *         corresponds to the original image resolution). The final flow is obtained by bilinear upscaling.
-     * SEE: setFinestScale
-     * @return automatically generated
-     */
-    public int getFinestScale() {
-        return getFinestScale_0(nativeObj);
+    //javadoc: DISOpticalFlow::getFinestScale()
+    public  int getFinestScale()
+    {
+        
+        int retVal = getFinestScale_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -153,14 +134,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  int cv::DISOpticalFlow::getGradientDescentIterations()
     //
 
-    /**
-     * Maximum number of gradient descent iterations in the patch inverse search stage. Higher values
-     *         may improve quality in some cases.
-     * SEE: setGradientDescentIterations
-     * @return automatically generated
-     */
-    public int getGradientDescentIterations() {
-        return getGradientDescentIterations_0(nativeObj);
+    //javadoc: DISOpticalFlow::getGradientDescentIterations()
+    public  int getGradientDescentIterations()
+    {
+        
+        int retVal = getGradientDescentIterations_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -168,14 +148,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  int cv::DISOpticalFlow::getPatchSize()
     //
 
-    /**
-     * Size of an image patch for matching (in pixels). Normally, default 8x8 patches work well
-     *         enough in most cases.
-     * SEE: setPatchSize
-     * @return automatically generated
-     */
-    public int getPatchSize() {
-        return getPatchSize_0(nativeObj);
+    //javadoc: DISOpticalFlow::getPatchSize()
+    public  int getPatchSize()
+    {
+        
+        int retVal = getPatchSize_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -183,14 +162,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  int cv::DISOpticalFlow::getPatchStride()
     //
 
-    /**
-     * Stride between neighbor patches. Must be less than patch size. Lower values correspond
-     *         to higher flow quality.
-     * SEE: setPatchStride
-     * @return automatically generated
-     */
-    public int getPatchStride() {
-        return getPatchStride_0(nativeObj);
+    //javadoc: DISOpticalFlow::getPatchStride()
+    public  int getPatchStride()
+    {
+        
+        int retVal = getPatchStride_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -198,15 +176,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  int cv::DISOpticalFlow::getVariationalRefinementIterations()
     //
 
-    /**
-     * Number of fixed point iterations of variational refinement per scale. Set to zero to
-     *         disable variational refinement completely. Higher values will typically result in more smooth and
-     *         high-quality flow.
-     * SEE: setGradientDescentIterations
-     * @return automatically generated
-     */
-    public int getVariationalRefinementIterations() {
-        return getVariationalRefinementIterations_0(nativeObj);
+    //javadoc: DISOpticalFlow::getVariationalRefinementIterations()
+    public  int getVariationalRefinementIterations()
+    {
+        
+        int retVal = getVariationalRefinementIterations_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -214,12 +190,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setFinestScale(int val)
     //
 
-    /**
-     *  getFinestScale SEE: getFinestScale
-     * @param val automatically generated
-     */
-    public void setFinestScale(int val) {
+    //javadoc: DISOpticalFlow::setFinestScale(val)
+    public  void setFinestScale(int val)
+    {
+        
         setFinestScale_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -227,12 +204,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setGradientDescentIterations(int val)
     //
 
-    /**
-     *  getGradientDescentIterations SEE: getGradientDescentIterations
-     * @param val automatically generated
-     */
-    public void setGradientDescentIterations(int val) {
+    //javadoc: DISOpticalFlow::setGradientDescentIterations(val)
+    public  void setGradientDescentIterations(int val)
+    {
+        
         setGradientDescentIterations_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -240,12 +218,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setPatchSize(int val)
     //
 
-    /**
-     *  getPatchSize SEE: getPatchSize
-     * @param val automatically generated
-     */
-    public void setPatchSize(int val) {
+    //javadoc: DISOpticalFlow::setPatchSize(val)
+    public  void setPatchSize(int val)
+    {
+        
         setPatchSize_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -253,12 +232,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setPatchStride(int val)
     //
 
-    /**
-     *  getPatchStride SEE: getPatchStride
-     * @param val automatically generated
-     */
-    public void setPatchStride(int val) {
+    //javadoc: DISOpticalFlow::setPatchStride(val)
+    public  void setPatchStride(int val)
+    {
+        
         setPatchStride_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -266,12 +246,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setUseMeanNormalization(bool val)
     //
 
-    /**
-     *  getUseMeanNormalization SEE: getUseMeanNormalization
-     * @param val automatically generated
-     */
-    public void setUseMeanNormalization(boolean val) {
+    //javadoc: DISOpticalFlow::setUseMeanNormalization(val)
+    public  void setUseMeanNormalization(boolean val)
+    {
+        
         setUseMeanNormalization_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -279,12 +260,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setUseSpatialPropagation(bool val)
     //
 
-    /**
-     *  getUseSpatialPropagation SEE: getUseSpatialPropagation
-     * @param val automatically generated
-     */
-    public void setUseSpatialPropagation(boolean val) {
+    //javadoc: DISOpticalFlow::setUseSpatialPropagation(val)
+    public  void setUseSpatialPropagation(boolean val)
+    {
+        
         setUseSpatialPropagation_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -292,12 +274,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setVariationalRefinementAlpha(float val)
     //
 
-    /**
-     *  getVariationalRefinementAlpha SEE: getVariationalRefinementAlpha
-     * @param val automatically generated
-     */
-    public void setVariationalRefinementAlpha(float val) {
+    //javadoc: DISOpticalFlow::setVariationalRefinementAlpha(val)
+    public  void setVariationalRefinementAlpha(float val)
+    {
+        
         setVariationalRefinementAlpha_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -305,12 +288,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setVariationalRefinementDelta(float val)
     //
 
-    /**
-     *  getVariationalRefinementDelta SEE: getVariationalRefinementDelta
-     * @param val automatically generated
-     */
-    public void setVariationalRefinementDelta(float val) {
+    //javadoc: DISOpticalFlow::setVariationalRefinementDelta(val)
+    public  void setVariationalRefinementDelta(float val)
+    {
+        
         setVariationalRefinementDelta_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -318,12 +302,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setVariationalRefinementGamma(float val)
     //
 
-    /**
-     *  getVariationalRefinementGamma SEE: getVariationalRefinementGamma
-     * @param val automatically generated
-     */
-    public void setVariationalRefinementGamma(float val) {
+    //javadoc: DISOpticalFlow::setVariationalRefinementGamma(val)
+    public  void setVariationalRefinementGamma(float val)
+    {
+        
         setVariationalRefinementGamma_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -331,12 +316,13 @@ public class DISOpticalFlow extends DenseOpticalFlow {
     // C++:  void cv::DISOpticalFlow::setVariationalRefinementIterations(int val)
     //
 
-    /**
-     *  getGradientDescentIterations SEE: getGradientDescentIterations
-     * @param val automatically generated
-     */
-    public void setVariationalRefinementIterations(int val) {
+    //javadoc: DISOpticalFlow::setVariationalRefinementIterations(val)
+    public  void setVariationalRefinementIterations(int val)
+    {
+        
         setVariationalRefinementIterations_0(nativeObj, val);
+        
+        return;
     }
 
 

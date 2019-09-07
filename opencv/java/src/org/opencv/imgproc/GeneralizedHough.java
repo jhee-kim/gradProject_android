@@ -8,9 +8,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 
 // C++: class GeneralizedHough
-/**
- * finds arbitrary template in the grayscale image using Generalized Hough Transform
- */
+//javadoc: GeneralizedHough
+
 public class GeneralizedHough extends Algorithm {
 
     protected GeneralizedHough(long addr) { super(addr); }
@@ -22,8 +21,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  double cv::GeneralizedHough::getDp()
     //
 
-    public double getDp() {
-        return getDp_0(nativeObj);
+    //javadoc: GeneralizedHough::getDp()
+    public  double getDp()
+    {
+        
+        double retVal = getDp_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -31,8 +35,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  double cv::GeneralizedHough::getMinDist()
     //
 
-    public double getMinDist() {
-        return getMinDist_0(nativeObj);
+    //javadoc: GeneralizedHough::getMinDist()
+    public  double getMinDist()
+    {
+        
+        double retVal = getMinDist_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -40,8 +49,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  int cv::GeneralizedHough::getCannyHighThresh()
     //
 
-    public int getCannyHighThresh() {
-        return getCannyHighThresh_0(nativeObj);
+    //javadoc: GeneralizedHough::getCannyHighThresh()
+    public  int getCannyHighThresh()
+    {
+        
+        int retVal = getCannyHighThresh_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -49,8 +63,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  int cv::GeneralizedHough::getCannyLowThresh()
     //
 
-    public int getCannyLowThresh() {
-        return getCannyLowThresh_0(nativeObj);
+    //javadoc: GeneralizedHough::getCannyLowThresh()
+    public  int getCannyLowThresh()
+    {
+        
+        int retVal = getCannyLowThresh_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -58,8 +77,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  int cv::GeneralizedHough::getMaxBufferSize()
     //
 
-    public int getMaxBufferSize() {
-        return getMaxBufferSize_0(nativeObj);
+    //javadoc: GeneralizedHough::getMaxBufferSize()
+    public  int getMaxBufferSize()
+    {
+        
+        int retVal = getMaxBufferSize_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -67,12 +91,22 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::detect(Mat edges, Mat dx, Mat dy, Mat& positions, Mat& votes = Mat())
     //
 
-    public void detect(Mat edges, Mat dx, Mat dy, Mat positions, Mat votes) {
+    //javadoc: GeneralizedHough::detect(edges, dx, dy, positions, votes)
+    public  void detect(Mat edges, Mat dx, Mat dy, Mat positions, Mat votes)
+    {
+        
         detect_0(nativeObj, edges.nativeObj, dx.nativeObj, dy.nativeObj, positions.nativeObj, votes.nativeObj);
+        
+        return;
     }
 
-    public void detect(Mat edges, Mat dx, Mat dy, Mat positions) {
+    //javadoc: GeneralizedHough::detect(edges, dx, dy, positions)
+    public  void detect(Mat edges, Mat dx, Mat dy, Mat positions)
+    {
+        
         detect_1(nativeObj, edges.nativeObj, dx.nativeObj, dy.nativeObj, positions.nativeObj);
+        
+        return;
     }
 
 
@@ -80,12 +114,22 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::detect(Mat image, Mat& positions, Mat& votes = Mat())
     //
 
-    public void detect(Mat image, Mat positions, Mat votes) {
+    //javadoc: GeneralizedHough::detect(image, positions, votes)
+    public  void detect(Mat image, Mat positions, Mat votes)
+    {
+        
         detect_2(nativeObj, image.nativeObj, positions.nativeObj, votes.nativeObj);
+        
+        return;
     }
 
-    public void detect(Mat image, Mat positions) {
+    //javadoc: GeneralizedHough::detect(image, positions)
+    public  void detect(Mat image, Mat positions)
+    {
+        
         detect_3(nativeObj, image.nativeObj, positions.nativeObj);
+        
+        return;
     }
 
 
@@ -93,8 +137,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::setCannyHighThresh(int cannyHighThresh)
     //
 
-    public void setCannyHighThresh(int cannyHighThresh) {
+    //javadoc: GeneralizedHough::setCannyHighThresh(cannyHighThresh)
+    public  void setCannyHighThresh(int cannyHighThresh)
+    {
+        
         setCannyHighThresh_0(nativeObj, cannyHighThresh);
+        
+        return;
     }
 
 
@@ -102,8 +151,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::setCannyLowThresh(int cannyLowThresh)
     //
 
-    public void setCannyLowThresh(int cannyLowThresh) {
+    //javadoc: GeneralizedHough::setCannyLowThresh(cannyLowThresh)
+    public  void setCannyLowThresh(int cannyLowThresh)
+    {
+        
         setCannyLowThresh_0(nativeObj, cannyLowThresh);
+        
+        return;
     }
 
 
@@ -111,8 +165,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::setDp(double dp)
     //
 
-    public void setDp(double dp) {
+    //javadoc: GeneralizedHough::setDp(dp)
+    public  void setDp(double dp)
+    {
+        
         setDp_0(nativeObj, dp);
+        
+        return;
     }
 
 
@@ -120,8 +179,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::setMaxBufferSize(int maxBufferSize)
     //
 
-    public void setMaxBufferSize(int maxBufferSize) {
+    //javadoc: GeneralizedHough::setMaxBufferSize(maxBufferSize)
+    public  void setMaxBufferSize(int maxBufferSize)
+    {
+        
         setMaxBufferSize_0(nativeObj, maxBufferSize);
+        
+        return;
     }
 
 
@@ -129,8 +193,13 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::setMinDist(double minDist)
     //
 
-    public void setMinDist(double minDist) {
+    //javadoc: GeneralizedHough::setMinDist(minDist)
+    public  void setMinDist(double minDist)
+    {
+        
         setMinDist_0(nativeObj, minDist);
+        
+        return;
     }
 
 
@@ -138,12 +207,22 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::setTemplate(Mat edges, Mat dx, Mat dy, Point templCenter = Point(-1, -1))
     //
 
-    public void setTemplate(Mat edges, Mat dx, Mat dy, Point templCenter) {
+    //javadoc: GeneralizedHough::setTemplate(edges, dx, dy, templCenter)
+    public  void setTemplate(Mat edges, Mat dx, Mat dy, Point templCenter)
+    {
+        
         setTemplate_0(nativeObj, edges.nativeObj, dx.nativeObj, dy.nativeObj, templCenter.x, templCenter.y);
+        
+        return;
     }
 
-    public void setTemplate(Mat edges, Mat dx, Mat dy) {
+    //javadoc: GeneralizedHough::setTemplate(edges, dx, dy)
+    public  void setTemplate(Mat edges, Mat dx, Mat dy)
+    {
+        
         setTemplate_1(nativeObj, edges.nativeObj, dx.nativeObj, dy.nativeObj);
+        
+        return;
     }
 
 
@@ -151,12 +230,22 @@ public class GeneralizedHough extends Algorithm {
     // C++:  void cv::GeneralizedHough::setTemplate(Mat templ, Point templCenter = Point(-1, -1))
     //
 
-    public void setTemplate(Mat templ, Point templCenter) {
+    //javadoc: GeneralizedHough::setTemplate(templ, templCenter)
+    public  void setTemplate(Mat templ, Point templCenter)
+    {
+        
         setTemplate_2(nativeObj, templ.nativeObj, templCenter.x, templCenter.y);
+        
+        return;
     }
 
-    public void setTemplate(Mat templ) {
+    //javadoc: GeneralizedHough::setTemplate(templ)
+    public  void setTemplate(Mat templ)
+    {
+        
         setTemplate_3(nativeObj, templ.nativeObj);
+        
+        return;
     }
 
 

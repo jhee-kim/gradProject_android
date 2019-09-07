@@ -1,18 +1,27 @@
 package grad_project.myapplication;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -38,6 +47,9 @@ import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
@@ -56,56 +68,154 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class OcrActivity  extends Activity {
+import static android.Manifest.permission.CAMERA;
+
+public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
+
+    private CameraBridgeViewBase mOpenCvCameraView;
+    private Mat matInput;
+    private Mat matResult;
+
+    public native void ConvertRGBtoGray(long matAddrInput, long matAddrResult);
+
+
+    static {
+        System.loadLibrary("opencv_java4");
+        System.loadLibrary("native-lib");
+    }
+
+
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS:
+                {
+                    mOpenCvCameraView.enableView();
+                } break;
+                default:
+                {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_ocr);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            throw new NullPointerException("Null ActionBar");
+        } else {
+            actionBar.hide();
+        }
+
+        mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
+        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
+        mOpenCvCameraView.setCvCameraViewListener(this);
+        mOpenCvCameraView.setCameraIndex(0); // front-camera(1),  back-camera(0)
+        mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+
+
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        if (mOpenCvCameraView != null)
+            mOpenCvCameraView.disableView();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        if (!OpenCVLoader.initDebug()) {
+            Log.d(TAG, "onResume :: Internal OpenCV library not found.");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
+        } else {
+            Log.d(TAG, "onResum :: OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mOpenCvCameraView != null)
+            mOpenCvCameraView.disableView();
+    }
+
+    @Override
+    public void onCameraViewStarted(int width, int height) {
+
+    }
+
+    @Override
+    public void onCameraViewStopped() {
+
+    }
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+
+        matInput = inputFrame.rgba();
+
+        //if ( matResult != null ) matResult.release(); fix 2018. 8. 18
+
+        if ( matResult == null )
+
+            matResult = new Mat(matInput.rows(), matInput.cols(), matInput.type());
+
+        ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+
+        return matResult;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private static final String CLOUD_VISION_API_KEY = "AIzaSyC5ilTz6H2zJCkC4joiZnW2T7IDouhmZwY";
     private static final String ANDROID_CERT_HEADER = "X-Android-Cert";
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";
     private static final int MAX_LABEL_RESULTS = 10;
     private static final String TAG = OcrActivity.class.getSimpleName();
-    private long mLastClickTime = 0;
-
-    Preview preview;
-    Camera camera;
-    Activity act;
-    Context ctx;
-
-    ImageView img;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_regist);
-
-        ctx = this;
-        act = this;
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        setContentView(R.layout.activity_ocr);
-
-        preview = new Preview(this, (SurfaceView)findViewById(R.id.surfaceView));
-        img = (ImageView)findViewById(R.id.img);
-
-        preview.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
-        ((RelativeLayout) findViewById(R.id.layout)).addView(preview);
-        preview.setKeepScreenOn(true);
-
-        ImageButton shutter = (ImageButton) findViewById(R.id.button_capture);
-        shutter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (SystemClock.elapsedRealtime() - mLastClickTime < 10000){
-                    return;
-                }
-                mLastClickTime = SystemClock.elapsedRealtime();
-                camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-            }
-        });
-    }
-
 
     public void uploadImage(Bitmap bitmap) {
         if (bitmap != null) {
@@ -135,7 +245,6 @@ public class OcrActivity  extends Activity {
                 Rect rect = Imgproc.boundingRect(temp);
                 bitmap = Bitmap.createBitmap(bitmap, (int)rect.tl().x, (int)rect.tl().y, rect.width, rect.height);
             }
-            img.setImageBitmap(bitmap);
             callCloudVision(bitmap);
         }
         else {
@@ -279,56 +388,4 @@ public class OcrActivity  extends Activity {
 
         return message.toString();
     }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        int numCams = Camera.getNumberOfCameras();
-        if(numCams > 0){
-            try{
-                camera = Camera.open(0);
-                camera.startPreview();
-                preview.setCamera(camera);
-
-            } catch (RuntimeException ex){
-                Toast.makeText(ctx, getString(R.string.camera_not_found), Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        if(camera != null) {
-            camera.stopPreview();
-            preview.setCamera(null);
-            camera.release();
-            camera = null;
-        }
-        super.onPause();
-    }
-
-    Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
-        public void onShutter() {
-            //			 Log.d(TAG, "onShutter'd");
-        }
-    };
-
-    Camera.PictureCallback rawCallback = new Camera.PictureCallback() {
-        public void onPictureTaken(byte[] data, Camera camera) {
-            //			 Log.d(TAG, "onPictureTaken - raw");
-        }
-    };
-
-    Camera.PictureCallback jpegCallback = new Camera.PictureCallback() {
-        public void onPictureTaken(byte[] data, Camera camera) {
-            if(data != null) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                Matrix rotateMatrix = new Matrix();
-                rotateMatrix.postRotate(90);
-
-                uploadImage(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, false));
-            }
-        }
-    };
 }

@@ -220,7 +220,7 @@ Project_SOURCE_DIR:STATIC=C:/Users/Administrator/AndroidStudioProjects/android2/
 log-lib:FILEPATH=C:/Users/Administrator/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/x86_64-linux-android/21/liblog.so
 
 //Dependencies for the target
-native-lib_LIB_DEPENDS:STATIC=general;C:/Users/Administrator/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/x86_64-linux-android/21/liblog.so;
+native-lib_LIB_DEPENDS:STATIC=general;lib_opencv;general;C:/Users/Administrator/AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/x86_64-linux-android/21/liblog.so;
 
 
 ########################

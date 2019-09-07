@@ -892,52 +892,52 @@ class CV_EXPORTS_W GeneralizedHoughGuil : public GeneralizedHough
 {
 public:
     //! Angle difference in degrees between two points in feature.
-    CV_WRAP virtual void setXi(double xi) = 0;
-    CV_WRAP virtual double getXi() const = 0;
+    virtual void setXi(double xi) = 0;
+    virtual double getXi() const = 0;
 
     //! Feature table levels.
-    CV_WRAP virtual void setLevels(int levels) = 0;
-    CV_WRAP virtual int getLevels() const = 0;
+    virtual void setLevels(int levels) = 0;
+    virtual int getLevels() const = 0;
 
     //! Maximal difference between angles that treated as equal.
-    CV_WRAP virtual void setAngleEpsilon(double angleEpsilon) = 0;
-    CV_WRAP virtual double getAngleEpsilon() const = 0;
+    virtual void setAngleEpsilon(double angleEpsilon) = 0;
+    virtual double getAngleEpsilon() const = 0;
 
     //! Minimal rotation angle to detect in degrees.
-    CV_WRAP virtual void setMinAngle(double minAngle) = 0;
-    CV_WRAP virtual double getMinAngle() const = 0;
+    virtual void setMinAngle(double minAngle) = 0;
+    virtual double getMinAngle() const = 0;
 
     //! Maximal rotation angle to detect in degrees.
-    CV_WRAP virtual void setMaxAngle(double maxAngle) = 0;
-    CV_WRAP virtual double getMaxAngle() const = 0;
+    virtual void setMaxAngle(double maxAngle) = 0;
+    virtual double getMaxAngle() const = 0;
 
     //! Angle step in degrees.
-    CV_WRAP virtual void setAngleStep(double angleStep) = 0;
-    CV_WRAP virtual double getAngleStep() const = 0;
+    virtual void setAngleStep(double angleStep) = 0;
+    virtual double getAngleStep() const = 0;
 
     //! Angle votes threshold.
-    CV_WRAP virtual void setAngleThresh(int angleThresh) = 0;
-    CV_WRAP virtual int getAngleThresh() const = 0;
+    virtual void setAngleThresh(int angleThresh) = 0;
+    virtual int getAngleThresh() const = 0;
 
     //! Minimal scale to detect.
-    CV_WRAP virtual void setMinScale(double minScale) = 0;
-    CV_WRAP virtual double getMinScale() const = 0;
+    virtual void setMinScale(double minScale) = 0;
+    virtual double getMinScale() const = 0;
 
     //! Maximal scale to detect.
-    CV_WRAP virtual void setMaxScale(double maxScale) = 0;
-    CV_WRAP virtual double getMaxScale() const = 0;
+    virtual void setMaxScale(double maxScale) = 0;
+    virtual double getMaxScale() const = 0;
 
     //! Scale step.
-    CV_WRAP virtual void setScaleStep(double scaleStep) = 0;
-    CV_WRAP virtual double getScaleStep() const = 0;
+    virtual void setScaleStep(double scaleStep) = 0;
+    virtual double getScaleStep() const = 0;
 
     //! Scale votes threshold.
-    CV_WRAP virtual void setScaleThresh(int scaleThresh) = 0;
-    CV_WRAP virtual int getScaleThresh() const = 0;
+    virtual void setScaleThresh(int scaleThresh) = 0;
+    virtual int getScaleThresh() const = 0;
 
     //! Position votes threshold.
-    CV_WRAP virtual void setPosThresh(int posThresh) = 0;
-    CV_WRAP virtual int getPosThresh() const = 0;
+    virtual void setPosThresh(int posThresh) = 0;
+    virtual int getPosThresh() const = 0;
 };
 
 //! @} imgproc_shape
@@ -4175,11 +4175,11 @@ CV_EXPORTS_W int rotatedRectangleIntersection( const RotatedRect& rect1, const R
 
 /** @brief Creates a smart pointer to a cv::GeneralizedHoughBallard class and initializes it.
 */
-CV_EXPORTS_W Ptr<GeneralizedHoughBallard> createGeneralizedHoughBallard();
+CV_EXPORTS Ptr<GeneralizedHoughBallard> createGeneralizedHoughBallard();
 
 /** @brief Creates a smart pointer to a cv::GeneralizedHoughGuil class and initializes it.
 */
-CV_EXPORTS_W Ptr<GeneralizedHoughGuil> createGeneralizedHoughGuil();
+CV_EXPORTS Ptr<GeneralizedHoughGuil> createGeneralizedHoughGuil();
 
 //! @} imgproc_shape
 

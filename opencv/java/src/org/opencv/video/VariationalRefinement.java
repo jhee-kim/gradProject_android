@@ -8,17 +8,8 @@ import org.opencv.video.DenseOpticalFlow;
 import org.opencv.video.VariationalRefinement;
 
 // C++: class VariationalRefinement
-/**
- * Variational optical flow refinement
- *
- * This class implements variational refinement of the input flow field, i.e.
- * it uses input flow to initialize the minimization of the following functional:
- * \(E(U) = \int_{\Omega} \delta \Psi(E_I) + \gamma \Psi(E_G) + \alpha \Psi(E_S) \),
- * where \(E_I,E_G,E_S\) are color constancy, gradient constancy and smoothness terms
- * respectively. \(\Psi(s^2)=\sqrt{s^2+\epsilon^2}\) is a robust penalizer to limit the
- * influence of outliers. A complete formulation and a description of the minimization
- * procedure can be found in CITE: Brox2004
- */
+//javadoc: VariationalRefinement
+
 public class VariationalRefinement extends DenseOpticalFlow {
 
     protected VariationalRefinement(long addr) { super(addr); }
@@ -30,12 +21,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++: static Ptr_VariationalRefinement cv::VariationalRefinement::create()
     //
 
-    /**
-     * Creates an instance of VariationalRefinement
-     * @return automatically generated
-     */
-    public static VariationalRefinement create() {
-        return VariationalRefinement.__fromPtr__(create_0());
+    //javadoc: VariationalRefinement::create()
+    public static VariationalRefinement create()
+    {
+        
+        VariationalRefinement retVal = VariationalRefinement.__fromPtr__(create_0());
+        
+        return retVal;
     }
 
 
@@ -43,13 +35,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  float cv::VariationalRefinement::getAlpha()
     //
 
-    /**
-     * Weight of the smoothness term
-     * SEE: setAlpha
-     * @return automatically generated
-     */
-    public float getAlpha() {
-        return getAlpha_0(nativeObj);
+    //javadoc: VariationalRefinement::getAlpha()
+    public  float getAlpha()
+    {
+        
+        float retVal = getAlpha_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -57,13 +49,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  float cv::VariationalRefinement::getDelta()
     //
 
-    /**
-     * Weight of the color constancy term
-     * SEE: setDelta
-     * @return automatically generated
-     */
-    public float getDelta() {
-        return getDelta_0(nativeObj);
+    //javadoc: VariationalRefinement::getDelta()
+    public  float getDelta()
+    {
+        
+        float retVal = getDelta_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -71,13 +63,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  float cv::VariationalRefinement::getGamma()
     //
 
-    /**
-     * Weight of the gradient constancy term
-     * SEE: setGamma
-     * @return automatically generated
-     */
-    public float getGamma() {
-        return getGamma_0(nativeObj);
+    //javadoc: VariationalRefinement::getGamma()
+    public  float getGamma()
+    {
+        
+        float retVal = getGamma_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -85,13 +77,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  float cv::VariationalRefinement::getOmega()
     //
 
-    /**
-     * Relaxation factor in SOR
-     * SEE: setOmega
-     * @return automatically generated
-     */
-    public float getOmega() {
-        return getOmega_0(nativeObj);
+    //javadoc: VariationalRefinement::getOmega()
+    public  float getOmega()
+    {
+        
+        float retVal = getOmega_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -99,13 +91,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  int cv::VariationalRefinement::getFixedPointIterations()
     //
 
-    /**
-     * Number of outer (fixed-point) iterations in the minimization procedure.
-     * SEE: setFixedPointIterations
-     * @return automatically generated
-     */
-    public int getFixedPointIterations() {
-        return getFixedPointIterations_0(nativeObj);
+    //javadoc: VariationalRefinement::getFixedPointIterations()
+    public  int getFixedPointIterations()
+    {
+        
+        int retVal = getFixedPointIterations_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -113,14 +105,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  int cv::VariationalRefinement::getSorIterations()
     //
 
-    /**
-     * Number of inner successive over-relaxation (SOR) iterations
-     *         in the minimization procedure to solve the respective linear system.
-     * SEE: setSorIterations
-     * @return automatically generated
-     */
-    public int getSorIterations() {
-        return getSorIterations_0(nativeObj);
+    //javadoc: VariationalRefinement::getSorIterations()
+    public  int getSorIterations()
+    {
+        
+        int retVal = getSorIterations_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -128,16 +119,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  void cv::VariationalRefinement::calcUV(Mat I0, Mat I1, Mat& flow_u, Mat& flow_v)
     //
 
-    /**
-     * REF: calc function overload to handle separate horizontal (u) and vertical (v) flow components
-     * (to avoid extra splits/merges)
-     * @param I0 automatically generated
-     * @param I1 automatically generated
-     * @param flow_u automatically generated
-     * @param flow_v automatically generated
-     */
-    public void calcUV(Mat I0, Mat I1, Mat flow_u, Mat flow_v) {
+    //javadoc: VariationalRefinement::calcUV(I0, I1, flow_u, flow_v)
+    public  void calcUV(Mat I0, Mat I1, Mat flow_u, Mat flow_v)
+    {
+        
         calcUV_0(nativeObj, I0.nativeObj, I1.nativeObj, flow_u.nativeObj, flow_v.nativeObj);
+        
+        return;
     }
 
 
@@ -145,12 +133,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  void cv::VariationalRefinement::setAlpha(float val)
     //
 
-    /**
-     *  getAlpha SEE: getAlpha
-     * @param val automatically generated
-     */
-    public void setAlpha(float val) {
+    //javadoc: VariationalRefinement::setAlpha(val)
+    public  void setAlpha(float val)
+    {
+        
         setAlpha_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -158,12 +147,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  void cv::VariationalRefinement::setDelta(float val)
     //
 
-    /**
-     *  getDelta SEE: getDelta
-     * @param val automatically generated
-     */
-    public void setDelta(float val) {
+    //javadoc: VariationalRefinement::setDelta(val)
+    public  void setDelta(float val)
+    {
+        
         setDelta_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -171,12 +161,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  void cv::VariationalRefinement::setFixedPointIterations(int val)
     //
 
-    /**
-     *  getFixedPointIterations SEE: getFixedPointIterations
-     * @param val automatically generated
-     */
-    public void setFixedPointIterations(int val) {
+    //javadoc: VariationalRefinement::setFixedPointIterations(val)
+    public  void setFixedPointIterations(int val)
+    {
+        
         setFixedPointIterations_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -184,12 +175,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  void cv::VariationalRefinement::setGamma(float val)
     //
 
-    /**
-     *  getGamma SEE: getGamma
-     * @param val automatically generated
-     */
-    public void setGamma(float val) {
+    //javadoc: VariationalRefinement::setGamma(val)
+    public  void setGamma(float val)
+    {
+        
         setGamma_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -197,12 +189,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  void cv::VariationalRefinement::setOmega(float val)
     //
 
-    /**
-     *  getOmega SEE: getOmega
-     * @param val automatically generated
-     */
-    public void setOmega(float val) {
+    //javadoc: VariationalRefinement::setOmega(val)
+    public  void setOmega(float val)
+    {
+        
         setOmega_0(nativeObj, val);
+        
+        return;
     }
 
 
@@ -210,12 +203,13 @@ public class VariationalRefinement extends DenseOpticalFlow {
     // C++:  void cv::VariationalRefinement::setSorIterations(int val)
     //
 
-    /**
-     *  getSorIterations SEE: getSorIterations
-     * @param val automatically generated
-     */
-    public void setSorIterations(int val) {
+    //javadoc: VariationalRefinement::setSorIterations(val)
+    public  void setSorIterations(int val)
+    {
+        
         setSorIterations_0(nativeObj, val);
+        
+        return;
     }
 
 

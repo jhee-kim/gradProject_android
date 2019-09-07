@@ -1,5 +1,6 @@
 package org.opencv.android;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import android.content.Context;
@@ -212,7 +213,21 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                        mCamera.setPreviewDisplay(null);
 
                     /* Finally we are ready to start the preview */
+                    ////////////////////////////////////////////////////////////////////////////////////
                     Log.d(TAG, "startPreview");
+                    setDisplayOrientation(mCamera, 90);
+                    mCamera.setPreviewDisplay(getHolder());
+                    Camera.Parameters parameters = mCamera.getParameters();
+                    List<String>    focusModes = parameters.getSupportedFocusModes();
+                    if(focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)){
+                        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                    } else
+                    if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)){
+                        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                    }
+
+                    mCamera.setParameters(parameters);
+                    ////////////////////////////////////////////////////////////////////////////////////
                     mCamera.startPreview();
                 }
                 else
@@ -224,6 +239,18 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
         }
 
         return result;
+    }
+    protected void setDisplayOrientation(Camera camera, int angle){
+        Method downPolymorphic;
+        try
+        {
+            downPolymorphic = camera.getClass().getMethod("setDisplayOrientation", new Class[] { int.class });
+            if (downPolymorphic != null)
+                downPolymorphic.invoke(camera, new Object[] { angle });
+        }
+        catch (Exception e1)
+        {
+        }
     }
 
     protected void releaseCamera() {

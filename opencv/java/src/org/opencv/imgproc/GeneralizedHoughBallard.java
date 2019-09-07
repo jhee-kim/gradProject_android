@@ -6,11 +6,8 @@ package org.opencv.imgproc;
 import org.opencv.imgproc.GeneralizedHough;
 
 // C++: class GeneralizedHoughBallard
-/**
- * finds arbitrary template in the grayscale image using Generalized Hough Transform
- *
- * Detects position only without translation and rotation CITE: Ballard1981 .
- */
+//javadoc: GeneralizedHoughBallard
+
 public class GeneralizedHoughBallard extends GeneralizedHough {
 
     protected GeneralizedHoughBallard(long addr) { super(addr); }
@@ -22,8 +19,13 @@ public class GeneralizedHoughBallard extends GeneralizedHough {
     // C++:  int cv::GeneralizedHoughBallard::getLevels()
     //
 
-    public int getLevels() {
-        return getLevels_0(nativeObj);
+    //javadoc: GeneralizedHoughBallard::getLevels()
+    public  int getLevels()
+    {
+        
+        int retVal = getLevels_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -31,8 +33,13 @@ public class GeneralizedHoughBallard extends GeneralizedHough {
     // C++:  int cv::GeneralizedHoughBallard::getVotesThreshold()
     //
 
-    public int getVotesThreshold() {
-        return getVotesThreshold_0(nativeObj);
+    //javadoc: GeneralizedHoughBallard::getVotesThreshold()
+    public  int getVotesThreshold()
+    {
+        
+        int retVal = getVotesThreshold_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -40,8 +47,13 @@ public class GeneralizedHoughBallard extends GeneralizedHough {
     // C++:  void cv::GeneralizedHoughBallard::setLevels(int levels)
     //
 
-    public void setLevels(int levels) {
+    //javadoc: GeneralizedHoughBallard::setLevels(levels)
+    public  void setLevels(int levels)
+    {
+        
         setLevels_0(nativeObj, levels);
+        
+        return;
     }
 
 
@@ -49,8 +61,13 @@ public class GeneralizedHoughBallard extends GeneralizedHough {
     // C++:  void cv::GeneralizedHoughBallard::setVotesThreshold(int votesThreshold)
     //
 
-    public void setVotesThreshold(int votesThreshold) {
+    //javadoc: GeneralizedHoughBallard::setVotesThreshold(votesThreshold)
+    public  void setVotesThreshold(int votesThreshold)
+    {
+        
         setVotesThreshold_0(nativeObj, votesThreshold);
+        
+        return;
     }
 
 

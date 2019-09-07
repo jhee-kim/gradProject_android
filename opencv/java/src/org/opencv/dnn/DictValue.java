@@ -3,13 +3,11 @@
 //
 package org.opencv.dnn;
 
-
+import java.lang.String;
 
 // C++: class DictValue
-/**
- * This struct stores the scalar value (or array) of one of the following type: double, cv::String or int64.
- * TODO: Maybe int64 is useless because double type exactly stores at least 2^52 integers.
- */
+//javadoc: DictValue
+
 public class DictValue {
 
     protected final long nativeObj;
@@ -24,8 +22,13 @@ public class DictValue {
     // C++:   cv::dnn::DictValue::DictValue(String s)
     //
 
-    public DictValue(String s) {
+    //javadoc: DictValue::DictValue(s)
+    public   DictValue(String s)
+    {
+        
         nativeObj = DictValue_0(s);
+        
+        return;
     }
 
 
@@ -33,8 +36,13 @@ public class DictValue {
     // C++:   cv::dnn::DictValue::DictValue(double p)
     //
 
-    public DictValue(double p) {
+    //javadoc: DictValue::DictValue(p)
+    public   DictValue(double p)
+    {
+        
         nativeObj = DictValue_1(p);
+        
+        return;
     }
 
 
@@ -42,8 +50,13 @@ public class DictValue {
     // C++:   cv::dnn::DictValue::DictValue(int i)
     //
 
-    public DictValue(int i) {
+    //javadoc: DictValue::DictValue(i)
+    public   DictValue(int i)
+    {
+        
         nativeObj = DictValue_2(i);
+        
+        return;
     }
 
 
@@ -51,12 +64,22 @@ public class DictValue {
     // C++:  String cv::dnn::DictValue::getStringValue(int idx = -1)
     //
 
-    public String getStringValue(int idx) {
-        return getStringValue_0(nativeObj, idx);
+    //javadoc: DictValue::getStringValue(idx)
+    public  String getStringValue(int idx)
+    {
+        
+        String retVal = getStringValue_0(nativeObj, idx);
+        
+        return retVal;
     }
 
-    public String getStringValue() {
-        return getStringValue_1(nativeObj);
+    //javadoc: DictValue::getStringValue()
+    public  String getStringValue()
+    {
+        
+        String retVal = getStringValue_1(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -64,8 +87,13 @@ public class DictValue {
     // C++:  bool cv::dnn::DictValue::isInt()
     //
 
-    public boolean isInt() {
-        return isInt_0(nativeObj);
+    //javadoc: DictValue::isInt()
+    public  boolean isInt()
+    {
+        
+        boolean retVal = isInt_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -73,8 +101,13 @@ public class DictValue {
     // C++:  bool cv::dnn::DictValue::isReal()
     //
 
-    public boolean isReal() {
-        return isReal_0(nativeObj);
+    //javadoc: DictValue::isReal()
+    public  boolean isReal()
+    {
+        
+        boolean retVal = isReal_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -82,8 +115,13 @@ public class DictValue {
     // C++:  bool cv::dnn::DictValue::isString()
     //
 
-    public boolean isString() {
-        return isString_0(nativeObj);
+    //javadoc: DictValue::isString()
+    public  boolean isString()
+    {
+        
+        boolean retVal = isString_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -91,12 +129,22 @@ public class DictValue {
     // C++:  double cv::dnn::DictValue::getRealValue(int idx = -1)
     //
 
-    public double getRealValue(int idx) {
-        return getRealValue_0(nativeObj, idx);
+    //javadoc: DictValue::getRealValue(idx)
+    public  double getRealValue(int idx)
+    {
+        
+        double retVal = getRealValue_0(nativeObj, idx);
+        
+        return retVal;
     }
 
-    public double getRealValue() {
-        return getRealValue_1(nativeObj);
+    //javadoc: DictValue::getRealValue()
+    public  double getRealValue()
+    {
+        
+        double retVal = getRealValue_1(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -104,12 +152,22 @@ public class DictValue {
     // C++:  int cv::dnn::DictValue::getIntValue(int idx = -1)
     //
 
-    public int getIntValue(int idx) {
-        return getIntValue_0(nativeObj, idx);
+    //javadoc: DictValue::getIntValue(idx)
+    public  int getIntValue(int idx)
+    {
+        
+        int retVal = getIntValue_0(nativeObj, idx);
+        
+        return retVal;
     }
 
-    public int getIntValue() {
-        return getIntValue_1(nativeObj);
+    //javadoc: DictValue::getIntValue()
+    public  int getIntValue()
+    {
+        
+        int retVal = getIntValue_1(nativeObj);
+        
+        return retVal;
     }
 
 

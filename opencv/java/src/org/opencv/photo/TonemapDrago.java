@@ -6,17 +6,8 @@ package org.opencv.photo;
 import org.opencv.photo.Tonemap;
 
 // C++: class TonemapDrago
-/**
- * Adaptive logarithmic mapping is a fast global tonemapping algorithm that scales the image in
- * logarithmic domain.
- *
- * Since it's a global operator the same function is applied to all the pixels, it is controlled by the
- * bias parameter.
- *
- * Optional saturation enhancement is possible as described in CITE: FL02 .
- *
- * For more information see CITE: DM03 .
- */
+//javadoc: TonemapDrago
+
 public class TonemapDrago extends Tonemap {
 
     protected TonemapDrago(long addr) { super(addr); }
@@ -28,8 +19,13 @@ public class TonemapDrago extends Tonemap {
     // C++:  float cv::TonemapDrago::getBias()
     //
 
-    public float getBias() {
-        return getBias_0(nativeObj);
+    //javadoc: TonemapDrago::getBias()
+    public  float getBias()
+    {
+        
+        float retVal = getBias_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -37,8 +33,13 @@ public class TonemapDrago extends Tonemap {
     // C++:  float cv::TonemapDrago::getSaturation()
     //
 
-    public float getSaturation() {
-        return getSaturation_0(nativeObj);
+    //javadoc: TonemapDrago::getSaturation()
+    public  float getSaturation()
+    {
+        
+        float retVal = getSaturation_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -46,8 +47,13 @@ public class TonemapDrago extends Tonemap {
     // C++:  void cv::TonemapDrago::setBias(float bias)
     //
 
-    public void setBias(float bias) {
+    //javadoc: TonemapDrago::setBias(bias)
+    public  void setBias(float bias)
+    {
+        
         setBias_0(nativeObj, bias);
+        
+        return;
     }
 
 
@@ -55,8 +61,13 @@ public class TonemapDrago extends Tonemap {
     // C++:  void cv::TonemapDrago::setSaturation(float saturation)
     //
 
-    public void setSaturation(float saturation) {
+    //javadoc: TonemapDrago::setSaturation(saturation)
+    public  void setSaturation(float saturation)
+    {
+        
         setSaturation_0(nativeObj, saturation);
+        
+        return;
     }
 
 

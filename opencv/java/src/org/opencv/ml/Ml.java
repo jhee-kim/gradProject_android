@@ -6,6 +6,7 @@ package org.opencv.ml;
 
 
 // C++: class Ml
+//javadoc: Ml
 
 public class Ml {
 

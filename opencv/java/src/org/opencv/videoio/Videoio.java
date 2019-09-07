@@ -3,9 +3,10 @@
 //
 package org.opencv.videoio;
 
-
+import java.lang.String;
 
 // C++: class Videoio
+//javadoc: Videoio
 
 public class Videoio {
 
@@ -366,13 +367,13 @@ public class Videoio {
     // C++:  String cv::videoio_registry::getBackendName(VideoCaptureAPIs api)
     //
 
-    /**
-     * Returns backend API name or "UnknownVideoAPI(xxx)"
-     * @param api backend ID (#VideoCaptureAPIs)
-     * @return automatically generated
-     */
-    public static String getBackendName(int api) {
-        return getBackendName_0(api);
+    //javadoc: getBackendName(api)
+    public static String getBackendName(int api)
+    {
+        
+        String retVal = getBackendName_0(api);
+        
+        return retVal;
     }
 
 

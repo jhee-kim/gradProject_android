@@ -3,18 +3,13 @@
 //
 package org.opencv.features2d;
 
+import java.lang.String;
 import org.opencv.features2d.Feature2D;
 import org.opencv.features2d.ORB;
 
 // C++: class ORB
-/**
- * Class implementing the ORB (*oriented BRIEF*) keypoint detector and descriptor extractor
- *
- * described in CITE: RRKB11 . The algorithm uses FAST in pyramids to detect stable keypoints, selects
- * the strongest features using FAST or Harris response, finds their orientation using first-order
- * moments and computes the descriptors using BRIEF (where the coordinates of random point pairs (or
- * k-tuples) are rotated according to the measured orientation).
- */
+//javadoc: ORB
+
 public class ORB extends Feature2D {
 
     protected ORB(long addr) { super(addr); }
@@ -32,8 +27,13 @@ public class ORB extends Feature2D {
     // C++:  ORB_ScoreType cv::ORB::getScoreType()
     //
 
-    public int getScoreType() {
-        return getScoreType_0(nativeObj);
+    //javadoc: ORB::getScoreType()
+    public  int getScoreType()
+    {
+        
+        int retVal = getScoreType_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -41,329 +41,94 @@ public class ORB extends Feature2D {
     // C++: static Ptr_ORB cv::ORB::create(int nfeatures = 500, float scaleFactor = 1.2f, int nlevels = 8, int edgeThreshold = 31, int firstLevel = 0, int WTA_K = 2, ORB_ScoreType scoreType = ORB::HARRIS_SCORE, int patchSize = 31, int fastThreshold = 20)
     //
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     @param scaleFactor Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     @param nlevels The number of pyramid levels. The smallest level will have linear size equal to
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     @param edgeThreshold This is size of the border where the features are not detected. It should
-     *     roughly match the patchSize parameter.
-     *     @param firstLevel The level of pyramid to put source image to. Previous layers are filled
-     *     with upscaled source image.
-     *     @param WTA_K The number of points that produce each element of the oriented BRIEF descriptor. The
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     @param scoreType The default HARRIS_SCORE means that Harris algorithm is used to rank features
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     @param patchSize size of the patch used by the oriented BRIEF descriptor. Of course, on smaller
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     *     @param fastThreshold the fast threshold
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType, int patchSize, int fastThreshold) {
-        return ORB.__fromPtr__(create_0(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThreshold));
+    //javadoc: ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThreshold)
+    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType, int patchSize, int fastThreshold)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_0(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThreshold));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     @param scaleFactor Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     @param nlevels The number of pyramid levels. The smallest level will have linear size equal to
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     @param edgeThreshold This is size of the border where the features are not detected. It should
-     *     roughly match the patchSize parameter.
-     *     @param firstLevel The level of pyramid to put source image to. Previous layers are filled
-     *     with upscaled source image.
-     *     @param WTA_K The number of points that produce each element of the oriented BRIEF descriptor. The
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     @param scoreType The default HARRIS_SCORE means that Harris algorithm is used to rank features
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     @param patchSize size of the patch used by the oriented BRIEF descriptor. Of course, on smaller
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType, int patchSize) {
-        return ORB.__fromPtr__(create_1(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize));
+    //javadoc: ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize)
+    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType, int patchSize)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_1(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     @param scaleFactor Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     @param nlevels The number of pyramid levels. The smallest level will have linear size equal to
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     @param edgeThreshold This is size of the border where the features are not detected. It should
-     *     roughly match the patchSize parameter.
-     *     @param firstLevel The level of pyramid to put source image to. Previous layers are filled
-     *     with upscaled source image.
-     *     @param WTA_K The number of points that produce each element of the oriented BRIEF descriptor. The
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     @param scoreType The default HARRIS_SCORE means that Harris algorithm is used to rank features
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType) {
-        return ORB.__fromPtr__(create_2(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType));
+    //javadoc: ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType)
+    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_2(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     @param scaleFactor Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     @param nlevels The number of pyramid levels. The smallest level will have linear size equal to
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     @param edgeThreshold This is size of the border where the features are not detected. It should
-     *     roughly match the patchSize parameter.
-     *     @param firstLevel The level of pyramid to put source image to. Previous layers are filled
-     *     with upscaled source image.
-     *     @param WTA_K The number of points that produce each element of the oriented BRIEF descriptor. The
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K) {
-        return ORB.__fromPtr__(create_3(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K));
+    //javadoc: ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K)
+    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_3(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     @param scaleFactor Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     @param nlevels The number of pyramid levels. The smallest level will have linear size equal to
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     @param edgeThreshold This is size of the border where the features are not detected. It should
-     *     roughly match the patchSize parameter.
-     *     @param firstLevel The level of pyramid to put source image to. Previous layers are filled
-     *     with upscaled source image.
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel) {
-        return ORB.__fromPtr__(create_4(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel));
+    //javadoc: ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel)
+    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_4(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     @param scaleFactor Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     @param nlevels The number of pyramid levels. The smallest level will have linear size equal to
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     @param edgeThreshold This is size of the border where the features are not detected. It should
-     *     roughly match the patchSize parameter.
-     *     with upscaled source image.
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold) {
-        return ORB.__fromPtr__(create_5(nfeatures, scaleFactor, nlevels, edgeThreshold));
+    //javadoc: ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold)
+    public static ORB create(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_5(nfeatures, scaleFactor, nlevels, edgeThreshold));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     @param scaleFactor Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     @param nlevels The number of pyramid levels. The smallest level will have linear size equal to
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     roughly match the patchSize parameter.
-     *     with upscaled source image.
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures, float scaleFactor, int nlevels) {
-        return ORB.__fromPtr__(create_6(nfeatures, scaleFactor, nlevels));
+    //javadoc: ORB::create(nfeatures, scaleFactor, nlevels)
+    public static ORB create(int nfeatures, float scaleFactor, int nlevels)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_6(nfeatures, scaleFactor, nlevels));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     @param scaleFactor Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     roughly match the patchSize parameter.
-     *     with upscaled source image.
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures, float scaleFactor) {
-        return ORB.__fromPtr__(create_7(nfeatures, scaleFactor));
+    //javadoc: ORB::create(nfeatures, scaleFactor)
+    public static ORB create(int nfeatures, float scaleFactor)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_7(nfeatures, scaleFactor));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     @param nfeatures The maximum number of features to retain.
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     roughly match the patchSize parameter.
-     *     with upscaled source image.
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create(int nfeatures) {
-        return ORB.__fromPtr__(create_8(nfeatures));
+    //javadoc: ORB::create(nfeatures)
+    public static ORB create(int nfeatures)
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_8(nfeatures));
+        
+        return retVal;
     }
 
-    /**
-     * The ORB constructor
-     *
-     *     pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor
-     *     will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor
-     *     will mean that to cover certain scale range you will need more pyramid levels and so the speed
-     *     will suffer.
-     *     input_image_linear_size/pow(scaleFactor, nlevels - firstLevel).
-     *     roughly match the patchSize parameter.
-     *     with upscaled source image.
-     *     default value 2 means the BRIEF where we take a random point pair and compare their brightnesses,
-     *     so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3
-     *     random points (of course, those point coordinates are random, but they are generated from the
-     *     pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel
-     *     rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such
-     *     output will occupy 2 bits, and therefore it will need a special variant of Hamming distance,
-     *     denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each
-     *     bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-     *     (the score is written to KeyPoint::score and is used to retain best nfeatures features);
-     *     FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints,
-     *     but it is a little faster to compute.
-     *     pyramid layers the perceived image area covered by a feature will be larger.
-     * @return automatically generated
-     */
-    public static ORB create() {
-        return ORB.__fromPtr__(create_9());
+    //javadoc: ORB::create()
+    public static ORB create()
+    {
+        
+        ORB retVal = ORB.__fromPtr__(create_9());
+        
+        return retVal;
     }
 
 
@@ -371,8 +136,13 @@ public class ORB extends Feature2D {
     // C++:  String cv::ORB::getDefaultName()
     //
 
-    public String getDefaultName() {
-        return getDefaultName_0(nativeObj);
+    //javadoc: ORB::getDefaultName()
+    public  String getDefaultName()
+    {
+        
+        String retVal = getDefaultName_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -380,8 +150,13 @@ public class ORB extends Feature2D {
     // C++:  double cv::ORB::getScaleFactor()
     //
 
-    public double getScaleFactor() {
-        return getScaleFactor_0(nativeObj);
+    //javadoc: ORB::getScaleFactor()
+    public  double getScaleFactor()
+    {
+        
+        double retVal = getScaleFactor_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -389,8 +164,13 @@ public class ORB extends Feature2D {
     // C++:  int cv::ORB::getEdgeThreshold()
     //
 
-    public int getEdgeThreshold() {
-        return getEdgeThreshold_0(nativeObj);
+    //javadoc: ORB::getEdgeThreshold()
+    public  int getEdgeThreshold()
+    {
+        
+        int retVal = getEdgeThreshold_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -398,8 +178,13 @@ public class ORB extends Feature2D {
     // C++:  int cv::ORB::getFastThreshold()
     //
 
-    public int getFastThreshold() {
-        return getFastThreshold_0(nativeObj);
+    //javadoc: ORB::getFastThreshold()
+    public  int getFastThreshold()
+    {
+        
+        int retVal = getFastThreshold_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -407,8 +192,13 @@ public class ORB extends Feature2D {
     // C++:  int cv::ORB::getFirstLevel()
     //
 
-    public int getFirstLevel() {
-        return getFirstLevel_0(nativeObj);
+    //javadoc: ORB::getFirstLevel()
+    public  int getFirstLevel()
+    {
+        
+        int retVal = getFirstLevel_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -416,8 +206,13 @@ public class ORB extends Feature2D {
     // C++:  int cv::ORB::getMaxFeatures()
     //
 
-    public int getMaxFeatures() {
-        return getMaxFeatures_0(nativeObj);
+    //javadoc: ORB::getMaxFeatures()
+    public  int getMaxFeatures()
+    {
+        
+        int retVal = getMaxFeatures_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -425,8 +220,13 @@ public class ORB extends Feature2D {
     // C++:  int cv::ORB::getNLevels()
     //
 
-    public int getNLevels() {
-        return getNLevels_0(nativeObj);
+    //javadoc: ORB::getNLevels()
+    public  int getNLevels()
+    {
+        
+        int retVal = getNLevels_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -434,8 +234,13 @@ public class ORB extends Feature2D {
     // C++:  int cv::ORB::getPatchSize()
     //
 
-    public int getPatchSize() {
-        return getPatchSize_0(nativeObj);
+    //javadoc: ORB::getPatchSize()
+    public  int getPatchSize()
+    {
+        
+        int retVal = getPatchSize_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -443,8 +248,13 @@ public class ORB extends Feature2D {
     // C++:  int cv::ORB::getWTA_K()
     //
 
-    public int getWTA_K() {
-        return getWTA_K_0(nativeObj);
+    //javadoc: ORB::getWTA_K()
+    public  int getWTA_K()
+    {
+        
+        int retVal = getWTA_K_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -452,8 +262,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setEdgeThreshold(int edgeThreshold)
     //
 
-    public void setEdgeThreshold(int edgeThreshold) {
+    //javadoc: ORB::setEdgeThreshold(edgeThreshold)
+    public  void setEdgeThreshold(int edgeThreshold)
+    {
+        
         setEdgeThreshold_0(nativeObj, edgeThreshold);
+        
+        return;
     }
 
 
@@ -461,8 +276,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setFastThreshold(int fastThreshold)
     //
 
-    public void setFastThreshold(int fastThreshold) {
+    //javadoc: ORB::setFastThreshold(fastThreshold)
+    public  void setFastThreshold(int fastThreshold)
+    {
+        
         setFastThreshold_0(nativeObj, fastThreshold);
+        
+        return;
     }
 
 
@@ -470,8 +290,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setFirstLevel(int firstLevel)
     //
 
-    public void setFirstLevel(int firstLevel) {
+    //javadoc: ORB::setFirstLevel(firstLevel)
+    public  void setFirstLevel(int firstLevel)
+    {
+        
         setFirstLevel_0(nativeObj, firstLevel);
+        
+        return;
     }
 
 
@@ -479,8 +304,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setMaxFeatures(int maxFeatures)
     //
 
-    public void setMaxFeatures(int maxFeatures) {
+    //javadoc: ORB::setMaxFeatures(maxFeatures)
+    public  void setMaxFeatures(int maxFeatures)
+    {
+        
         setMaxFeatures_0(nativeObj, maxFeatures);
+        
+        return;
     }
 
 
@@ -488,8 +318,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setNLevels(int nlevels)
     //
 
-    public void setNLevels(int nlevels) {
+    //javadoc: ORB::setNLevels(nlevels)
+    public  void setNLevels(int nlevels)
+    {
+        
         setNLevels_0(nativeObj, nlevels);
+        
+        return;
     }
 
 
@@ -497,8 +332,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setPatchSize(int patchSize)
     //
 
-    public void setPatchSize(int patchSize) {
+    //javadoc: ORB::setPatchSize(patchSize)
+    public  void setPatchSize(int patchSize)
+    {
+        
         setPatchSize_0(nativeObj, patchSize);
+        
+        return;
     }
 
 
@@ -506,8 +346,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setScaleFactor(double scaleFactor)
     //
 
-    public void setScaleFactor(double scaleFactor) {
+    //javadoc: ORB::setScaleFactor(scaleFactor)
+    public  void setScaleFactor(double scaleFactor)
+    {
+        
         setScaleFactor_0(nativeObj, scaleFactor);
+        
+        return;
     }
 
 
@@ -515,8 +360,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setScoreType(ORB_ScoreType scoreType)
     //
 
-    public void setScoreType(int scoreType) {
+    //javadoc: ORB::setScoreType(scoreType)
+    public  void setScoreType(int scoreType)
+    {
+        
         setScoreType_0(nativeObj, scoreType);
+        
+        return;
     }
 
 
@@ -524,8 +374,13 @@ public class ORB extends Feature2D {
     // C++:  void cv::ORB::setWTA_K(int wta_k)
     //
 
-    public void setWTA_K(int wta_k) {
+    //javadoc: ORB::setWTA_K(wta_k)
+    public  void setWTA_K(int wta_k)
+    {
+        
         setWTA_K_0(nativeObj, wta_k);
+        
+        return;
     }
 
 

@@ -93,31 +93,16 @@ apply plugin: 'com.android.library'
 println "OpenCV: " + project.buildscript.sourceFile
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion var
     //buildToolsVersion "x.y.z" // not needed since com.android.tools.build:gradle:3.0.0
 
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 28
-
-        externalNativeBuild {
-            cmake {
-                arguments "-DANDROID_STL=c++_shared"
-                targets "opencv_jni_shared"
-            }
-        }
     }
 
     buildTypes {
-        debug {
-            packagingOptions {
-                doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
-            }
-        }
         release {
-            packagingOptions {
-                doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
-            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
@@ -134,12 +119,6 @@ android {
             aidl.srcDirs = ['java/src']
             res.srcDirs = ['java/res']
             manifest.srcFile 'java/AndroidManifest.xml'
-        }
-    }
-
-    externalNativeBuild {
-        cmake {
-            path (project.projectDir.toString() + '/libcxx_helper/CMakeLists.txt')
         }
     }
 }

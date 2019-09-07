@@ -7,12 +7,8 @@ import org.opencv.core.Mat;
 import org.opencv.video.BackgroundSubtractor;
 
 // C++: class BackgroundSubtractorMOG2
-/**
- * Gaussian Mixture-based Background/Foreground Segmentation Algorithm.
- *
- * The class implements the Gaussian mixture model background subtraction described in CITE: Zivkovic2004
- * and CITE: Zivkovic2006 .
- */
+//javadoc: BackgroundSubtractorMOG2
+
 public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
 
     protected BackgroundSubtractorMOG2(long addr) { super(addr); }
@@ -24,15 +20,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  bool cv::BackgroundSubtractorMOG2::getDetectShadows()
     //
 
-    /**
-     * Returns the shadow detection flag
-     *
-     *     If true, the algorithm detects shadows and marks them. See createBackgroundSubtractorMOG2 for
-     *     details.
-     * @return automatically generated
-     */
-    public boolean getDetectShadows() {
-        return getDetectShadows_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getDetectShadows()
+    public  boolean getDetectShadows()
+    {
+        
+        boolean retVal = getDetectShadows_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -40,16 +34,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  double cv::BackgroundSubtractorMOG2::getBackgroundRatio()
     //
 
-    /**
-     * Returns the "background ratio" parameter of the algorithm
-     *
-     *     If a foreground pixel keeps semi-constant value for about backgroundRatio\*history frames, it's
-     *     considered background and added to the model as a center of a new component. It corresponds to TB
-     *     parameter in the paper.
-     * @return automatically generated
-     */
-    public double getBackgroundRatio() {
-        return getBackgroundRatio_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getBackgroundRatio()
+    public  double getBackgroundRatio()
+    {
+        
+        double retVal = getBackgroundRatio_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -57,16 +48,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  double cv::BackgroundSubtractorMOG2::getComplexityReductionThreshold()
     //
 
-    /**
-     * Returns the complexity reduction threshold
-     *
-     *     This parameter defines the number of samples needed to accept to prove the component exists. CT=0.05
-     *     is a default value for all the samples. By setting CT=0 you get an algorithm very similar to the
-     *     standard Stauffer&amp;Grimson algorithm.
-     * @return automatically generated
-     */
-    public double getComplexityReductionThreshold() {
-        return getComplexityReductionThreshold_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getComplexityReductionThreshold()
+    public  double getComplexityReductionThreshold()
+    {
+        
+        double retVal = getComplexityReductionThreshold_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -74,17 +62,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  double cv::BackgroundSubtractorMOG2::getShadowThreshold()
     //
 
-    /**
-     * Returns the shadow threshold
-     *
-     *     A shadow is detected if pixel is a darker version of the background. The shadow threshold (Tau in
-     *     the paper) is a threshold defining how much darker the shadow can be. Tau= 0.5 means that if a pixel
-     *     is more than twice darker then it is not shadow. See Prati, Mikic, Trivedi and Cucchiara,
-     * Detecting Moving Shadows...*, IEEE PAMI,2003.
-     * @return automatically generated
-     */
-    public double getShadowThreshold() {
-        return getShadowThreshold_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getShadowThreshold()
+    public  double getShadowThreshold()
+    {
+        
+        double retVal = getShadowThreshold_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -92,12 +76,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  double cv::BackgroundSubtractorMOG2::getVarInit()
     //
 
-    /**
-     * Returns the initial variance of each gaussian component
-     * @return automatically generated
-     */
-    public double getVarInit() {
-        return getVarInit_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getVarInit()
+    public  double getVarInit()
+    {
+        
+        double retVal = getVarInit_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -105,8 +90,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  double cv::BackgroundSubtractorMOG2::getVarMax()
     //
 
-    public double getVarMax() {
-        return getVarMax_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getVarMax()
+    public  double getVarMax()
+    {
+        
+        double retVal = getVarMax_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -114,8 +104,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  double cv::BackgroundSubtractorMOG2::getVarMin()
     //
 
-    public double getVarMin() {
-        return getVarMin_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getVarMin()
+    public  double getVarMin()
+    {
+        
+        double retVal = getVarMin_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -123,15 +118,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  double cv::BackgroundSubtractorMOG2::getVarThreshold()
     //
 
-    /**
-     * Returns the variance threshold for the pixel-model match
-     *
-     *     The main threshold on the squared Mahalanobis distance to decide if the sample is well described by
-     *     the background model or not. Related to Cthr from the paper.
-     * @return automatically generated
-     */
-    public double getVarThreshold() {
-        return getVarThreshold_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getVarThreshold()
+    public  double getVarThreshold()
+    {
+        
+        double retVal = getVarThreshold_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -139,18 +132,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  double cv::BackgroundSubtractorMOG2::getVarThresholdGen()
     //
 
-    /**
-     * Returns the variance threshold for the pixel-model match used for new mixture component generation
-     *
-     *     Threshold for the squared Mahalanobis distance that helps decide when a sample is close to the
-     *     existing components (corresponds to Tg in the paper). If a pixel is not close to any component, it
-     *     is considered foreground or added as a new component. 3 sigma =&gt; Tg=3\*3=9 is default. A smaller Tg
-     *     value generates more components. A higher Tg value may result in a small number of components but
-     *     they can grow too large.
-     * @return automatically generated
-     */
-    public double getVarThresholdGen() {
-        return getVarThresholdGen_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getVarThresholdGen()
+    public  double getVarThresholdGen()
+    {
+        
+        double retVal = getVarThresholdGen_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -158,12 +146,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  int cv::BackgroundSubtractorMOG2::getHistory()
     //
 
-    /**
-     * Returns the number of last frames that affect the background model
-     * @return automatically generated
-     */
-    public int getHistory() {
-        return getHistory_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getHistory()
+    public  int getHistory()
+    {
+        
+        int retVal = getHistory_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -171,12 +160,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  int cv::BackgroundSubtractorMOG2::getNMixtures()
     //
 
-    /**
-     * Returns the number of gaussian components in the background model
-     * @return automatically generated
-     */
-    public int getNMixtures() {
-        return getNMixtures_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getNMixtures()
+    public  int getNMixtures()
+    {
+        
+        int retVal = getNMixtures_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -184,15 +174,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  int cv::BackgroundSubtractorMOG2::getShadowValue()
     //
 
-    /**
-     * Returns the shadow value
-     *
-     *     Shadow value is the value used to mark shadows in the foreground mask. Default value is 127. Value 0
-     *     in the mask always means background, 255 means foreground.
-     * @return automatically generated
-     */
-    public int getShadowValue() {
-        return getShadowValue_0(nativeObj);
+    //javadoc: BackgroundSubtractorMOG2::getShadowValue()
+    public  int getShadowValue()
+    {
+        
+        int retVal = getShadowValue_0(nativeObj);
+        
+        return retVal;
     }
 
 
@@ -200,31 +188,22 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::apply(Mat image, Mat& fgmask, double learningRate = -1)
     //
 
-    /**
-     * Computes a foreground mask.
-     *
-     *     @param image Next video frame. Floating point frame will be used without scaling and should be in range \([0,255]\).
-     *     @param fgmask The output foreground mask as an 8-bit binary image.
-     *     @param learningRate The value between 0 and 1 that indicates how fast the background model is
-     *     learnt. Negative parameter value makes the algorithm to use some automatically chosen learning
-     *     rate. 0 means that the background model is not updated at all, 1 means that the background model
-     *     is completely reinitialized from the last frame.
-     */
-    public void apply(Mat image, Mat fgmask, double learningRate) {
+    //javadoc: BackgroundSubtractorMOG2::apply(image, fgmask, learningRate)
+    public  void apply(Mat image, Mat fgmask, double learningRate)
+    {
+        
         apply_0(nativeObj, image.nativeObj, fgmask.nativeObj, learningRate);
+        
+        return;
     }
 
-    /**
-     * Computes a foreground mask.
-     *
-     *     @param image Next video frame. Floating point frame will be used without scaling and should be in range \([0,255]\).
-     *     @param fgmask The output foreground mask as an 8-bit binary image.
-     *     learnt. Negative parameter value makes the algorithm to use some automatically chosen learning
-     *     rate. 0 means that the background model is not updated at all, 1 means that the background model
-     *     is completely reinitialized from the last frame.
-     */
-    public void apply(Mat image, Mat fgmask) {
+    //javadoc: BackgroundSubtractorMOG2::apply(image, fgmask)
+    public  void apply(Mat image, Mat fgmask)
+    {
+        
         apply_1(nativeObj, image.nativeObj, fgmask.nativeObj);
+        
+        return;
     }
 
 
@@ -232,12 +211,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setBackgroundRatio(double ratio)
     //
 
-    /**
-     * Sets the "background ratio" parameter of the algorithm
-     * @param ratio automatically generated
-     */
-    public void setBackgroundRatio(double ratio) {
+    //javadoc: BackgroundSubtractorMOG2::setBackgroundRatio(ratio)
+    public  void setBackgroundRatio(double ratio)
+    {
+        
         setBackgroundRatio_0(nativeObj, ratio);
+        
+        return;
     }
 
 
@@ -245,12 +225,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setComplexityReductionThreshold(double ct)
     //
 
-    /**
-     * Sets the complexity reduction threshold
-     * @param ct automatically generated
-     */
-    public void setComplexityReductionThreshold(double ct) {
+    //javadoc: BackgroundSubtractorMOG2::setComplexityReductionThreshold(ct)
+    public  void setComplexityReductionThreshold(double ct)
+    {
+        
         setComplexityReductionThreshold_0(nativeObj, ct);
+        
+        return;
     }
 
 
@@ -258,12 +239,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setDetectShadows(bool detectShadows)
     //
 
-    /**
-     * Enables or disables shadow detection
-     * @param detectShadows automatically generated
-     */
-    public void setDetectShadows(boolean detectShadows) {
+    //javadoc: BackgroundSubtractorMOG2::setDetectShadows(detectShadows)
+    public  void setDetectShadows(boolean detectShadows)
+    {
+        
         setDetectShadows_0(nativeObj, detectShadows);
+        
+        return;
     }
 
 
@@ -271,12 +253,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setHistory(int history)
     //
 
-    /**
-     * Sets the number of last frames that affect the background model
-     * @param history automatically generated
-     */
-    public void setHistory(int history) {
+    //javadoc: BackgroundSubtractorMOG2::setHistory(history)
+    public  void setHistory(int history)
+    {
+        
         setHistory_0(nativeObj, history);
+        
+        return;
     }
 
 
@@ -284,14 +267,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setNMixtures(int nmixtures)
     //
 
-    /**
-     * Sets the number of gaussian components in the background model.
-     *
-     *     The model needs to be reinitalized to reserve memory.
-     * @param nmixtures automatically generated
-     */
-    public void setNMixtures(int nmixtures) {
+    //javadoc: BackgroundSubtractorMOG2::setNMixtures(nmixtures)
+    public  void setNMixtures(int nmixtures)
+    {
+        
         setNMixtures_0(nativeObj, nmixtures);
+        
+        return;
     }
 
 
@@ -299,12 +281,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setShadowThreshold(double threshold)
     //
 
-    /**
-     * Sets the shadow threshold
-     * @param threshold automatically generated
-     */
-    public void setShadowThreshold(double threshold) {
+    //javadoc: BackgroundSubtractorMOG2::setShadowThreshold(threshold)
+    public  void setShadowThreshold(double threshold)
+    {
+        
         setShadowThreshold_0(nativeObj, threshold);
+        
+        return;
     }
 
 
@@ -312,12 +295,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setShadowValue(int value)
     //
 
-    /**
-     * Sets the shadow value
-     * @param value automatically generated
-     */
-    public void setShadowValue(int value) {
+    //javadoc: BackgroundSubtractorMOG2::setShadowValue(value)
+    public  void setShadowValue(int value)
+    {
+        
         setShadowValue_0(nativeObj, value);
+        
+        return;
     }
 
 
@@ -325,12 +309,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setVarInit(double varInit)
     //
 
-    /**
-     * Sets the initial variance of each gaussian component
-     * @param varInit automatically generated
-     */
-    public void setVarInit(double varInit) {
+    //javadoc: BackgroundSubtractorMOG2::setVarInit(varInit)
+    public  void setVarInit(double varInit)
+    {
+        
         setVarInit_0(nativeObj, varInit);
+        
+        return;
     }
 
 
@@ -338,8 +323,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setVarMax(double varMax)
     //
 
-    public void setVarMax(double varMax) {
+    //javadoc: BackgroundSubtractorMOG2::setVarMax(varMax)
+    public  void setVarMax(double varMax)
+    {
+        
         setVarMax_0(nativeObj, varMax);
+        
+        return;
     }
 
 
@@ -347,8 +337,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setVarMin(double varMin)
     //
 
-    public void setVarMin(double varMin) {
+    //javadoc: BackgroundSubtractorMOG2::setVarMin(varMin)
+    public  void setVarMin(double varMin)
+    {
+        
         setVarMin_0(nativeObj, varMin);
+        
+        return;
     }
 
 
@@ -356,12 +351,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setVarThreshold(double varThreshold)
     //
 
-    /**
-     * Sets the variance threshold for the pixel-model match
-     * @param varThreshold automatically generated
-     */
-    public void setVarThreshold(double varThreshold) {
+    //javadoc: BackgroundSubtractorMOG2::setVarThreshold(varThreshold)
+    public  void setVarThreshold(double varThreshold)
+    {
+        
         setVarThreshold_0(nativeObj, varThreshold);
+        
+        return;
     }
 
 
@@ -369,12 +365,13 @@ public class BackgroundSubtractorMOG2 extends BackgroundSubtractor {
     // C++:  void cv::BackgroundSubtractorMOG2::setVarThresholdGen(double varThresholdGen)
     //
 
-    /**
-     * Sets the variance threshold for the pixel-model match used for new mixture component generation
-     * @param varThresholdGen automatically generated
-     */
-    public void setVarThresholdGen(double varThresholdGen) {
+    //javadoc: BackgroundSubtractorMOG2::setVarThresholdGen(varThresholdGen)
+    public  void setVarThresholdGen(double varThresholdGen)
+    {
+        
         setVarThresholdGen_0(nativeObj, varThresholdGen);
+        
+        return;
     }
 
 

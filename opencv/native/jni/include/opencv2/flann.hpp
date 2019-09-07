@@ -289,7 +289,7 @@ public:
 
         int veclen() const { return nnIndex->veclen(); }
 
-        int size() const { return (int)nnIndex->size(); }
+        int size() const { return nnIndex->size(); }
 
         ::cvflann::IndexParams getParameters() { return nnIndex->getParameters(); }
 
@@ -297,7 +297,6 @@ public:
 
 private:
         ::cvflann::Index<Distance>* nnIndex;
-        Mat _dataset;
 };
 
 //! @cond IGNORED
@@ -313,11 +312,10 @@ private:
 
 template <typename Distance>
 GenericIndex<Distance>::GenericIndex(const Mat& dataset, const ::cvflann::IndexParams& params, Distance distance)
-: _dataset(dataset)
 {
     CV_Assert(dataset.type() == CvType<ElementType>::type());
     CV_Assert(dataset.isContinuous());
-    ::cvflann::Matrix<ElementType> m_dataset((ElementType*)_dataset.ptr<ElementType>(0), _dataset.rows, _dataset.cols);
+    ::cvflann::Matrix<ElementType> m_dataset((ElementType*)dataset.ptr<ElementType>(0), dataset.rows, dataset.cols);
 
     nnIndex = new ::cvflann::Index<Distance>(m_dataset, params, distance);
 

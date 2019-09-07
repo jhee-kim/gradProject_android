@@ -8,9 +8,8 @@ import org.opencv.core.TermCriteria;
 import org.opencv.features2d.BOWTrainer;
 
 // C++: class BOWKMeansTrainer
-/**
- * kmeans -based class to train visual vocabulary using the *bag of visual words* approach. :
- */
+//javadoc: BOWKMeansTrainer
+
 public class BOWKMeansTrainer extends BOWTrainer {
 
     protected BOWKMeansTrainer(long addr) { super(addr); }
@@ -22,50 +21,40 @@ public class BOWKMeansTrainer extends BOWTrainer {
     // C++:   cv::BOWKMeansTrainer::BOWKMeansTrainer(int clusterCount, TermCriteria termcrit = TermCriteria(), int attempts = 3, int flags = KMEANS_PP_CENTERS)
     //
 
-    /**
-     * The constructor.
-     *
-     *     SEE: cv::kmeans
-     * @param clusterCount automatically generated
-     * @param termcrit automatically generated
-     * @param attempts automatically generated
-     * @param flags automatically generated
-     */
-    public BOWKMeansTrainer(int clusterCount, TermCriteria termcrit, int attempts, int flags) {
-        super(BOWKMeansTrainer_0(clusterCount, termcrit.type, termcrit.maxCount, termcrit.epsilon, attempts, flags));
+    //javadoc: BOWKMeansTrainer::BOWKMeansTrainer(clusterCount, termcrit, attempts, flags)
+    public   BOWKMeansTrainer(int clusterCount, TermCriteria termcrit, int attempts, int flags)
+    {
+        
+        super( BOWKMeansTrainer_0(clusterCount, termcrit.type, termcrit.maxCount, termcrit.epsilon, attempts, flags) );
+        
+        return;
     }
 
-    /**
-     * The constructor.
-     *
-     *     SEE: cv::kmeans
-     * @param clusterCount automatically generated
-     * @param termcrit automatically generated
-     * @param attempts automatically generated
-     */
-    public BOWKMeansTrainer(int clusterCount, TermCriteria termcrit, int attempts) {
-        super(BOWKMeansTrainer_1(clusterCount, termcrit.type, termcrit.maxCount, termcrit.epsilon, attempts));
+    //javadoc: BOWKMeansTrainer::BOWKMeansTrainer(clusterCount, termcrit, attempts)
+    public   BOWKMeansTrainer(int clusterCount, TermCriteria termcrit, int attempts)
+    {
+        
+        super( BOWKMeansTrainer_1(clusterCount, termcrit.type, termcrit.maxCount, termcrit.epsilon, attempts) );
+        
+        return;
     }
 
-    /**
-     * The constructor.
-     *
-     *     SEE: cv::kmeans
-     * @param clusterCount automatically generated
-     * @param termcrit automatically generated
-     */
-    public BOWKMeansTrainer(int clusterCount, TermCriteria termcrit) {
-        super(BOWKMeansTrainer_2(clusterCount, termcrit.type, termcrit.maxCount, termcrit.epsilon));
+    //javadoc: BOWKMeansTrainer::BOWKMeansTrainer(clusterCount, termcrit)
+    public   BOWKMeansTrainer(int clusterCount, TermCriteria termcrit)
+    {
+        
+        super( BOWKMeansTrainer_2(clusterCount, termcrit.type, termcrit.maxCount, termcrit.epsilon) );
+        
+        return;
     }
 
-    /**
-     * The constructor.
-     *
-     *     SEE: cv::kmeans
-     * @param clusterCount automatically generated
-     */
-    public BOWKMeansTrainer(int clusterCount) {
-        super(BOWKMeansTrainer_3(clusterCount));
+    //javadoc: BOWKMeansTrainer::BOWKMeansTrainer(clusterCount)
+    public   BOWKMeansTrainer(int clusterCount)
+    {
+        
+        super( BOWKMeansTrainer_3(clusterCount) );
+        
+        return;
     }
 
 
@@ -73,8 +62,13 @@ public class BOWKMeansTrainer extends BOWTrainer {
     // C++:  Mat cv::BOWKMeansTrainer::cluster(Mat descriptors)
     //
 
-    public Mat cluster(Mat descriptors) {
-        return new Mat(cluster_0(nativeObj, descriptors.nativeObj));
+    //javadoc: BOWKMeansTrainer::cluster(descriptors)
+    public  Mat cluster(Mat descriptors)
+    {
+        
+        Mat retVal = new Mat(cluster_0(nativeObj, descriptors.nativeObj));
+        
+        return retVal;
     }
 
 
@@ -82,8 +76,13 @@ public class BOWKMeansTrainer extends BOWTrainer {
     // C++:  Mat cv::BOWKMeansTrainer::cluster()
     //
 
-    public Mat cluster() {
-        return new Mat(cluster_1(nativeObj));
+    //javadoc: BOWKMeansTrainer::cluster()
+    public  Mat cluster()
+    {
+        
+        Mat retVal = new Mat(cluster_1(nativeObj));
+        
+        return retVal;
     }
 
 
