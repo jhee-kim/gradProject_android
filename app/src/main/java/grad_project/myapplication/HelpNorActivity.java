@@ -26,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 
-public class HelpActivity extends AppCompatActivity {
+public class HelpNorActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     TimerHandler timerhandler;
     private static int MESSAGE_TIMER_START = 100;
@@ -41,7 +41,7 @@ public class HelpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_help);
+        setContentView(R.layout.activity_helpnor);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar == null) {
@@ -92,14 +92,14 @@ public class HelpActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             if  (msg.what == MESSAGE_TIMER_START) {
-                GetIsStartTask startTask = new GetIsStartTask(HelpActivity.this);
+                GetIsStartTask startTask = new GetIsStartTask(HelpNorActivity.this);
                 try {
                     String result = startTask.execute(GET_ISSTART, s_id).get();
                     is_start = !result.equals("0");
                     if (is_start) {
                         SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         startDate = df.parse(result).getTime();
-                        Intent intent = new Intent(HelpActivity.this, NormalActivity.class);
+                        Intent intent = new Intent(HelpNorActivity.this, NormalActivity.class);
                         intent.putExtra("Time", startDate);
                         startActivity(intent);
                         finish();
@@ -117,9 +117,9 @@ public class HelpActivity extends AppCompatActivity {
 
     // 관람 시작 여부 받아오는 부분
     public static class GetIsStartTask extends AsyncTask<String, Void, String> {
-        private WeakReference<HelpActivity> activityReference;
+        private WeakReference<HelpNorActivity> activityReference;
 
-        GetIsStartTask(HelpActivity context) {
+        GetIsStartTask(HelpNorActivity context) {
             activityReference = new WeakReference<>(context);
         }
         @Override

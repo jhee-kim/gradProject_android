@@ -29,6 +29,9 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,6 +39,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,12 +69,13 @@ public class RegistActivity extends AppCompatActivity {
 
     ArrayAdapter<String> timeAdapter;
     List<String> timeList;
-    boolean[] b_expTime = {false, true, true};
+    boolean[] b_expTime = {true, false, false};
     boolean is_dialog = false;
 
     /***** php 통신 *****/
     private static final String BASE_PATH = "http://35.221.108.183/android/";
     public static final String ADD_AUDIENCE = BASE_PATH + "add_audience.php";            //관람등록(성공 1, 실패 0 반환)
+    public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";            //{"result":[{"first_time":"1","second_time":"1"}]}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,6 +203,34 @@ public class RegistActivity extends AppCompatActivity {
 
             }
         });
+
+        narratorData narratortask = new narratorData(this);
+        try {
+            String result = narratortask.execute(GET_NARRATOR).get();
+            Log.d("REGIST", result);
+            if (result.equals("0")) {
+                Toast.makeText(RegistActivity.this, "Error", Toast.LENGTH_SHORT).show();
+            } else if (result.equals("ERROR")) {
+                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+            } else {
+                JSONObject jResult = new JSONObject(result);
+                JSONArray jArray = jResult.getJSONArray("result");
+                for (int i = 0; i < jArray.length(); i++) {
+                    JSONObject jObject = jArray.getJSONObject(i);
+                    if(jObject.getString("first_time").equals("1")) {
+                        b_expTime[1] = true;
+                    }
+                    if(jObject.getString("second_time").equals("1")) {
+                        b_expTime[2] = true;
+                    }
+                    if(b_expTime[1] || b_expTime[2]) {
+                        b_expTime[0] = false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         timeList = new ArrayList<String>();
         if (b_expTime[0]) {
@@ -581,6 +614,59 @@ public class RegistActivity extends AppCompatActivity {
                 return sb.toString();
             } catch (Exception e) {
                 return "ERROR";
+            }
+        }
+    }
+    public static class narratorData extends AsyncTask<String, Void, String> {
+        private WeakReference<RegistActivity> activityReference;
+        ProgressDialog progressDialog;
+
+        narratorData(RegistActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activityReference.get(),
+                    "Please Wait", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+            /*출력값*/
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String serverURL = params[0];
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                InputStream inputStream;
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                } else {
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+                bufferedReader.close();
+                return sb.toString();
+            } catch (Exception e) {
+                return "Error: " + e.getMessage();
             }
         }
     }

@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -60,6 +61,7 @@ public class CheckActivity extends AppCompatActivity {
     public static final String SET_ISEND = BASE_PATH + "set_isEnd.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
     public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
     public static final String GET_SURVEY = BASE_PATH + "get_survey.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
+    public static final String GET_PARTICIPATION = BASE_PATH + "get_participation.php";    //0(일반관람), 1(전시해설)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,8 +245,27 @@ public class CheckActivity extends AppCompatActivity {
                         intent.putExtra("Time", l_startTime);
                         startActivity(intent);
                     } else {
-                        Intent intent = new Intent(CheckActivity.this, HelpActivity.class);
-                        startActivity(intent);
+                        CheckActivity.participationData participationdata = new CheckActivity.participationData(this);
+                        try {
+                            String result = participationdata.execute(GET_PARTICIPATION, s_id).get();
+                            Log.d("REGIST", result);
+                            if (result.equals("-1")) {
+                                Toast.makeText(CheckActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                            } else if (result.equals("ERROR")) {
+                                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                            } else {
+                                if(result.equals("0")) {
+                                    Intent intent = new Intent(CheckActivity.this, HelpNorActivity.class);
+                                    startActivity(intent);
+                                }
+                                else if(result.equals("1")){
+                                    Intent intent = new Intent(CheckActivity.this, HelpComActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 } else {    // 네트워크 통신 오류 예외처리
                     Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
@@ -740,6 +761,66 @@ public class CheckActivity extends AppCompatActivity {
                 httpURLConnection.setConnectTimeout(5000);
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.connect();
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+                bufferedReader.close();
+                return sb.toString();
+            } catch (Exception e) {
+                return "ERROR";
+            }
+        }
+    }
+    public static class participationData extends AsyncTask<String, Void, String> {
+        private WeakReference<CheckActivity> activityReference;
+        ProgressDialog progressDialog;
+
+        participationData(CheckActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activityReference.get(),
+                    "Please Wait", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+            /*출력값*/
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String serverURL = params[0];
+            String id = params[1];
+            String postParameters = "&id=" + id;
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
                 int responseStatusCode = httpURLConnection.getResponseCode();
                 InputStream inputStream;
                 if(responseStatusCode == HttpURLConnection.HTTP_OK) {

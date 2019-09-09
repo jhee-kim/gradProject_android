@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Administrator/AndroidStudioProjects/android2/app/src/main/cpp
+# Install script for directory: C:/Users/Administrator/AndroidStudioProjects/android/app/src/main/cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/Administrator/AndroidStudioProjects/android2/app/.cxx/cmake/release/x86/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/Administrator/AndroidStudioProjects/android/app/.cxx/cmake/release/x86/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

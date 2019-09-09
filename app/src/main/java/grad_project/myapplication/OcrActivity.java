@@ -79,16 +79,17 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
     private CameraBridgeViewBase mOpenCvCameraView;
     private Mat matInput;
     private Mat matResult;
+    private long mLastClickTime = 0;
+
+
+    ImageView img;
 
     public native void ConvertRGBtoGray(long matAddrInput, long matAddrResult);
-
 
     static {
         System.loadLibrary("opencv_java4");
         System.loadLibrary("native-lib");
     }
-
-
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -105,7 +106,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             }
         }
     };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +125,20 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
         mOpenCvCameraView.setCameraIndex(0); // front-camera(1),  back-camera(0)
         mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
 
+        img = (ImageView)findViewById(R.id.img);
 
+
+        ImageButton shutter = (ImageButton) findViewById(R.id.button_capture);
+        shutter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 10000){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+                uploadImage(matResult);
+            }
+        });
     }
 
     @Override
@@ -176,16 +189,12 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
 
         if ( matResult == null )
 
-            matResult = new Mat(matInput.rows(), matInput.cols(), matInput.type());
+            matResult = new Mat(matInput.rows(), matInput.cols(), CvType.CV_32FC2);
 
         ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
 
         return matResult;
     }
-
-
-
-
 
 
 
@@ -217,34 +226,45 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
     private static final int MAX_LABEL_RESULTS = 10;
     private static final String TAG = OcrActivity.class.getSimpleName();
 
-    public void uploadImage(Bitmap bitmap) {
-        if (bitmap != null) {
-            OpenCVLoader.initDebug();
-            Mat grayImage = new Mat(0, 0, CvType.CV_32FC2);
-            Utils.bitmapToMat(bitmap, grayImage);
-            Imgproc.cvtColor(grayImage.clone(), grayImage, Imgproc.COLOR_RGB2GRAY);
-            Utils.matToBitmap(grayImage, bitmap);
+    public void uploadImage(Mat mat) {
+        if (mat != null) {
+            //OpenCVLoader.initDebug();
+//            Imgproc.cvtColor(mat.clone(), mat, Imgproc.COLOR_RGB2GRAY);
 
-            ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-            Mat hierarchy = new Mat();
-            Imgproc.findContours(grayImage, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+//            ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+//            Mat hierarchy = new Mat();
+//            Imgproc.findContours(mat, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+//
+//            double maxArr = 0;
+//            MatOfPoint2f temp = new MatOfPoint2f();
+//            for (MatOfPoint contour : contours) {
+//                MatOfPoint2f approx = new MatOfPoint2f();
+//                MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
+//                Imgproc.approxPolyDP(contour2f, approx, 0.02 * Imgproc.arcLength(contour2f, true), true);
+//
+//                if (approx.toArray().length == 4 && Imgproc.contourArea(contour) > maxArr) {
+//                    maxArr = Imgproc.contourArea(contour);
+//                    temp = approx;
+//                }
+//            }
+            Bitmap bitmap = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(matResult, bitmap);
+//            if (temp != null) {
+//                Rect rect = Imgproc.boundingRect(temp);
+//                Log.d("text-x", String.valueOf(rect.tl().x));
+//                Log.d("text-y", String.valueOf(rect.tl().y));
+//                Log.d("text-w", String.valueOf(rect.width));
+//                Log.d("text-h", String.valueOf(rect.height));
+                //bitmap = Bitmap.createBitmap(bitmap, (int)rect.tl().x, (int)rect.tl().y, rect.width, rect.height);
+//            }
 
-            double maxArr = 0;
-            MatOfPoint2f temp = new MatOfPoint2f();
-            for (MatOfPoint contour : contours) {
-                MatOfPoint2f approx = new MatOfPoint2f();
-                MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
-                Imgproc.approxPolyDP(contour2f, approx, 0.02 * Imgproc.arcLength(contour2f, true), true);
+              /*90도 회전*/
+//            Matrix matrix = new Matrix();
+//            matrix.postRotate(90);
+//            Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
-                if (approx.toArray().length == 4 && Imgproc.contourArea(contour) > maxArr) {
-                    maxArr = Imgproc.contourArea(contour);
-                    temp = approx;
-                }
-            }
-            if (temp != null) {
-                Rect rect = Imgproc.boundingRect(temp);
-                bitmap = Bitmap.createBitmap(bitmap, (int)rect.tl().x, (int)rect.tl().y, rect.width, rect.height);
-            }
+            img.setImageBitmap(bitmap);
+
             callCloudVision(bitmap);
         }
         else {
@@ -279,8 +299,8 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             asyncDialog.setMessage("인식중입니다..");
 
-            //show dialog
-            //asyncDialog.show();
+            /*show dialog*/
+            asyncDialog.show();
             super.onPreExecute();
         }
 
@@ -307,7 +327,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
                 intent.putExtra("result", result);
                 setResult(RESULT_OK, intent);
 
-                //finish();
+                finish();
             }
         }
     }

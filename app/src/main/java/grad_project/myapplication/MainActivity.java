@@ -44,6 +44,9 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,6 +54,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -74,7 +78,6 @@ import java.util.Locale;
 *
 */
 
-
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     boolean is_login = false;
@@ -96,10 +99,12 @@ public class MainActivity extends AppCompatActivity {
     public static Activity A_MainActivity;
 
     /***** php 통신 *****/
+    DdConnect dbConnect = new DdConnect(this);
     private static final String BASE_PATH = "http://35.221.108.183/android/";
 
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
-    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
+    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";                  //시작여부(true : 1, false : 0)
+    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";                       //전시 종료 여부 받기(true : 시간, false : 0)
+    public static final String GET_PARTICIPATION = BASE_PATH + "get_participation.php";    //관람 종료(일반관람 : 0, 전시해설 : 1)
 
     /***** 권한 *****/
     private String[] permissions = {
@@ -243,7 +248,8 @@ public class MainActivity extends AppCompatActivity {
         bt_information.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "도움말 버튼 눌림", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.i815.or.kr/2018/tour/armyVisit.do"));
+                startActivity(intent);
             }
         });
         // 오시는길 버튼
@@ -254,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         resumeActivity();
     }
 
@@ -319,10 +324,11 @@ public class MainActivity extends AppCompatActivity {
     // 관람 시작이 되었는지 여부 받아오는 메소드(연결 상태 return)
     public boolean getStartState() {
         // 관람 시작 여부
-        GetIsStartTask startTask = new GetIsStartTask(this);
         try {
-            String result = startTask.execute(GET_ISSTART, s_id).get();
-            if (result.equals("ERROR")) {
+            String result = dbConnect.execute(GET_ISSTART, s_id).get();
+            Log.d("GET_ISSTART RESULT", result);
+            if (result.equals("-1")) {
+                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
                 return false;
             } else {
                 is_start = !result.equals("0");
@@ -339,15 +345,14 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-
     public boolean isEnd() {
-        FinishTask finishTask = new FinishTask(this);
         try {
-            String result = finishTask.execute(GET_ISEND, s_id).get();
-            Log.d("ISEND RESULT", result);
-            if (result.equals("ERROR")) {
+            String result = dbConnect.execute(GET_ISEND, s_id).get();
+            Log.d("GET_ISEND RESULT", result);
+            if (result.equals("-1")) {
+                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
                 return false;
-            } else if (result.equals("0")) {
+            } else if (!result.equals("0")) {
                 is_end = false;
                 return true;
             } else {
@@ -520,11 +525,26 @@ public class MainActivity extends AppCompatActivity {
                     if (is_start) {
                         Intent intent = new Intent(MainActivity.this, NormalActivity.class);
                         intent.putExtra("Time", startDate);
-
                         startActivity(intent);
                     } else {
-                        Intent intent = new Intent(MainActivity.this, HelpActivity.class);
-                        startActivity(intent);
+                        try {
+                            String result = dbConnect.execute(GET_PARTICIPATION, s_id).get();
+                            Log.d("REGIST", result);
+                            if (result.equals("-1")) {
+                                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                            }else {
+                                if(result.equals("0")) {
+                                    Intent intent = new Intent(MainActivity.this, HelpNorActivity.class);
+                                    startActivity(intent);
+                                }
+                                else if(result.equals("1")){
+                                    Intent intent = new Intent(MainActivity.this, HelpComActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 } else {    // 네트워크 통신 오류 예외처리
                     Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
@@ -633,141 +653,5 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
     }
-
-    /***** 서버 통신 *****/
-    // 관람 시작 여부 받아오는 부분
-    public static class GetIsStartTask extends AsyncTask<String, Void, String> {
-        private WeakReference<MainActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetIsStartTask(MainActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-    }
-    // 관람 종료 여부 정보 받아오기
-    public static class FinishTask extends AsyncTask<String, Void, String> {
-        private WeakReference<MainActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        FinishTask(MainActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
-    }
-
-//    public void notification() {
-//        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
-//        contentView.setImageViewResource(R.id.image, R.mipmap.ic_launcher);
-//        contentView.setTextViewText(R.id.title, "Custom notification");
-//        contentView.setTextViewText(R.id.text, "This is a custom layout");
-//
-//        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-//                .setSmallIcon(R.drawable.logo)
-//                .setContent(contentView);
-//
-//        Notification notification = mBuilder.build();
-//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-//        notification.defaults |= Notification.DEFAULT_SOUND;
-//        notification.defaults |= Notification.DEFAULT_VIBRATE;
-//
-//        NotificationManager notificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
-//        notificationManager.notify(1, mBuilder.build());
-//    }
 }
 
