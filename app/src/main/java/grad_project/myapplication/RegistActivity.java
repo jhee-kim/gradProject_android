@@ -2,14 +2,11 @@ package grad_project.myapplication;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +17,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -32,16 +28,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RegistActivity extends AppCompatActivity {
@@ -72,11 +59,6 @@ public class RegistActivity extends AppCompatActivity {
     boolean[] b_expTime = {true, false, false};
     boolean is_dialog = false;
 
-    /***** php 통신 *****/
-    private static final String BASE_PATH = "http://35.221.108.183/android/";
-    public static final String ADD_AUDIENCE = BASE_PATH + "add_audience.php";            //관람등록(성공 1, 실패 0 반환)
-    public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";            //{"result":[{"first_time":"1","second_time":"1"}]}
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +71,6 @@ public class RegistActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
-
         et_name = findViewById(R.id.et_name);
         et_temper = findViewById(R.id.et_temper);
         sp_number_0 = findViewById(R.id.sp_number_0);
@@ -100,7 +81,6 @@ public class RegistActivity extends AppCompatActivity {
         et_destination = findViewById(R.id.et_destination);
         cb_check = findViewById(R.id.cb_check);
         sp_division = findViewById(R.id.sp_division);
-//        rg_participation = findViewById(R.id.rg_participation);
         ll_agreement = findViewById(R.id.ll_agreement);
         bt_partHelp = findViewById(R.id.bt_partHelp);
         sp_participation = findViewById(R.id.sp_participation);
@@ -204,13 +184,11 @@ public class RegistActivity extends AppCompatActivity {
             }
         });
 
-        narratorData narratortask = new narratorData(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = narratortask.execute(GET_NARRATOR).get();
-            Log.d("REGIST", result);
-            if (result.equals("0")) {
-                Toast.makeText(RegistActivity.this, "Error", Toast.LENGTH_SHORT).show();
-            } else if (result.equals("ERROR")) {
+            String result = dbConnect.execute(dbConnect.GET_NARRATOR).get();
+            Log.d("GET_NARRATOR", result);
+            if (result.equals("-1")) {
                 Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             } else {
                 JSONObject jResult = new JSONObject(result);
@@ -230,6 +208,7 @@ public class RegistActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
         }
 
         timeList = new ArrayList<String>();
@@ -420,13 +399,13 @@ public class RegistActivity extends AppCompatActivity {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 SharedPreferences.Editor editor = infoData.edit();
-                InsertData task = new InsertData(this);
+                DdConnect dbConnect = new DdConnect(this);
                 try {
-                    String result = task.execute(ADD_AUDIENCE, s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination).get();
-                    Log.d("REGIST", result);
+                    String result = dbConnect.execute(dbConnect.ADD_AUDIENCE, "", s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination).get();
+                    Log.d("ADD_AUDIENCE", result);
                     if (result.equals("0")) {
                         Toast.makeText(RegistActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                    } else if (result.equals("ERROR")) {
+                    } else if (result.equals("-1")) {
                         Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                     } else {
                         s_id = result;
@@ -441,6 +420,7 @@ public class RegistActivity extends AppCompatActivity {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -478,14 +458,12 @@ public class RegistActivity extends AppCompatActivity {
 
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("성명"))) {
-                            Log.d("성명", results.get(i+1));
                             et_name.setText(results.get(i+1));
                             break;
                         }
                     }
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("군번"))) {
-                            Log.d("군번", results.get(i+1));
                             String temp_num[] = results.get(i+1).split("-");
                             boolean is_success_sp = false;
                             for (int j = 0; j < sp_number_0.getCount(); j++) {
@@ -503,14 +481,12 @@ public class RegistActivity extends AppCompatActivity {
                     }
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("행선지"))) {
-                            Log.d("행선지", results.get(i+1));
                             et_destination.setText(results.get(i+1));
                             break;
                         }
                     }
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("소속"))) {
-                            Log.d("소속", results.get(i+1));
                             et_temper.setText(results.get(i+1));
                             break;
                         }
@@ -547,126 +523,7 @@ public class RegistActivity extends AppCompatActivity {
                         et_phone_1.setText(temp_phone[1]);
                         et_phone_2.setText(temp_phone[2]);
                     }
-                    Log.d("핸드폰", PhoneNum);
                 }
-            }
-        }
-    }
-
-    /***** 서버 통신 *****/
-    public static class InsertData extends AsyncTask<String, Void, String> {
-        private WeakReference<RegistActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        InsertData(RegistActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String number = params[1];
-            String name = params[2];
-            String participation = params[3];
-            String division = params[4];
-            String temper = params[5];
-            String phone = params[6];
-            String destination = params[7];
-            String postParameters = "&number=" + number + "&name=" + name + "&participation=" + participation + "&division=" + division + "&temper=" + temper + "&phone=" + phone + "&destination=" + destination;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
-    }
-    public static class narratorData extends AsyncTask<String, Void, String> {
-        private WeakReference<RegistActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        narratorData(RegistActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                } else {
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
             }
         }
     }

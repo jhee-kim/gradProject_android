@@ -5,24 +5,16 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 
 public class PopupMapActivity extends Activity {
 
     ImageView MuseImage;
     TextView MuseTitle, MuseSub;
     String Mus_Title, Mus_Sub;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

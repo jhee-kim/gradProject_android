@@ -1,9 +1,7 @@
 package grad_project.myapplication;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,14 +19,6 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -52,16 +42,6 @@ public class CheckActivity extends AppCompatActivity {
     private static int MESSAGE_TIMER_START = 100;
     private static int REFRESH_TIMER_START = 200;
     private static int NOWTIME_REFRESH_TIMER_START = 199;
-
-    /***** php 통신 *****/
-    private static final String BASE_PATH = "http://35.221.108.183/android/";
-
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
-    public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";          //각 전시관 별 개설 여부(JSON 형식) - ex) { "number": "1", "isOpen": "1" }
-    public static final String SET_ISEND = BASE_PATH + "set_isEnd.php";    //전시 종료 값 보내기(성공 1, 실패 0 반환)
-    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
-    public static final String GET_SURVEY = BASE_PATH + "get_survey.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
-    public static final String GET_PARTICIPATION = BASE_PATH + "get_participation.php";    //0(일반관람), 1(전시해설)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,8 +104,8 @@ public class CheckActivity extends AppCompatActivity {
         loadData();
 
         String endResult = getEndTime();
-        Log.d("CHECK_ENDRESULT", endResult);
-        if (endResult.equals("ERROR")) {
+
+        if (endResult.equals("-1")) {
             Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             finish();
         } else if (endResult.equals("0")) {
@@ -238,53 +218,48 @@ public class CheckActivity extends AppCompatActivity {
 
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.bt_toMap :
+            case R.id.bt_toMap : {
                 if (getStartState()) {
                     if (is_start) {
                         Intent intent = new Intent(CheckActivity.this, NormalActivity.class);
                         intent.putExtra("Time", l_startTime);
                         startActivity(intent);
                     } else {
-                        CheckActivity.participationData participationdata = new CheckActivity.participationData(this);
-                        try {
-                            String result = participationdata.execute(GET_PARTICIPATION, s_id).get();
-                            Log.d("REGIST", result);
-                            if (result.equals("-1")) {
-                                Toast.makeText(CheckActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                            } else if (result.equals("ERROR")) {
-                                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
-                            } else {
-                                if(result.equals("0")) {
-                                    Intent intent = new Intent(CheckActivity.this, HelpNorActivity.class);
-                                    startActivity(intent);
-                                }
-                                else if(result.equals("1")){
-                                    Intent intent = new Intent(CheckActivity.this, HelpComActivity.class);
-                                    startActivity(intent);
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                       switch (getParticipation()) {
+                           case "0": {
+                               Intent intent = new Intent(CheckActivity.this, HelpNorActivity.class);
+                               startActivity(intent);
+                               break;
+                           }
+                           case "1": {
+                               Intent intent = new Intent(CheckActivity.this, HelpComActivity.class);
+                               startActivity(intent);
+                               break;
+                           }
+                           default: {
+                               Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                               break;
+                           }
+                       }
                     }
-                } else {    // 네트워크 통신 오류 예외처리
+                } else {
                     Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                 }
-//                finish();
                 break;
+            }
             case R.id.bt_finish :
                 if (getFinish()) {
                     if (setFinish()) {
                         surveyUrl = getSurveyUrl();
-                        if (surveyUrl.equals("ERROR")) {
-                            Toast.makeText(getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                        if (surveyUrl.equals("-1")) {
+                            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                         }
                         else if (!surveyUrl.equals("0")) {
                             Intent in_survey = new Intent(CheckActivity.this, PopupSurveyActivity.class);
                             in_survey.putExtra("URL", surveyUrl);
                             startActivityForResult(in_survey, 0);
                         }
-                        else if (surveyUrl.equals("0")) {
+                        else {
                             Intent intent = new Intent(CheckActivity.this, ConfirmActivity.class);
                             startActivity(intent);
                             finish();
@@ -314,12 +289,26 @@ public class CheckActivity extends AppCompatActivity {
     }
 
     public String getEndTime() {
-        FinishTask finishTask = new FinishTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            return finishTask.execute(GET_ISEND, s_id).get();
+            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
+            Log.d("GET_ISEND", result);
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
-            return "ERROR";
+            return "-1";
+        }
+
+    }
+    public String getParticipation() {
+        DdConnect dbConnect = new DdConnect(this);
+        try {
+            String result = dbConnect.execute(dbConnect.GET_PARTICIPATION, s_id).get();
+            Log.d("GET_PARTICIPATION", result);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "-1";
         }
     }
 
@@ -365,7 +354,6 @@ public class CheckActivity extends AppCompatActivity {
     }
 
     public void getTimeRefresh() {
-//        getNowTime();
         nowTimeRefresh();
 
         if (is_start) {
@@ -378,7 +366,6 @@ public class CheckActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-//                    tv_nowTime.setText(s_nowTime);
                     tv_elapsedTime.setText(s_elapseTime);
                 }
             });
@@ -386,7 +373,6 @@ public class CheckActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-//                    tv_nowTime.setText(s_nowTime);
                     tv_elapsedTime.setText("");
                 }
             });
@@ -398,7 +384,6 @@ public class CheckActivity extends AppCompatActivity {
         Date nowDate = new Date(l_nowTime);
         SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
         s_nowTime = sdfNow.format(nowDate);
-        Log.d("CURRENT TIME", s_nowTime);
     }
 
     // 3초 단위로 시작 여부 서버에서 받아옴
@@ -417,7 +402,6 @@ public class CheckActivity extends AppCompatActivity {
                         l_startTime = getStartTime();
                         getTimeData();
                         onResume();
-                        Log.d("REFRESH", "RUNNING");
                     } else {
                         this.sendEmptyMessageDelayed(REFRESH_TIMER_START, 1000);
                     }
@@ -433,15 +417,13 @@ public class CheckActivity extends AppCompatActivity {
     }
 
     public boolean getStartState() {
-        GetIsStartTask startTask = new GetIsStartTask(CheckActivity.this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = startTask.execute(GET_ISSTART, s_id).get();
-            if (result.equals("ERROR")) {
-                return false;
-            } else {
+            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+            Log.d("GET_ISSTART", result);
+            if (!result.equals("-1")) {
                 is_start = !result.equals("0");
                 getTimeRefresh();
-                Log.d("ISSTART", Boolean.toString(is_start));
                 return true;
             }
         } catch (Exception e) {
@@ -476,21 +458,15 @@ public class CheckActivity extends AppCompatActivity {
         }
     }
 
-    /* DB-서버 통신 파트 */
-    // 관람 시작이 되었는지 여부 받아오는 메소드
     public long getStartTime() {
-        // 관람 시작 여부
-        GetIsStartTask startTask = new GetIsStartTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = startTask.execute(GET_ISSTART, s_id).get();
+            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+            Log.d("GET_ISSTART", result);
             is_start = !result.equals("0");
-            if (result.equals("ERROR")) {
-                is_start = false;
-            }
             if (is_start) {
                 SimpleDateFormat sdfStart = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
                 long time = sdfStart.parse(result).getTime();
-                Log.d("ISSTART", Long.toString(time));
                 return time;
             }
         } catch (Exception e) {
@@ -498,349 +474,59 @@ public class CheckActivity extends AppCompatActivity {
         }
         return -1;
     }
-
-    // 관람 종료 설정하는 메소드
     public boolean setFinish() {
-        FinishTask finishTask = new FinishTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = finishTask.execute(SET_ISEND, s_id).get();
-            if (result.equals("0")) {
-                Toast.makeText(getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            else if (result.equals("1")) {
+            String result = dbConnect.execute(dbConnect.SET_ISEND, s_id).get();
+            Log.d("SET_ISEND", result);
+            if (result.equals("1")) {
                 Toast.makeText(getApplicationContext(), "관람 종료 확인이 되었습니다.", Toast.LENGTH_SHORT).show();
                 return true;
-            } else {
-                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
-    // DB 전시관 데이터 받아오기
     public boolean getExhibitionData() {
-        // 전시관 오픈 여부
-        GetExhibitionTask task = new GetExhibitionTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = task.execute(GET_EXHIBITION).get();
-            Log.d("Exhibition", result);
-            JSONObject jResult = new JSONObject(result);
-            JSONArray jArray = jResult.getJSONArray("result");
-            Log.d("ARRAY LENGTH", Integer.toString(jArray.length()));
-            for (int i = 0; i < jArray.length(); i++) {
-                JSONObject jObject = jArray.getJSONObject(i);
-                exhibitionState[i] = jObject.getString("isOpen");
-                Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
+            String result = dbConnect.execute(dbConnect.GET_EXHIBITION).get();
+            Log.d("GET_EXHIBITION", result);
+            if(!result.equals("-1")) {
+                JSONObject jResult = new JSONObject(result);
+                JSONArray jArray = jResult.getJSONArray("result");
+                for (int i = 0; i < jArray.length(); i++) {
+                    JSONObject jObject = jArray.getJSONObject(i);
+                    exhibitionState[i] = jObject.getString("isOpen");
+                    Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
+                }
+                return true;
             }
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
-    // 설문조사 주소 받아오기
     public String getSurveyUrl() {
-        // 전시관 오픈 여부
-        GetSurveyTask task = new GetSurveyTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = task.execute(GET_SURVEY).get();
-            Log.d("SURVEY", result);
-            JSONObject jResult = new JSONObject(result);
-            JSONArray jArray = jResult.getJSONArray("result");
-            JSONObject jObject = jArray.getJSONObject(0);
-            surveyState = jObject.getString("is_exist").equals("1");
-            if (surveyState) {
-                return jObject.getString("url");
-            } else {
-                return "0";
+            String result = dbConnect.execute(dbConnect.GET_SURVEY).get();
+            Log.d("GET_SURVEY", result);
+            if(!result.equals("-1")) {
+                JSONObject jResult = new JSONObject(result);
+                JSONArray jArray = jResult.getJSONArray("result");
+                JSONObject jObject = jArray.getJSONObject(0);
+                surveyState = jObject.getString("is_exist").equals("1");
+                if (surveyState) {
+                    return jObject.getString("url");
+                } else {
+                    return "0";
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return "ERROR";
         }
-    }
-    /***** 서버 통신 *****/
-    // 관람 시작 여부 받아오는 부분
-    public static class GetIsStartTask extends AsyncTask<String, Void, String> {
-        private WeakReference<CheckActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetIsStartTask(CheckActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
-    }
-
-    // 전시관 오픈 여부 받아오는 부분
-    public static class GetExhibitionTask extends AsyncTask<String, Void, String> {
-        private WeakReference<CheckActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetExhibitionTask(CheckActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-    }
-
-    // 관람 종료시 데이터 전송, 관람 종료 여부 정보 받아오기
-    public static class FinishTask extends AsyncTask<String, Void, String> {
-        private WeakReference<CheckActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        FinishTask(CheckActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
-    }
-
-    // 설문조사 여부 및 주소 받아오기
-    public static class GetSurveyTask extends AsyncTask<String, Void, String> {
-        private WeakReference<CheckActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetSurveyTask(CheckActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
-    }
-    public static class participationData extends AsyncTask<String, Void, String> {
-        private WeakReference<CheckActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        participationData(CheckActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
+        return "-1";
     }
 }

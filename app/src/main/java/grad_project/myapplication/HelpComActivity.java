@@ -1,30 +1,16 @@
 package grad_project.myapplication;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 
 public class HelpComActivity extends AppCompatActivity {
 
@@ -40,11 +26,17 @@ public class HelpComActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
-        TextView tv = (TextView)findViewById(R.id.tv_red);
-        String str = "● 지참물 : 휴가증(외박증, 외출증 미적용)";
-        SpannableStringBuilder ssb = new SpannableStringBuilder(str);
-        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#FF0000")), 8, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tv.setText(ssb);
+        TextView tv1 = (TextView)findViewById(R.id.tv_red1);
+        String str1 = "● 지참물 : 휴가증 필참\n                 (육군은 외박, 외출 제외)";
+        SpannableStringBuilder ssb1 = new SpannableStringBuilder(str1);
+        ssb1.setSpan(new ForegroundColorSpan(Color.parseColor("#FF0000")), 8, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tv1.setText(ssb1);
+
+        TextView tv2 = (TextView)findViewById(R.id.tv_red2);
+        String str2 = "● 인원제한 : 선착순으로 등록이 진행됨";
+        SpannableStringBuilder ssb2 = new SpannableStringBuilder(str2);
+        ssb2.setSpan(new ForegroundColorSpan(Color.parseColor("#FF0000")), 9, 12, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tv2.setText(ssb2);
 
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
         bt_back_layout.setOnClickListener(new View.OnClickListener() {

@@ -3,33 +3,17 @@ package grad_project.myapplication;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.ResultReceiver;
 import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -37,24 +21,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -97,14 +68,6 @@ public class MainActivity extends AppCompatActivity {
     boolean is_notiService = false;
 
     public static Activity A_MainActivity;
-
-    /***** php 통신 *****/
-    DdConnect dbConnect = new DdConnect(this);
-    private static final String BASE_PATH = "http://35.221.108.183/android/";
-
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";                  //시작여부(true : 1, false : 0)
-    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";                       //전시 종료 여부 받기(true : 시간, false : 0)
-    public static final String GET_PARTICIPATION = BASE_PATH + "get_participation.php";    //관람 종료(일반관람 : 0, 전시해설 : 1)
 
     /***** 권한 *****/
     private String[] permissions = {
@@ -280,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-
-        Log.d("RESTART", "onRestart()");
         resumeActivity();
     }
     @Override
@@ -320,23 +281,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /* DB-서버 통신 파트 */
-    // 관람 시작이 되었는지 여부 받아오는 메소드(연결 상태 return)
     public boolean getStartState() {
-        // 관람 시작 여부
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(GET_ISSTART, s_id).get();
-            Log.d("GET_ISSTART RESULT", result);
-            if (result.equals("-1")) {
-                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                return false;
-            } else {
+            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+            Log.d("GET_ISSTART", result);
+            if (!result.equals("-1")) {
                 is_start = !result.equals("0");
                 if (is_start) {
                     SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
                     startDate = df.parse(result).getTime();
                 }
-                Log.d("ISSTART", String.valueOf(startDate));
                 return true;
             }
         } catch (Exception e) {
@@ -346,25 +301,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isEnd() {
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(GET_ISEND, s_id).get();
-            Log.d("GET_ISEND RESULT", result);
-            if (result.equals("-1")) {
-                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                return false;
-            } else if (!result.equals("0")) {
-                is_end = false;
-                return true;
-            } else {
-                is_end = true;
-                return true;
+            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
+            Log.d("GET_ISEND", result);
+            if (!result.equals("-1")) {
+                if (result.equals("0")) {
+                    is_end = false;
+                    return true;
+                } else {
+                    is_end = true;
+                    return true;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+        }
+        return false;
+    }
+    public String getParticipation() {
+        DdConnect dbConnect = new DdConnect(this);
+        try {
+            String result = dbConnect.execute(dbConnect.GET_PARTICIPATION, s_id).get();
+            Log.d("GET_PARTICIPATION", result);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "-1";
         }
     }
-
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
 
@@ -456,8 +421,6 @@ public class MainActivity extends AppCompatActivity {
             bt_logout.setVisibility(View.INVISIBLE);
         }
 
-        Log.d("STATE", Boolean.toString(is_start));
-
         /* 메뉴 버튼 온클릭리스너 설정 */
 
         // 내 정보 버튼
@@ -496,8 +459,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 is_login = true;
-                Log.d("LOGIN COMPLETE", s_id);
-
             }
         }
         // 최초 등록 완료했을 경우(자동 로그인 됨)
@@ -510,7 +471,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
                 drawerLayout.closeDrawer(slideView);
-                Log.d("DRAWER", "CLOSING");
                 is_menuOpen = false;
             }
         }
@@ -527,23 +487,21 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("Time", startDate);
                         startActivity(intent);
                     } else {
-                        try {
-                            String result = dbConnect.execute(GET_PARTICIPATION, s_id).get();
-                            Log.d("REGIST", result);
-                            if (result.equals("-1")) {
-                                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                            }else {
-                                if(result.equals("0")) {
-                                    Intent intent = new Intent(MainActivity.this, HelpNorActivity.class);
-                                    startActivity(intent);
-                                }
-                                else if(result.equals("1")){
-                                    Intent intent = new Intent(MainActivity.this, HelpComActivity.class);
-                                    startActivity(intent);
-                                }
+                        switch (getParticipation()) {
+                            case "0": {
+                                Intent intent = new Intent(MainActivity.this, HelpNorActivity.class);
+                                startActivity(intent);
+                                break;
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            case "1": {
+                                Intent intent = new Intent(MainActivity.this, HelpComActivity.class);
+                                startActivity(intent);
+                                break;
+                            }
+                            default: {
+                                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                                break;
+                            }
                         }
                     }
                 } else {    // 네트워크 통신 오류 예외처리

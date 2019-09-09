@@ -1,4 +1,5 @@
 package grad_project.myapplication;
+
 import android.content.ContentValues;
 import java.io.BufferedReader;
 import java.io.IOException;

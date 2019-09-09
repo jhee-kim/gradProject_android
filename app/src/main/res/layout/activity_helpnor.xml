@@ -52,6 +52,8 @@
         android:layout_below="@+id/title_help"
         android:layout_marginTop="20dp">
 
+
+
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,11 +65,23 @@
 
             <TableRow>
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:text="일반관람 등록안내"
+                    android:textSize="23sp"
+                    android:textColor="#000">
+                </TextView>
+            </TableRow>
+
+            <TableRow>
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:fontFamily="@font/m_gothic_bold"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginBottom="10dp"
                     android:text="관람등록처"
                     android:textSize="21sp" />
@@ -97,7 +111,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="25dp"
-                    android:text="정기 휴관일 : 월요일 이용불가\n                       (공휴일인 경우 가능)"
+                    android:text="정기 휴관일 : 월요일 이용불가\n                      (공휴일인 경우 가능)"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp" />
             </TableRow>
@@ -127,6 +141,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
                     android:text="● 관람확인 : 각 전시관 별 QR코드 확인"
+                    android:textSize="15sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="                  각 전시관 별 전시물 사진 확인"
                     android:textSize="15sp" />
             </TableRow>
 
