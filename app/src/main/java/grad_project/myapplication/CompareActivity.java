@@ -180,7 +180,9 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         //if ( matResult != null ) matResult.release(); fix 2018. 8. 18
         if ( matResult == null )
             matResult = new Mat(matInput.rows(), matInput.cols(), matInput.type());
-        //ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+
+        ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+
         return matResult;
     }
 
