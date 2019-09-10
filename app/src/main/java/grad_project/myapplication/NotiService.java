@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -21,12 +20,6 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -84,12 +77,6 @@ public class NotiService extends Service {
     final int LOCATION_DELAY = 10; // 위치검사 시간 간격 : 값 변경할 때는 초 단위로 변경
     LocationTimerHandler locationTimerHandler;
     final int LOCATION_TIMER_START = 300;
-
-    /***** php 통신 *****/
-    private static final String BASE_PATH = "http://35.221.108.183/android/";
-
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
-    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
 
     class NotiBinder extends Binder {
         NotiService getService() {
@@ -518,17 +505,12 @@ public class NotiService extends Service {
         notiManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    /* DB-서버 통신 파트 */
-    // 관람 시작이 되었는지 여부 받아오는 메소드(연결 상태 return)
     public boolean getStartState() {
-        // 관람 시작 여부
-        GetIsStartTask startTask = new GetIsStartTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = startTask.execute(GET_ISSTART, s_id).get();
-            Log.d("GETSTART RESULT", result);
-            if (result.equals("ERROR")) {
-                return false;
-            } else {
+            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+            Log.d("GET_ISSTART", result);
+            if (!result.equals("-1")) {
                 is_start = !result.equals("0");
                 if (is_start) {
                     SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
@@ -543,13 +525,11 @@ public class NotiService extends Service {
     }
 
     public boolean isEnd() {
-        FinishTask finishTask = new FinishTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = finishTask.execute(GET_ISEND, s_id).get();
-            Log.d("ISEND RESULT", result);
-            if (result.equals("ERROR")) {
-                return false;
-            } else {
+            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
+            Log.d("GET_ISEND", result);
+            if (!result.equals("-1")) {
                 is_end = !result.equals("0");
                 return true;
             }
@@ -557,112 +537,5 @@ public class NotiService extends Service {
             e.printStackTrace();
         }
         return false;
-    }
-
-    /***** 서버 통신 *****/
-    // 관람 시작 여부 받아오는 부분
-    public static class GetIsStartTask extends AsyncTask<String, Void, String> {
-
-        GetIsStartTask(NotiService context) {
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-    }
-
-    // 관람 종료 여부 정보 받아오기
-    public static class FinishTask extends AsyncTask<String, Void, String> {
-
-        FinishTask(NotiService context) {
-
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
     }
 }

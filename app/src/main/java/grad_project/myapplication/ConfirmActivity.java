@@ -1,16 +1,11 @@
 package grad_project.myapplication;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
@@ -23,16 +18,9 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,11 +31,6 @@ import static android.os.Environment.DIRECTORY_DCIM;
 public class ConfirmActivity extends AppCompatActivity {
     String s_id, s_name, s_number, s_phone, s_temper, s_destination, s_participation, s_division, s_startDate;
     TextView tv_participation, tv_name, tv_start, tv_date1, tv_date2;
-
-    /***** php 통신 *****/
-    private static final String BASE_PATH = "http://35.221.108.183/android/";
-    public static final String GET_AUDIENCE = BASE_PATH + "get_audience.php";             //사용자 정보 데이터 가져오기
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 시작 시간, 실패 0 반환)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +54,7 @@ public class ConfirmActivity extends AppCompatActivity {
         SharedPreferences infoData;
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
         s_id = infoData.getString("ID", "");
-        if (getStartState()) {
+        if (getStartState() && getEndDate()) {
             if(getUserData()) {
                 tv_participation = findViewById(R.id.tv_participation);
                 tv_name = findViewById(R.id.tv_name);
@@ -137,14 +120,12 @@ public class ConfirmActivity extends AppCompatActivity {
         }
     }
 
-    // DB에서 데이터 새로 받아오는 메소드
     public boolean getUserData() {
-        GetUserData task = new GetUserData(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = task.execute(GET_AUDIENCE, s_id).get();
-            if (result.equals("ERROR")) {
-                return false;
-            } else {
+            String result = dbConnect.execute(dbConnect.GET_AUDIENCE, s_id).get();
+            Log.d("GET_AUDIENCE", result);
+            if (!result.equals("-1")) {
                 JSONObject jResult = new JSONObject(result);
                 JSONArray jArray = jResult.getJSONArray("result");
                 JSONObject jObject = jArray.getJSONObject(0);
@@ -155,24 +136,19 @@ public class ConfirmActivity extends AppCompatActivity {
                 s_division = jObject.getString("division");
                 s_temper = jObject.getString("temper");
                 s_destination = jObject.getString("destination");
+                return true;
             }
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
-    /* DB-서버 통신 파트 */
-    // 관람 시작이 되었는지 여부 받아오는 메소드
     public boolean getStartState() {
-        // 관람 시작 여부
-        GetIsStartTask startTask = new GetIsStartTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = startTask.execute(GET_ISSTART, s_id).get();
-            Log.d("CONFIRM result", result);
-            if (result.equals("ERROR")) {
-                return false;
-            } else if (!result.equals("0")) {
+            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+            Log.d("GET_ISSTART", result);
+            if (!result.equals("-1") && !result.equals("0")) {
                 Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).parse(result);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd\n(HH:mm)", Locale.KOREA);
                 s_startDate = sdf.format(date);
@@ -180,127 +156,20 @@ public class ConfirmActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("CONNECTION ERROR", "start state");
         }
         return false;
     }
-
-    /***** 서버 통신 *****/
-    // 사용자 데이터 받아오는 부분
-    public static class GetUserData extends AsyncTask<String, Void, String> {
-        private WeakReference<ConfirmActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetUserData(ConfirmActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
+    public boolean getEndDate() {
+        DdConnect dbConnect = new DdConnect(this);
+        try {
+            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
+            Log.d("GET_ISEND", result);
+            if (!result.equals("-1") && !result.equals("0")) {
+                return true;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    }
-    /***** 서버 통신 *****/
-    // 관람 시작 여부 받아오는 부분
-    public static class GetIsStartTask extends AsyncTask<String, Void, String> {
-        private WeakReference<ConfirmActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetIsStartTask(ConfirmActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
+        return false;
     }
 }

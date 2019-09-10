@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/title_help"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <RelativeLayout
+            android:id="@+id/bt_back_layout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true" >
+
+            <ImageButton
+                android:id="@+id/bt_back"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/title_back"
+                android:scaleType="fitCenter"
+                android:onClick="onBack"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/bt_back_layout"
+            android:layout_marginStart="5dp"
+            android:layout_centerVertical="true"
+            android:text="@string/regist_info_str"
+            android:textSize="24sp"
+            android:fontFamily="@font/m_gothic_extrabold"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/menubar"
+        android:layout_below="@id/title_help"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/title_help"
+        android:layout_marginTop="20dp">
+
+
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal">
+
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:text="일반관람 등록안내"
+                    android:textSize="23sp"
+                    android:textColor="#000">
+                </TextView>
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="관람등록처"
+                    android:textSize="21sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="● 종합안내센터(주차장 옆)"
+                    android:textSize="16sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="※국군병사 휴가 프로그램 등록은 현장 접수만 가능합니다."
+                    android:textColor="#A4A4A4"
+                    android:textSize="16sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:text="정기 휴관일 : 월요일 이용불가\n                      (공휴일인 경우 가능)"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:layout_marginBottom="10dp"
+                    android:text="필수사항"
+                    android:textSize="21sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="● 관람시간 : 2시간 이상"
+                    android:textSize="15sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="● 관람확인 : 각 전시관 별 QR코드 확인"
+                    android:textSize="15sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="                  각 전시관 별 전시물 사진 확인"
+                    android:textSize="15sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:id="@+id/tv_red"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:textSize="15sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/m_gothic_bold"
+                    android:text="등록시간"
+                    android:textSize="21sp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra ="5dp"
+                    android:text="● 하절기(3월~10월) : 15:50 이전
+                         \n● 동절기(11월~2월) : 14:50 이전"
+                    android:textSize="15sp" />
+            </TableRow>
+
+        </TableLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -26,13 +26,11 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
@@ -41,20 +39,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -78,7 +67,6 @@ import java.util.Locale;
 *
 */
 
-
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     boolean is_login = false;
@@ -98,12 +86,6 @@ public class MainActivity extends AppCompatActivity {
     boolean is_notification = false;
 
     public static Activity A_MainActivity;
-
-    /***** php 통신 *****/
-    private static final String BASE_PATH = "http://35.221.108.183/android/";
-
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";              //시작여부(성공 1, 실패 0 반환)
-    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";    //전시 종료 여부 받기(종료됨 : 시간, 종료안됨 : 0)
 
     /***** 권한 *****/
     private String[] permissions = {
@@ -257,7 +239,8 @@ public class MainActivity extends AppCompatActivity {
         bt_information.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "도움말 버튼 눌림", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.i815.or.kr/2018/tour/armyVisit.do"));
+                startActivity(intent);
             }
         });
         // 오시는길 버튼
@@ -268,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         resumeActivity();
     }
 
@@ -296,8 +278,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-
-        Log.d("RESTART", "onRestart()");
         resumeActivity();
     }
 
@@ -356,19 +336,16 @@ public class MainActivity extends AppCompatActivity {
     /* DB-서버 통신 파트 */
     // 관람 시작이 되었는지 여부 받아오는 메소드(연결 상태 return)
     public boolean getStartState() {
-        // 관람 시작 여부
-        GetIsStartTask startTask = new GetIsStartTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = startTask.execute(GET_ISSTART, s_id).get();
-            if (result.equals("ERROR")) {
-                return false;
-            } else {
+            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+            Log.d("GET_ISSTART", result);
+            if (!result.equals("-1")) {
                 is_start = !result.equals("0");
                 if (is_start) {
                     SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
                     startDate = df.parse(result).getTime();
                 }
-                Log.d("ISSTART", String.valueOf(startDate));
                 return true;
             }
         } catch (Exception e) {
@@ -377,27 +354,36 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-
     public boolean isEnd() {
-        FinishTask finishTask = new FinishTask(this);
+        DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = finishTask.execute(GET_ISEND, s_id).get();
-            Log.d("ISEND RESULT", result);
-            if (result.equals("ERROR")) {
-                return false;
-            } else if (result.equals("0")) {
-                is_end = false;
-                return true;
-            } else {
-                is_end = true;
-                return true;
+            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
+            Log.d("GET_ISEND", result);
+            if (!result.equals("-1")) {
+                if (result.equals("0")) {
+                    is_end = false;
+                    return true;
+                } else {
+                    is_end = true;
+                    return true;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+        }
+        return false;
+    }
+    public String getParticipation() {
+        DdConnect dbConnect = new DdConnect(this);
+        try {
+            String result = dbConnect.execute(dbConnect.GET_PARTICIPATION, s_id).get();
+            Log.d("GET_PARTICIPATION", result);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "-1";
         }
     }
-
     // 액티비티 내용 새로고침 하는 메소드
     public void resumeActivity() {
 
@@ -506,8 +492,6 @@ public class MainActivity extends AppCompatActivity {
             bt_logout.setVisibility(View.INVISIBLE);
         }
 
-        Log.d("STATE", Boolean.toString(is_start));
-
         /* 메뉴 버튼 온클릭리스너 설정 */
 
         // 내 정보 버튼
@@ -545,10 +529,8 @@ public class MainActivity extends AppCompatActivity {
         // 로그인 완료했을 경우
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-//                is_login = true;
                 startNotiService();
                 Log.d("LOGIN COMPLETE", s_id);
-
             }
         }
         // 최초 등록 완료했을 경우(자동 로그인 됨)
@@ -561,7 +543,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
                 drawerLayout.closeDrawer(slideView);
-                Log.d("DRAWER", "CLOSING");
                 is_menuOpen = false;
             }
         }
@@ -585,11 +566,24 @@ public class MainActivity extends AppCompatActivity {
                     if (is_start) {
                         Intent intent = new Intent(MainActivity.this, NormalActivity.class);
                         intent.putExtra("Time", startDate);
-
                         startActivity(intent);
                     } else {
-                        Intent intent = new Intent(MainActivity.this, HelpActivity.class);
-                        startActivity(intent);
+                        switch (getParticipation()) {
+                            case "0": {
+                                Intent intent = new Intent(MainActivity.this, HelpNorActivity.class);
+                                startActivity(intent);
+                                break;
+                            }
+                            case "1": {
+                                Intent intent = new Intent(MainActivity.this, HelpComActivity.class);
+                                startActivity(intent);
+                                break;
+                            }
+                            default: {
+                                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                                break;
+                            }
+                        }
                     }
                 } else {    // 네트워크 통신 오류 예외처리
                     Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
@@ -709,141 +703,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
-    /***** 서버 통신 *****/
-    // 관람 시작 여부 받아오는 부분
-    public static class GetIsStartTask extends AsyncTask<String, Void, String> {
-        private WeakReference<MainActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetIsStartTask(MainActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-    }
-    // 관람 종료 여부 정보 받아오기
-    public static class FinishTask extends AsyncTask<String, Void, String> {
-        private WeakReference<MainActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        FinishTask(MainActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            String id = params[1];
-            String postParameters = "&id=" + id;
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "ERROR";
-            }
-        }
-    }
-
-//    public void notification() {
-//        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
-//        contentView.setImageViewResource(R.id.image, R.mipmap.ic_launcher);
-//        contentView.setTextViewText(R.id.title, "Custom notification");
-//        contentView.setTextViewText(R.id.text, "This is a custom layout");
-//
-//        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-//                .setSmallIcon(R.drawable.logo)
-//                .setContent(contentView);
-//
-//        Notification notification = mBuilder.build();
-//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-//        notification.defaults |= Notification.DEFAULT_SOUND;
-//        notification.defaults |= Notification.DEFAULT_VIBRATE;
-//
-//        NotificationManager notificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
-//        notificationManager.notify(1, mBuilder.build());
-//    }
 }
 

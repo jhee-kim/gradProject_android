@@ -1,7 +1,6 @@
 package grad_project.myapplication;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,7 +11,6 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -40,13 +38,6 @@ import net.daum.mf.map.api.MapView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +51,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     private TextView listCountTv;
     private ViewGroup mapViewContainer;
     private ListView questViewContainer;
+    ImageButton gps_but;
     private MapView mapView;
     private int Mode;
     private boolean ToggleGps = false;
@@ -79,13 +71,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
     int zoomLevel = -2;
 
-    /***** php 통신 *****/
-    private static final String BASE_PATH = "http://35.221.108.183/android/";
-
-    public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";          //각 전시관 별 개설 여부(JSON 형식) - ex) { "number": "1", "isOpen": "1" }
-    public static final String GET_QR = BASE_PATH + "get_qr.php";                              //각 전시관 별 qr코드 파일 위치(JSON 형식) - ex) { "number": "1", "address": "http://35.221.108.183/QR/1.png" }
-//    public static final String GET_RSSID = BASE_PATH + "get_mac.php";                        //각 전시관 별 RSSI(JSON 형식) - ex) { "number": "1", "mac": "00:70:69:47:2F:30" }
-
     /*** list test ***/
     String qTitle[] = {"제1전시관", "제2전시관", "제3전시관", "제4전시관", "제5전시관", "제6전시관"};
     String qDescription[] = {"제1전시관", "제2전시관", "제3전시관", "제4전시관", "제5전시관", "제6전시관"};
@@ -98,8 +83,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
         questViewContainer = (ListView) findViewById(R.id.questList);
         listCountTv = (TextView)findViewById(R.id.list_count_tv);
+        gps_but = (ImageButton)findViewById(R.id.location);
 
-        /*테스트*/
         listCountTv.setText("10");
         listCountTv.setVisibility(View.VISIBLE);
 
@@ -213,7 +198,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             longitude = location.getLongitude();
             latitude = location.getLatitude();
             altitude = location.getAltitude();
-            Log.d("gps","위치정보 : " + provider + "\n" + "위도 : " + longitude + "\n" + "경도 : " + latitude + "\n" + "고도  : " + altitude);
             curPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
             setGpsTracking();
             checkBoundary();
@@ -231,7 +215,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         for (int i = 0; i < 6; i++) {
             int num = i + 1;
             isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_" + num, false);
-            Log.d("isCheckQrArr" + num, String.valueOf(isCheckQrArr[i]));
         }
         isShowTutorial = infoData.getBoolean("IS_SHOW_TUTORIAL", false);
     }
@@ -239,35 +222,45 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     // DB 전시관 데이터 받아오기
     public void getExhibitionData() {
         // 전시관 오픈 여부
-        GetExhibitionTask task = new GetExhibitionTask(this);
+        DdConnect dbConnect1 = new DdConnect(this);
         try {
-            String result = task.execute(GET_EXHIBITION).get();
-            Log.d("Exhibition", result);
-            JSONObject jResult = new JSONObject(result);
-            JSONArray jArray = jResult.getJSONArray("result");
-            Log.d("ARRAY LENGTH", Integer.toString(jArray.length()));
-            for (int i = 0; i < jArray.length(); i++) {
-                JSONObject jObject = jArray.getJSONObject(i);
-                exhibitionState[i] = jObject.getString("isOpen");
-                Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
+            String result = dbConnect1.execute(dbConnect1.GET_EXHIBITION).get();
+            Log.d("GET_EXHIBITION", result);
+            if(!result.equals("-1")) {
+                JSONObject jResult = new JSONObject(result);
+                JSONArray jArray = jResult.getJSONArray("result");
+                for (int i = 0; i < jArray.length(); i++) {
+                    JSONObject jObject = jArray.getJSONObject(i);
+                    exhibitionState[i] = jObject.getString("isOpen");
+                }
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
         }
 
         // 전시관 QR코드
-        GetExhibitionQrTask qrTask = new GetExhibitionQrTask(this);
+        DdConnect dbConnect2 = new DdConnect(this);
         try {
-            String result = qrTask.execute(GET_QR).get();
-            JSONObject jResult = new JSONObject(result);
-            JSONArray jArray = jResult.getJSONArray("result");
-            for (int i = 0; i < jArray.length(); i++) {
-                JSONObject jObject = jArray.getJSONObject(i);
-                exhibitionQrCode[i] = jObject.getString("address");
-                Log.d("EXHIBITION_QRCODE", exhibitionQrCode[i]);
+            String result = dbConnect2.execute(dbConnect2.GET_QR).get();
+            Log.d("GET_QR", result);
+            if(!result.equals("-1")) {
+                JSONObject jResult = new JSONObject(result);
+                JSONArray jArray = jResult.getJSONArray("result");
+                for (int i = 0; i < jArray.length(); i++) {
+                    JSONObject jObject = jArray.getJSONObject(i);
+                    exhibitionQrCode[i] = jObject.getString("address");
+                }
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -514,6 +507,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void setTogglebut(int Mode) {
         mapViewContainer.setVisibility(View.GONE);
         questViewContainer.setVisibility(View.GONE);
+        gps_but.setVisibility(View.GONE);
 
         ImageButton[] imgBut = new ImageButton[5];
         imgBut[0] = findViewById(R.id.in_exhibition);
@@ -544,6 +538,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[3].setBackgroundResource(R.drawable.store_off);
                 imgBut[4].setBackgroundResource(R.drawable.list_off);
                 mapViewContainer.setVisibility(View.VISIBLE);
+                gps_but.setVisibility(View.VISIBLE);
                 break;
             }
             case 1 : {
@@ -553,6 +548,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[3].setBackgroundResource(R.drawable.store_off);
                 imgBut[4].setBackgroundResource(R.drawable.list_off);
                 mapViewContainer.setVisibility(View.VISIBLE);
+                gps_but.setVisibility(View.VISIBLE);
                 break;
             }
             case 2 : {
@@ -562,6 +558,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[3].setBackgroundResource(R.drawable.store_off);
                 imgBut[4].setBackgroundResource(R.drawable.list_off);
                 mapViewContainer.setVisibility(View.VISIBLE);
+                gps_but.setVisibility(View.VISIBLE);
                 break;
             }
             case 3 : {
@@ -571,6 +568,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 imgBut[3].setBackgroundResource(R.drawable.store_on);
                 imgBut[4].setBackgroundResource(R.drawable.list_off);
                 mapViewContainer.setVisibility(View.VISIBLE);
+                gps_but.setVisibility(View.VISIBLE);
                 break;
             }
             case 4 : {
@@ -673,116 +671,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void onMapViewMoveFinished(MapView mapView, MapPoint mapPoint) {
 
     }
-
-    // 전시관 오픈 여부 받아오는 부분
-    public static class GetExhibitionTask extends AsyncTask<String, Void, String> {
-        private WeakReference<NormalActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetExhibitionTask(NormalActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                } else {
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-    }
-
-    // 전시관 QR코드 정보 받아오는 부분
-    public static class GetExhibitionQrTask extends AsyncTask<String, Void, String> {
-        private WeakReference<NormalActivity> activityReference;
-        ProgressDialog progressDialog;
-
-        GetExhibitionQrTask(NormalActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(activityReference.get(),
-                    "Please Wait", null, true, true);
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            /*출력값*/
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String serverURL = params[0];
-            try {
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                InputStream inputStream;
-                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                } else {
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    sb.append(line);
-                }
-                bufferedReader.close();
-                return sb.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-    }
     public void initBitmap() {
         gps_tracking = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.gps_tracking);
         gps_tracking = Bitmap.createScaledBitmap(gps_tracking, 100, 100, true);
@@ -859,7 +747,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
         }
 
-        //list test
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
