@@ -45,9 +45,10 @@ public class DdConnect extends AsyncTask<String, Void, String> {
     public static final String GET_NARRATOR = BASE_PATH+ "get_narrator.php";
     public static final String GET_SURVEY = "get_survey.php";
 
-    private WeakReference<Context> activityReference;
+    private WeakReference<Context> activityReference = null;
     private ProgressDialog progressDialog;
 
+    DdConnect() {}
     DdConnect(Context context) {
         activityReference = new WeakReference<>(context);
     }
@@ -55,9 +56,12 @@ public class DdConnect extends AsyncTask<String, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog = ProgressDialog.show(activityReference.get(),
-                "Please Wait", null, true, true);
+        if (activityReference != null) {
+            progressDialog = ProgressDialog.show(activityReference.get(),
+                    "Please Wait", null, true, true);
+        }
     }
+
     @Override
     protected String doInBackground(String... params) {
         String serverURL = params.length>0?params[0]:"";
@@ -112,7 +116,9 @@ public class DdConnect extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        progressDialog.dismiss();
+        if (activityReference != null) {
+            progressDialog.dismiss();
+        }
     }
 }
 

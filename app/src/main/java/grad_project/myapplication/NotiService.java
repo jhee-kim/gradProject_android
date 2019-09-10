@@ -506,7 +506,7 @@ public class NotiService extends Service {
     }
 
     public boolean getStartState() {
-        DdConnect dbConnect = new DdConnect(this);
+        DdConnect dbConnect = new DdConnect();
         try {
             String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
             Log.d("GET_ISSTART", result);
@@ -525,7 +525,7 @@ public class NotiService extends Service {
     }
 
     public boolean isEnd() {
-        DdConnect dbConnect = new DdConnect(this);
+        DdConnect dbConnect = new DdConnect();
         try {
             String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
             Log.d("GET_ISEND", result);
