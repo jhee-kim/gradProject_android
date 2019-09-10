@@ -411,7 +411,7 @@ public class RegistActivity extends AppCompatActivity {
                         s_id = result;
                         Toast.makeText(RegistActivity.this, "등록 완료되었습니다.", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegistActivity.this, MainActivity.class);
-                        editor.putBoolean("IS_AUTOLOGIN", true);
+                        editor.putBoolean("IS_LOGIN", true);
                         editor.putString("ID", s_id);
                         editor.putString("NAME", s_name);
                         editor.apply();

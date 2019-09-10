@@ -2,19 +2,37 @@ package grad_project.myapplication;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.location.LocationManager;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -53,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences infoData;
     boolean is_login = false;
     boolean is_registered = false;
-    boolean is_autoLogin;
     boolean is_menuOpen = false;
     String s_id, s_name;
     DrawerLayout drawerLayout;
@@ -65,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean is_start = false;
     private boolean is_end = false;
 
-    boolean is_notiService = false;
+    boolean is_service = false;
+    boolean is_notification = false;
 
     public static Activity A_MainActivity;
 
@@ -96,6 +114,9 @@ public class MainActivity extends AppCompatActivity {
         A_MainActivity = MainActivity.this;
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
+        is_service = isNotiServiceRunning();
+        Log.d("ISSERVICE", Boolean.toString(is_service));
+
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
         bt_registration = findViewById(R.id.bt_registration);
@@ -121,7 +142,11 @@ public class MainActivity extends AppCompatActivity {
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        startNotiService();
+                                        SharedPreferences.Editor editer = infoData.edit();
+                                        editer.putBoolean("NOTIFICATION", true);
+                                        editer.apply();
+                                        refreshService();
+
                                         Toast.makeText(getApplicationContext(), "알림 ON", Toast.LENGTH_SHORT).show();
                                         dialog.dismiss();
                                     }
@@ -138,7 +163,10 @@ public class MainActivity extends AppCompatActivity {
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        stopNotiService();
+                                        SharedPreferences.Editor editer = infoData.edit();
+                                        editer.putBoolean("NOTIFICATION", false);
+                                        editer.apply();
+                                        refreshService();
                                         Toast.makeText(getApplicationContext(), "알림 OFF", Toast.LENGTH_SHORT).show();
                                         dialog.dismiss();
                                     }
@@ -170,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                 }
-                builder.setCancelable(false);
+//                builder.setCancelable(false);
                 builder.show();
             }
         });
@@ -227,6 +255,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("Service Destroyed"));
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -245,6 +280,18 @@ public class MainActivity extends AppCompatActivity {
         super.onRestart();
         resumeActivity();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     @Override
     public void onBackPressed() {
         if (is_menuOpen) {
@@ -281,6 +328,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean getGpsInfo() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    /* DB-서버 통신 파트 */
+    // 관람 시작이 되었는지 여부 받아오는 메소드(연결 상태 return)
     public boolean getStartState() {
         DdConnect dbConnect = new DdConnect(this);
         try {
@@ -356,19 +410,36 @@ public class MainActivity extends AppCompatActivity {
             builder.show();
         }
 
-        loadInfo();
-
-        is_login = is_autoLogin;
-
-
-        is_notiService = infoData.getBoolean("NOTIFICATION", false);
-        if (is_notiService) {
-            startNotiService();
+        if (!getGpsInfo()) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("앱 사용을 위해서 GPS 실행이 필요합니다.");
+            builder.setPositiveButton("설정",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        }
+                    });
+            builder.setNegativeButton("종료",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            finish();
+                        }
+                    });
+            builder.setCancelable(false);
+            builder.show();
         }
+
+        loadInfo();
 
         /* 액티비티 화면 내용 설정 */
         // 최초 등록 버튼 활성화 및 비활성화
         if (is_login) {
+            startNotiService();
+
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(false);
             bt_registration.setTextColor(getResources().getColor(R.color.disableButton));
@@ -458,13 +529,14 @@ public class MainActivity extends AppCompatActivity {
         // 로그인 완료했을 경우
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                is_login = true;
+                startNotiService();
+                Log.d("LOGIN COMPLETE", s_id);
             }
         }
         // 최초 등록 완료했을 경우(자동 로그인 됨)
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                is_login = true;
+//                is_login = true;
             }
         }
         // 관람 완료 후 메인 액티비티로 자동 진입할 때
@@ -475,6 +547,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 새로고침시 시행할 내용
+            Log.d("SERVICE", "broadcast!");
+            resumeActivity();
+        }
+    };
 
     // 메인 화면 버튼
     public void onClick(View v) {
@@ -550,12 +631,12 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             is_login = false;
                             is_start = false;
-                            is_autoLogin = false;
+//                            is_autoLogin = false;
 
                             stopNotiService();
                             SharedPreferences.Editor editor = infoData.edit();
                             editor.clear();
-                            editor.putBoolean("IS_AUTOLOGIN", false);
+                            editor.putBoolean("IS_LOGIN", false);
                             editor.putBoolean("NOTIFICATION", false);
                             editor.apply();
 
@@ -582,34 +663,45 @@ public class MainActivity extends AppCompatActivity {
 
     // 저장된 값 가져오기
     private void loadInfo() {
-        is_autoLogin = infoData.getBoolean("IS_AUTOLOGIN", false);
+//        is_autoLogin = infoData.getBoolean("IS_AUTOLOGIN", false);
+        is_login = infoData.getBoolean("IS_LOGIN", false);
         s_id = infoData.getString("ID", "");
         s_name = infoData.getString("NAME", "");
-        is_notiService = infoData.getBoolean("NOTIFICATION", false);
+        is_notification = infoData.getBoolean("NOTIFICATION", false);
     }
 
     public void startNotiService() {
-        if (!is_notiService) {
+        if (!is_service) {
             Intent intent = new Intent(MainActivity.this, NotiService.class);
-            startService(intent);
-            is_notiService = true;
 
-            SharedPreferences.Editor editor = infoData.edit();
-            editor.putBoolean("NOTIFICATION", true);
-            editor.apply();
+            startService(intent);
+            is_service = true;
         }
     }
 
     public void stopNotiService() {
-        if (is_notiService) {
+        if (is_service) {
             Intent intent = new Intent(MainActivity.this, NotiService.class);
-            stopService(intent);
-            is_notiService = false;
 
-            SharedPreferences.Editor editor = infoData.edit();
-            editor.putBoolean("NOTIFICATION", false);
-            editor.apply();
+            stopService(intent);
+            is_service = false;
         }
+    }
+
+    public void refreshService() {
+        Intent intent = new Intent(MainActivity.this, NotiService.class);
+        stopService(intent);
+        startService(intent);
+    }
+
+    public boolean isNotiServiceRunning() {
+        ActivityManager manager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (NotiService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
