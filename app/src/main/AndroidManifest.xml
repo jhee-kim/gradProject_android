@@ -34,10 +34,24 @@
         android:fullBackupContent="false"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".LoginActivity"
+        <activity android:name=".CheckActivity"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".RegistActivity"
+        <activity
+            android:name=".CompareActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation">
+        </activity>
+        <activity android:name=".ConfirmActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".HelpComActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".HelpNorActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".LoginActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".MainActivity"
@@ -55,37 +69,25 @@
             android:name=".OcrActivity"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".HelpNorActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".HelpComActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".ConfirmActivity"
-            android:screenOrientation="portrait">
-        </activity>
         <activity android:name=".PersonalActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".CheckActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".PopupAgreementActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PopupOcrActivity" android:theme="@android:style/Theme.Dialog"
+        <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.popup_Map_Theme"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog"
+        <activity android:name=".PopupOcrActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".PopupPermissionActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PopupSurveyActivity" android:theme="@android:style/Theme.Dialog"
+        <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.popup_Map_Theme"
+        <activity android:name=".PopupSurveyActivity" android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".PopupTimeActivity" android:theme="@style/AppTheme.popup_Time_Theme"
@@ -95,7 +97,11 @@
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateAlwaysHidden">
+        </activity>
+        <activity android:name=".RegistActivity"
+            android:screenOrientation="portrait">
+        </activity>
         <activity android:name=".TutorialActivity">
         </activity>
 
