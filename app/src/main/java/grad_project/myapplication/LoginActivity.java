@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent in_login = new Intent(LoginActivity.this, MainActivity.class);
                     setResult(RESULT_OK, in_login);
                     SharedPreferences.Editor editor = infoData.edit();
-                    editor.putBoolean("IS_AUTOLOGIN", true);
+                    editor.putBoolean("IS_LOGIN", true);
                     editor.putString("ID", s_id);
                     editor.putString("NAME", input_name);
                     editor.apply();
