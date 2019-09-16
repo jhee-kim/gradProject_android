@@ -52,8 +52,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
     private Mat matResult;
     private long mLastClickTime = 0;
 
-    ImageView img;
-
     public native void ConvertRGBtoGray(long matAddrInput, long matAddrResult);
 
     static {
@@ -65,12 +63,10 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                {
+                case LoaderCallbackInterface.SUCCESS: {
                     mOpenCvCameraView.enableView();
                 } break;
-                default:
-                {
+                default: {
                     super.onManagerConnected(status);
                 } break;
             }
@@ -95,9 +91,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
         mOpenCvCameraView.setCameraIndex(0); // froremoveVient-camera(1),  back-camera(0)
         mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
 
-        img = (ImageView)findViewById(R.id.img);
-
-
         ImageButton shutter = (ImageButton) findViewById(R.id.button_capture);
         shutter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +99,15 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
-                uploadImage(matResult);
+
+                /*90도 회전*/
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                Bitmap bitmap = Bitmap.createBitmap(matResult.width(), matResult.height(), Bitmap.Config.ARGB_8888);
+                Utils.matToBitmap(matResult, bitmap);
+                Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+                callCloudVision(rotated);
             }
         });
     }
@@ -155,8 +156,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
 
         matInput = inputFrame.rgba();
 
-        //if ( matResult != null ) matResult.release(); fix 2018. 8. 18
-
         if ( matResult == null )
 
             matResult = new Mat(matInput.rows(), matInput.cols(), CvType.CV_32FC2);
@@ -166,81 +165,11 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
         return matResult;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     private static final String CLOUD_VISION_API_KEY = "AIzaSyC5ilTz6H2zJCkC4joiZnW2T7IDouhmZwY";
     private static final String ANDROID_CERT_HEADER = "X-Android-Cert";
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";
     private static final int MAX_LABEL_RESULTS = 10;
     private static final String TAG = OcrActivity.class.getSimpleName();
-
-    public void uploadImage(Mat mat) {
-        if (mat != null) {
-            //OpenCVLoader.initDebug();
-//            Imgproc.cvtColor(mat.clone(), mat, Imgproc.COLOR_RGB2GRAY);
-
-//            ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-//            Mat hierarchy = new Mat();
-//            Imgproc.findContours(mat, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-//
-//            double maxArr = 0;
-//            MatOfPoint2f temp = new MatOfPoint2f();
-//            for (MatOfPoint contour : contours) {
-//                MatOfPoint2f approx = new MatOfPoint2f();
-//                MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
-//                Imgproc.approxPolyDP(contour2f, approx, 0.02 * Imgproc.arcLength(contour2f, true), true);
-//
-//                if (approx.toArray().length == 4 && Imgproc.contourArea(contour) > maxArr) {
-//                    maxArr = Imgproc.contourArea(contour);
-//                    temp = approx;
-//                }
-//            }
-            Bitmap bitmap = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(matResult, bitmap);
-//            if (temp != null) {
-//                Rect rect = Imgproc.boundingRect(temp);
-//                Log.d("text-x", String.valueOf(rect.tl().x));
-//                Log.d("text-y", String.valueOf(rect.tl().y));
-//                Log.d("text-w", String.valueOf(rect.width));
-//                Log.d("text-h", String.valueOf(rect.height));
-                //bitmap = Bitmap.createBitmap(bitmap, (int)rect.tl().x, (int)rect.tl().y, rect.width, rect.height);
-//            }
-
-              /*90도 회전*/
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-            img.setImageBitmap(rotated);
-
-            callCloudVision(bitmap);
-        }
-        else {
-            Log.d(TAG, "Image picker gave us a null image.");
-        }
-    }
 
     private void callCloudVision(final Bitmap bitmap) {
         // Do the real work in an async task, because we need to use the network anyway

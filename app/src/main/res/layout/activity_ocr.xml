@@ -15,11 +15,6 @@
         android:visibility="gone"
         android:id="@+id/activity_surface_view" />
 
-    <ImageView
-        android:id="@+id/img"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <ImageButton
         android:id="@+id/button_capture"
         android:layout_width="wrap_content"
