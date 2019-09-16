@@ -9,6 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -52,10 +55,11 @@ public class NotiService extends Service {
     final String channelId_default = "notiChannel_2";
     final String channelName_default = "위치 검사";
     final String channelId_warning = "notiChannel_warning";
-    final String channelName_warning = "경고";
+    final String channelName_warning = "중요 알림";
     final int NOTIFICATION_ID = 1;
     final int NOTIFICATION_ID_default = 2;
     final int NOTIFICATION_ID_warning = 3;
+    final int NOTIFICATION_ID_network = 4;
     int requestId, requestId_default, requestId_warning;
     NotificationCompat.Builder builder;
     NotificationCompat.Builder builder_default;
@@ -98,6 +102,31 @@ public class NotiService extends Service {
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
         s_id = infoData.getString("ID", "");
         is_notify = infoData.getBoolean("NOTIFICATION", false);
+        if (!infoData.getBoolean("IS_LOGIN", false)) {
+            Log.d("서비스", "로그인 안되어있음");
+            stopSelf();
+        }
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService( Context.CONNECTIVITY_SERVICE );
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+        cm.registerNetworkCallback(builder.build(),
+                new ConnectivityManager.NetworkCallback()
+                {
+                    @Override
+                    public void onAvailable( Network network )
+                    {
+                        //네트워크 연결됨
+                        notiManager_warning.cancel(NOTIFICATION_ID_network);
+                    }
+
+                    @Override
+                    public void onLost( Network network )
+                    {
+                        //네트워크 끊어짐
+                        networkNotification();
+//                        stopSelf();
+                    }
+                } );
 
         // 초기화
         is_notification = false;
@@ -137,10 +166,12 @@ public class NotiService extends Service {
 
         // 서비스 시작하면 시작 여부와 종료 여부(시작했을 때) 받아옴
         if (!getStartState()) { // 네트워크 통신 오류 예외처리
-                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+//            networkNotification();
+            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
         }
         if (is_start) {
             if (!isEnd()) { // 네트워크 통신 오류 예외처리
+//                networkNotification();
                 Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             }
         }
@@ -154,9 +185,6 @@ public class NotiService extends Service {
                 notiManager_default.cancel(NOTIFICATION_ID_default);
                 is_defaultNoti = false;
             }
-            // 시작여부 일정 시간마다 받아오는 핸들러 실행
-            stateTimerhandler.sendEmptyMessage(START_TIMER_START);
-            timeTimerHandler.sendEmptyMessage(NOWTIME_TIMER_START);
         } else {    // 사용자가 알림 기능을 OFF 했으면
             // 오레오 이상 버전은 죽지 않는 서비스를 실행하기 위해 노티를 꼭 띄워야 함
             // 오레오 미만은 노티 띄울 필요 없어서 따로 동작하는 코드 없음
@@ -191,9 +219,11 @@ public class NotiService extends Service {
                     notiManager.cancel(NOTIFICATION_ID);
                     is_notification = false;
                 }
-                stateTimerhandler.sendEmptyMessage(START_TIMER_START);
             }
         }
+        // 시작여부 일정 시간마다 받아오는 핸들러 실행
+        stateTimerhandler.sendEmptyMessage(START_TIMER_START);
+        timeTimerHandler.sendEmptyMessage(NOWTIME_TIMER_START);
         locationTimerHandler.sendEmptyMessage(LOCATION_TIMER_START);
 
         return START_STICKY;
@@ -247,8 +277,8 @@ public class NotiService extends Service {
                         if (is_start) {
                             stateTimerhandler.removeMessages(START_TIMER_START);
                             if (i_state == 0) {
-                                s_stateNoti = "관람 진행 중";
                                 i_state = 1;
+                                s_stateNoti = "관람 진행 중";
                                 updateNotification(nFLAG_START);
                             }
                             this.sendEmptyMessage(END_TIMER_START);
@@ -257,6 +287,7 @@ public class NotiService extends Service {
                             this.sendEmptyMessageDelayed(START_TIMER_START, NETWORK_DELAY * 1000);
                         }
                     } else {
+//                        networkNotification();
                         Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                     }
                 } else {
@@ -273,27 +304,57 @@ public class NotiService extends Service {
                             if (i_state == 1) {
                                 stateTimerhandler.removeMessages(END_TIMER_START);
                                 this.sendEmptyMessage(START_TIMER_START);
+                                i_state = 0;
                                 s_stateNoti = "관람 시작 전";
                                 updateNotification(nFLAG_INITIALIZE);
-                                i_state = 0;
                             }
                         }
                     }
-                    if (isEnd()) {
-                        // 관람 종료되었으면 관람 종료했다고 띄워줌
-                        if (is_end) {
-                            stateTimerhandler.removeMessages(END_TIMER_START);
-                            timeTimerHandler.removeMessages(NOWTIME_TIMER_START);
-                            s_stateNoti = "관람 종료";
-                            i_state = 2;
-                            updateNotification(nFLAG_FINISH);
-                            Log.d("END TIMER", "RUNNING");
-                            stopSelf();
+//                    if (l_elapseTime > 7140000) {
+                    if (l_elapseTime > 0) {
+                        Log.d("NOTISERVICE", "두시간 넘었음!");
+                        if (isEnd()) {
+                            // 관람 종료되었으면 관람 종료했다고 띄워줌
+                            if (is_end) {
+                                stateTimerhandler.removeMessages(END_TIMER_START);
+                                timeTimerHandler.removeMessages(NOWTIME_TIMER_START);
+                                s_stateNoti = "관람 종료";
+                                i_state = 2;
+
+                                builder_warning = new NotificationCompat.Builder(getApplicationContext(), channelId_warning);
+
+                                Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+                                notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                                requestId_warning = (int) System.currentTimeMillis();
+
+                                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),
+                                        requestId_warning, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                                builder_warning.setContentTitle("종료")
+                                        .setContentText("관람 종료 확인되었습니다!")
+                                        .setDefaults(Notification.DEFAULT_ALL)
+                                        .setAutoCancel(false)
+                                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                                        .setSmallIcon(android.R.drawable.btn_star)
+                                        .setContentIntent(pendingIntent);
+
+                                notiManager_warning.notify(NOTIFICATION_ID_warning, builder_warning.build());
+
+                                Intent intent = new Intent("Finished!");
+                                LocalBroadcastManager.getInstance(NotiService.this).sendBroadcast(intent);
+
+                                Log.d("END TIMER", "RUNNING");
+                                stopSelf();
+                            } else {
+                                this.sendEmptyMessageDelayed(END_TIMER_START, NETWORK_DELAY * 1000);
+                            }
                         } else {
-                            this.sendEmptyMessageDelayed(END_TIMER_START, NETWORK_DELAY * 1000);
+//                            networkNotification();
+                            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                        Log.d("NOTISERVICE", "두시간 안 넘었음!");
                     }
                 }
             } else {
@@ -417,13 +478,6 @@ public class NotiService extends Service {
             l_elapseTime = l_nowTime - l_startTime;
         }
 
-//        // 오레오 이상 노티 채널 생성
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            int importance = NotificationManager.IMPORTANCE_LOW;
-//            NotificationChannel mChannel = new NotificationChannel(channelId, channelName, importance);
-//            notiManager.createNotificationChannel(mChannel);
-//        }
-
         builder = new NotificationCompat.Builder(getApplicationContext(), channelId);
 
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
@@ -463,46 +517,65 @@ public class NotiService extends Service {
 
         notification = builder.build();
 
-//        notiManager.notify(NOTIFICATION_ID, notification);
     }
 
     public void updateNotification(int flag) {
-        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification);
+        if (is_notification) {
+            RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification);
 
-        switch (flag) {
-            case nFLAG_INITIALIZE :
-                remoteViews.setTextViewText(R.id.tv_state, s_stateNoti);
-                remoteViews.setTextViewText(R.id.tv_time, "-");
-//                builder.setDefaults(Notification.DEFAULT_ALL);
-                break;
-            case nFLAG_START :
-                remoteViews.setTextViewText(R.id.tv_state, s_stateNoti);
-                remoteViews.setTextViewText(R.id.tv_time, s_elapseTime);
-//                builder.setDefaults(Notification.DEFAULT_ALL);
-                break;
-            case nFLAG_FINISH :
-                remoteViews.setTextViewText(R.id.tv_state, s_stateNoti);
-                remoteViews.setTextViewText(R.id.tv_time, "-");
-//                builder.setDefaults(Notification.DEFAULT_ALL);
-                break;
-            case nFLAG_TIME :
-                remoteViews.setTextViewText(R.id.tv_state, s_stateNoti);
-                remoteViews.setTextViewText(R.id.tv_time, s_elapseTime);
-//                builder.setDefaults(Notification.DEFAULT_LIGHTS);
-                break;
+            switch (flag) {
+                case nFLAG_INITIALIZE:
+                    remoteViews.setTextViewText(R.id.tv_state, s_stateNoti);
+                    remoteViews.setTextViewText(R.id.tv_time, "-");
+                    break;
+                case nFLAG_START:
+                    remoteViews.setTextViewText(R.id.tv_state, s_stateNoti);
+                    remoteViews.setTextViewText(R.id.tv_time, s_elapseTime);
+                    break;
+                case nFLAG_FINISH:
+                    remoteViews.setTextViewText(R.id.tv_state, s_stateNoti);
+                    remoteViews.setTextViewText(R.id.tv_time, "-");
+                    break;
+                case nFLAG_TIME:
+                    remoteViews.setTextViewText(R.id.tv_state, s_stateNoti);
+                    remoteViews.setTextViewText(R.id.tv_time, s_elapseTime);
+                    break;
+            }
+
+            Intent in_openMain = new Intent(getApplicationContext(), MainActivity.class);
+            PendingIntent pi_openMain = PendingIntent.getActivity(getApplicationContext(), requestId, in_openMain, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Intent in_openCheck = new Intent(getApplicationContext(), CheckActivity.class);
+            PendingIntent pi_openCheck = PendingIntent.getActivity(getApplicationContext(), requestId, in_openCheck, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            remoteViews.setOnClickPendingIntent(R.id.bt_openMain, pi_openMain);
+            remoteViews.setOnClickPendingIntent(R.id.bt_openCheck, pi_openCheck);
+            builder.setContent(remoteViews);
+
+            notiManager.notify(NOTIFICATION_ID, builder.build());
         }
+    }
 
-        Intent in_openMain = new Intent(getApplicationContext(), MainActivity.class);
-        PendingIntent pi_openMain = PendingIntent.getActivity(getApplicationContext(), requestId, in_openMain, PendingIntent.FLAG_UPDATE_CURRENT);
+    public void networkNotification() {
+        builder_warning = new NotificationCompat.Builder(getApplicationContext(), channelId_warning);
 
-        Intent in_openCheck = new Intent(getApplicationContext(), CheckActivity.class);
-        PendingIntent pi_openCheck = PendingIntent.getActivity(getApplicationContext(), requestId, in_openCheck, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        remoteViews.setOnClickPendingIntent(R.id.bt_openMain, pi_openMain);
-        remoteViews.setOnClickPendingIntent(R.id.bt_openCheck, pi_openCheck);
-        builder.setContent(remoteViews);
+        requestId_warning = (int) System.currentTimeMillis();
 
-        notiManager.notify(NOTIFICATION_ID, builder.build());
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),
+                requestId_warning, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder_warning.setContentTitle("경고")
+                .setContentText("네트워크 연결이 해제되었습니다.\n앱 이용을 위해 네트워크를 연결해주세요!")
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setAutoCancel(false)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setSmallIcon(android.R.drawable.btn_star)
+                .setContentIntent(pendingIntent);
+
+        notiManager_warning.notify(NOTIFICATION_ID_network, builder_warning.build());
     }
 
     public boolean getStartState() {
