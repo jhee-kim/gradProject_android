@@ -1,9 +1,0 @@
-# ninja log v5
-1	11339	589616674	CMakeFiles/native-lib.dir/native-lib.cpp.o	5803abee93bf7b89
-11348	11885	589616675	C:/Users/Administrator/AndroidStudioProjects/android/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so	643189f25a9a1d4
-8	10087	589657353	CMakeFiles/native-lib.dir/native-lib.cpp.o	5803abee93bf7b89
-10088	11086	589657354	C:/Users/Administrator/AndroidStudioProjects/android/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so	643189f25a9a1d4
-5	3516	589657534	CMakeFiles/native-lib.dir/native-lib.cpp.o	5803abee93bf7b89
-3517	3773	589657534	C:/Users/Administrator/AndroidStudioProjects/android/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so	643189f25a9a1d4
-10	4171	589819140	CMakeFiles/native-lib.dir/native-lib.cpp.o	5803abee93bf7b89
-4172	4899	589819141	C:/Users/Administrator/AndroidStudioProjects/android/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so	643189f25a9a1d4

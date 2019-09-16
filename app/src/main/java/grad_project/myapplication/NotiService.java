@@ -1,5 +1,6 @@
 package grad_project.myapplication;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,17 +9,28 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.RingtoneManager;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import net.daum.mf.map.api.MapPoint;
+import net.daum.mf.map.api.MapPointBounds;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +38,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class NotiService extends Service {
+    public static final int MSG_SEND_TO_ACTIVITY = 0;
     SharedPreferences infoData;
     IBinder mBinder = new NotiBinder();
     boolean is_notify = false;  // 커스텀 노티 기능 ON/OFF 여부(SharedPreferences 사용)
@@ -78,10 +91,25 @@ public class NotiService extends Service {
     LocationTimerHandler locationTimerHandler;
     final int LOCATION_TIMER_START = 300;
 
+    /*GPS*/
+    String provider;    //위치정보
+    double longitude;  //위도
+    double latitude;   //경도
+    double altitude;   //고도
+    private MapPoint gpsPosition;  //현재 GPS 위치
+
     class NotiBinder extends Binder {
         NotiService getService() {
             return NotiService.this;
         }
+    }
+
+    public double getLongitude(){
+        return longitude;
+    }
+
+    public double gatLatitude(){
+        return latitude;
     }
 
     @Override
@@ -130,6 +158,14 @@ public class NotiService extends Service {
             NotificationChannel mChannel_warning = new NotificationChannel(channelId_warning, channelName_warning, importance_warning);
             notiManager_warning.createNotificationChannel(mChannel_warning);
         }
+
+        /* GPS 초기화*/
+        final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsLocationListener);
+        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, gpsLocationListener);
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -220,9 +256,36 @@ public class NotiService extends Service {
         super.onDestroy();
     }
 
+    final LocationListener gpsLocationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            provider = location.getProvider();
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            altitude = location.getAltitude();
+            Log.d("gps", "위치정보 : " + provider + "\n" + "위도 : " + longitude + "\n" + "경도 : " + latitude + "\n" + "고도  : " + altitude);
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+
+        public void onProviderEnabled(String provider) {
+        }
+
+        public void onProviderDisabled(String provider) {
+        }
+    };
+
     public boolean checkInLocation() {
-        boolean check = true;
-        return check;
+        //MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.786625, 127.218318);
+        //MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.776687, 127.233477);
+
+        MapPoint leftB = MapPoint.mapPointWithGeoCoord( 36.243457, 126.886106);
+        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.244253, 126.888423);
+
+        MapPointBounds boundary = new MapPointBounds(leftB, RightT);
+        gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
+
+        return boundary.contains(gpsPosition);
     }
 
     public void setOutLocation() {

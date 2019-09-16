@@ -248,8 +248,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             AsyncTask<Object, Void, String> textDetectionTask = new TextDetectionTask(this, prepareAnnotationRequest(bitmap));
             textDetectionTask.execute();
         } catch (IOException e) {
-            Log.d(TAG, "failed to make API request because of other IOException " +
-                    e.getMessage());
+            Log.d(TAG, "failed to make API request because of other IOException " + e.getMessage());
         }
     }
 
@@ -270,7 +269,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             asyncDialog.setMessage("인식중입니다..");
 
             /*show dialog*/
-            //asyncDialog.show();
+            asyncDialog.show();
             super.onPreExecute();
         }
 
@@ -289,6 +288,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             return "Cloud Vision API request failed. Check logs for details.";
         }
 
+        @Override
         protected void onPostExecute(String result) {
             //asyncDialog.dismiss();
             OcrActivity activity = mActivityWeakReference.get();
@@ -297,7 +297,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
                 intent.putExtra("result", result);
                 setResult(RESULT_OK, intent);
 
-                //finish();
+                finish();
             }
         }
     }

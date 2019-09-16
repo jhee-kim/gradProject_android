@@ -4,32 +4,20 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.location.LocationManager;
-import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -489,7 +477,18 @@ public class MainActivity extends AppCompatActivity {
             bt_logout.setEnabled(false);
             bt_logout.setVisibility(View.INVISIBLE);
         }
-        
+
+        /*관람하기 버튼*/
+        Button bt_registration = findViewById(R.id.bt_open_map);
+        bt_registration.setEnabled(true);
+        bt_registration.setTextColor(getResources().getColor(R.color.unfocusText));
+        if(isEnd()) {
+            if(is_end) {
+                bt_registration.setEnabled(false);
+                bt_registration.setTextColor(getResources().getColor(R.color.disableButton));
+            }
+        }
+
         /* 메뉴 버튼 온클릭리스너 설정 */
 
         // 내 정보 버튼

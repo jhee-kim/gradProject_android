@@ -105,7 +105,12 @@
         <activity android:name=".TutorialActivity">
         </activity>
 
-        <service android:name=".NotiService"/>
+        <service android:name=".NotiService"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name=".NotiService" />
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"

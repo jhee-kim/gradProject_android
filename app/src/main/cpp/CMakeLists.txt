@@ -13,6 +13,10 @@ get_filename_component(pathPROJECT ${PARENT_DIR3} PATH)
 set(pathOPENCV ${pathPROJECT}/opencv)
 set(pathLIBOPENCV_JAVA ${pathOPENCV}/native/libs/${ANDROID_ABI}/libopencv_java4.so)
 
+#set(pathPROJECT C:/Users/Administrator/AndroidStudioProjects/android) # 수정필요
+#set(pathOPENCV ${pathPROJECT}/opencv)
+#set(pathLIBOPENCV_JAVA ${pathOPENCV}/native/libs/${ANDROID_ABI}/libopencv_java4.so)
+
 set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
