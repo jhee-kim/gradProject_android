@@ -3,6 +3,7 @@ package grad_project.myapplication;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -91,7 +92,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
         mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
-        mOpenCvCameraView.setCameraIndex(0); // front-camera(1),  back-camera(0)
+        mOpenCvCameraView.setCameraIndex(0); // froremoveVient-camera(1),  back-camera(0)
         mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
 
         img = (ImageView)findViewById(R.id.img);
@@ -228,11 +229,11 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
 //            }
 
               /*90도 회전*/
-//            Matrix matrix = new Matrix();
-//            matrix.postRotate(90);
-//            Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
-            img.setImageBitmap(bitmap);
+            img.setImageBitmap(rotated);
 
             callCloudVision(bitmap);
         }
@@ -269,7 +270,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             asyncDialog.setMessage("인식중입니다..");
 
             /*show dialog*/
-            asyncDialog.show();
+            //asyncDialog.show();
             super.onPreExecute();
         }
 
@@ -296,7 +297,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
                 intent.putExtra("result", result);
                 setResult(RESULT_OK, intent);
 
-                finish();
+                //finish();
             }
         }
     }

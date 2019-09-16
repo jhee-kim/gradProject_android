@@ -336,8 +336,6 @@ public class MainActivity extends AppCompatActivity {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-    /* DB-서버 통신 파트 */
-    // 관람 시작이 되었는지 여부 받아오는 메소드(연결 상태 return)
     public boolean getStartState() {
         DdConnect dbConnect = new DdConnect(this);
         try {
@@ -502,7 +500,7 @@ public class MainActivity extends AppCompatActivity {
             bt_logout.setEnabled(false);
             bt_logout.setVisibility(View.INVISIBLE);
         }
-
+        
         /* 메뉴 버튼 온클릭리스너 설정 */
 
         // 내 정보 버튼
