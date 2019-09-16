@@ -2,123 +2,92 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="grad_project.myapplication">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-
-    <uses-feature android:name="android.hardware.camera" android:required="false"/>
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
-    <uses-feature android:name="android.hardware.camera.front" android:required="false"/>
-    <uses-feature android:name="android.hardware.camera.front.autofocus"  android:required="false"/>
-
-    <supports-screens android:resizeable="true"
-        android:smallScreens="true"
-        android:normalScreens="true"
-        android:largeScreens="true"
-        android:anyDensity="true" />
-
     <application
-        android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:fullBackupContent="false"
-        android:theme="@style/AppTheme">
-
-        <activity android:name=".CheckActivity"
-            android:screenOrientation="portrait">
-        </activity>
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
         <activity
-            android:name=".CompareActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="keyboardHidden|orientation">
-        </activity>
-        <activity android:name=".ConfirmActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".HelpComActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".HelpNorActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".LoginActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".MainActivity"
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".RegistActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NormalActivity"
-            android:screenOrientation="portrait">
-        </activity>
+        <activity
+            android:name=".NormalActivity"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".OcrActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PersonalActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PopupAgreementActivity" android:theme="@android:style/Theme.Dialog"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PopupMapActivity" android:theme="@style/AppTheme.popup_Map_Theme"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PopupOcrActivity" android:theme="@android:style/Theme.Dialog"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PopupPermissionActivity" android:theme="@android:style/Theme.Dialog"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PopupRegistActivity" android:theme="@android:style/Theme.Dialog"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PopupSurveyActivity" android:theme="@android:style/Theme.Dialog"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PopupTimeActivity" android:theme="@style/AppTheme.popup_Time_Theme"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".QrActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".HelpNorActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".HelpComActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ConfirmActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".PersonalActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".CheckActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".PopupAgreementActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog"></activity>
+        <activity
+            android:name=".PopupOcrActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog"></activity>
+        <activity
+            android:name=".PopupRegistActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog"></activity>
+        <activity
+            android:name=".PopupPermissionActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog"></activity>
+        <activity
+            android:name=".PopupSurveyActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog"></activity>
+        <activity
+            android:name=".PopupMapActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.popup_Map_Theme"></activity>
+        <activity
+            android:name=".PopupTimeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.popup_Time_Theme"></activity>
+        <activity
+            android:name=".QrActivity"
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"
-            android:windowSoftInputMode="stateAlwaysHidden">
-        </activity>
-        <activity android:name=".RegistActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".TutorialActivity">
-        </activity>
-
-        <service android:name=".NotiService"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name=".NotiService" />
-            </intent-filter>
-        </service>
-
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".TutorialActivity"></activity>
+      
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="63c2eeea64bff757d4f3fbb253f2ff59" />
-
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -127,8 +96,59 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
+
+        <receiver
+            android:name=".RebootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+  
+        <service android:name=".NotiService"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name=".NotiService" />
+            </intent-filter>
+        </service>
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
     </application>
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front.autofocus"
+        android:required="false" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 </manifest>

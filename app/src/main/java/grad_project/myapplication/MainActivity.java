@@ -239,6 +239,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(processFinishedReceiver, new IntentFilter("Finished!"));
+
         resumeActivity();
     }
 
@@ -246,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("Service Destroyed"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(serviceDestroyedReceiver, new IntentFilter("Service Destroyed"));
     }
 
     @Override
@@ -272,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceDestroyedReceiver);
     }
 
     @Override
@@ -424,7 +427,15 @@ public class MainActivity extends AppCompatActivity {
         /* 액티비티 화면 내용 설정 */
         // 최초 등록 버튼 활성화 및 비활성화
         if (is_login) {
-            startNotiService();
+            if (isEnd()) {
+                if (!is_end) {
+                    if (!is_service) {
+                        startNotiService();
+                    }
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+            }
 
             Button bt_registration = findViewById(R.id.bt_registration);
             bt_registration.setEnabled(false);
@@ -545,12 +556,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver serviceDestroyedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // 새로고침시 시행할 내용
-            Log.d("SERVICE", "broadcast!");
+            // 서비스 꺼졌을 때
+            Log.d("SERVICE", "SerserviceDestroyedReceiver!@#");
             resumeActivity();
+        }
+    };
+
+    private BroadcastReceiver processFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 관람 종료됐을때
+            Log.d("SERVICE", "processFinishedReceiver!@#");
         }
     };
 
@@ -670,8 +689,11 @@ public class MainActivity extends AppCompatActivity {
     public void startNotiService() {
         if (!is_service) {
             Intent intent = new Intent(MainActivity.this, NotiService.class);
-
-            startService(intent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent);
+            } else {
+                startService(intent);
+            }
             is_service = true;
         }
     }
@@ -686,9 +708,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void refreshService() {
-        Intent intent = new Intent(MainActivity.this, NotiService.class);
-        stopService(intent);
-        startService(intent);
+        stopNotiService();
+        startNotiService();
     }
 
     public boolean isNotiServiceRunning() {

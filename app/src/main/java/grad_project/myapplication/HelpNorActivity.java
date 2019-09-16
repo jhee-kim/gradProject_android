@@ -89,6 +89,7 @@ public class HelpNorActivity extends AppCompatActivity {
                     Log.d("GET_ISSTART", result);
                     if(result.equals("-1")) {
                         Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                     else {
                         is_start = !result.equals("0");
