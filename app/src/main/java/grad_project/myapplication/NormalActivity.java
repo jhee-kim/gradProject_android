@@ -1,19 +1,16 @@
 package grad_project.myapplication;
 
-import android.Manifest;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
+import android.os.IBinder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -33,7 +30,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
-import net.daum.mf.map.api.MapPointBounds;
 import net.daum.mf.map.api.MapView;
 
 import org.json.JSONArray;
@@ -42,72 +38,101 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class NormalActivity extends AppCompatActivity implements MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
-    private static final String TAG = NormalActivity.class.getSimpleName();
+public class NormalActivity extends AppCompatActivity implements MapView.MapViewEventListener,
+                                                                      MapView.POIItemEventListener,
+                                                                      MapView.CurrentLocationEventListener {
     private SharedPreferences infoData;
-    private final int ImgNumByExhibition = 2;
-    private int totalImgNum;
-    private boolean[] isCheckQrArr = new boolean[6];
-    private boolean[][] isCheckImgArr = new boolean[6][ImgNumByExhibition];
-    private int[][] randomImgNumArr = new int[6][ImgNumByExhibition];   //랜덤으로 뽑은 이미지 번호
-    Long startDate;
+    private Long startDate;
+
     private String[] exhibitionState = new String[6];      // 전시관 오픈 여부(1 : open, 0 : close)
     private String[] exhibitionQrCode = new String[6];     // 전시관 QR코드 URL
-    private int nowPosition;        //선택한 list 위치
-    private boolean isShowTutorial;
-    private TextView listCountTv;   //리스트뷰 개수
-    private ViewGroup mapViewContainer;
-    private MapView mapView;
-    private int Mode;
-    private boolean ToggleGps = false;
-    private MapPoint curPosition;
+    private boolean[] isCheckQrArr = new boolean[6];            //전시관 QR코드 확인 체크
 
+    private ViewGroup mapViewContainer;   //맵
+    private TextView listCountTv;          //리스트뷰 Count
+    private ListView questView;             //관람확인 리스트
+    private ImageButton but_gps;            //GPS 버튼
+
+    /*튜토리얼 관람여부*/
+    private boolean isShowTutorial;
+
+    /*GPS*/
     MapPOIItem markerGps = new MapPOIItem();
-    String provider;    //위치정보
     double longitude;  //위도
     double latitude;   //경도
-    double altitude;   //고도
+    private boolean ToggleGps = false;
 
-    ListView questView;     //관람확인
-    List<questViewItems> questItems;
-    ImageButton but_gps;
-    int questNum;
-    QuestAdapter adapter;
-
+    /*맵 마커*/
+    private MapView mapView;
+    private int Mode = 0;
     Bitmap gps_tracking;
-    Bitmap[] in_exhibition_marker = new Bitmap[3];
+    Bitmap[] in_exhibition_marker = new Bitmap[5];
     Bitmap[] out_exhibition_marker = new Bitmap[12];
     Bitmap[] facilities_market = new Bitmap[13];
     Bitmap[] store = new Bitmap[10];
 
     int zoomLevel = -2;
 
+    /*서비스 통신*/
+    public NotiService ms;
+    boolean isService = false;
+    public ServiceConnection conn = new ServiceConnection() {
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // 서비스와 연결되었을 때 호출되는 메서드
+            NotiService.NotiBinder mb = (NotiService.NotiBinder) service;
+            ms = mb.getService();
+            isService = true; // 실행 여부를 판단
+        }
+        public void onServiceDisconnected(ComponentName name) {
+            // 서비스와 연결이 끊기거나 종료되었을 때
+            isService = false;
+        }
+    };
+    Timer timer = new Timer();
+    TimerTask onMessageTimerTask = new TimerTask() {
+        @Override
+        public void run() {
+            onMessage();
+        }
+    };
+
     /*** list test ***/
+    private final int ImgNumByExhibition = 1;                    //각 전시관 사진 갯수
+    private int totalImgNum;
+    private boolean[][] isCheckImgArr = new boolean[6][ImgNumByExhibition];  //전시관 사진 확인 체크
+    private int[][] randomImgNumArr = new int[6][ImgNumByExhibition];   //랜덤으로 뽑은 이미지 번호
+    private int nowPosition;        //선택한 list 위치
+    private List<questViewItems> questItems;
+    private int questNum;
+    private  QuestAdapter adapter;
     ListView listView;
     List<String> qTitle = new ArrayList<String>();
-    //    String qTitle[] = new String[10];
-    String Title[] = {"제1전시관", "제2전시관", "제3전시관", "제4전시관", "제5전시관", "제6전시관"};
-    //    String qTitle[];
+    String Title[] = {"제1전시관 겨레의뿌리", "제2전시관 겨례의시련", "제3전시관 겨레의함성", "제4전시관 평화누리", "제5전시관 나라되찾기", "제6전시관 새나라세우기"};
     List<String> qDescription = new ArrayList<String>();
-    //    String qDescription[] = new String[10];
-    String qrDescription[] = {"제1전시관 설명", "제2전시관 설명", "제3전시관 설명", "제4전시관 설명", "제5전시관 설명", "제6전시관 설명"};
-    String imgDescription[][] = {{"제1전시관 사진1", "제1전시관 사진2", "제1전시관 사진3", "제1전시관 사진4"},      //images배열과 매칭
-                                {"제2전시관 사진1", "제2전시관 사진2", "제2전시관 사진3", "제2전시관 사진4"},
-                                {"제3전시관 사진1", "제3전시관 사진2", "제3전시관 사진3", "제3전시관 사진4"},
-                                {},
-                                {"제5전시관 사진1", "제5전시관 사진2", "제5전시관 사진3", "제5전시관 사진4"},
-                                {"제6전시관 사진1", "제6전시관 사진2", "제6전시관 사진3", "제6전시관 사진4"},};  //찍을 사진들 이름 적으면 될듯
-    //    List<String> qDescription1;
+    String qrDescription = "해당 전시관 출입구에 있는 QR코드를 찍으세요.";
+    String imgDescription[][] = {{"사진1-1", "사진1-2", "사진1-3", "사진1-4"},      //images배열과 매칭
+            {},
+            {"사진3-1", "사진3-2", "사진3-3", "사진3-4"},
+            {},
+            {"사진5-1", "사진5-2", "사진5-3", "사진5-4"},
+            {"사진6-1", "사진6-2", "사진6-3", "사진6-4"},  };  //찍을 사진들 이름 적으면 될듯
     List<Integer> qImages = new ArrayList<Integer>();
-    //int qImages[] = new int[6];
-    int qrImages[] = {R.drawable.in_exhibition_img01, R.drawable.in_exhibition_img02, R.drawable.in_exhibition_img03, R.drawable.in_exhibition_img04, R.drawable.in_exhibition_img05, R.drawable.in_exhibition_img06};
-    int images[][] = {{R.drawable.img1_1, R.drawable.img1_2, R.drawable.img1_3, R.drawable.img1_4}, //전시관마다 최대 사진 4개씩
-                    {R.drawable.img2_1, R.drawable.img2_2, R.drawable.img2_3, R.drawable.img2_4},
-                    {R.drawable.img3_1, R.drawable.img3_2, R.drawable.img3_3, R.drawable.img3_4},
-                    {},         //4전시관은 사진X
-                    {R.drawable.img5_1, R.drawable.img5_2, R.drawable.img5_3, R.drawable.img5_4},
-                    {R.drawable.img6_1, R.drawable.img6_2, R.drawable.img6_3, R.drawable.img6_4}};   //찍을 이미지들
+    int qrImages = R.drawable.qr_img;
+    int images[][] = {{R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1}, //전시관마다 최대 사진 4개씩
+            {},         //2전시관 사진X
+            {R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1},
+            {},         //4전시관 사진X
+            {R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1},
+            {R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1}};   //찍을 이미지들
+//    int images[][] = {{R.drawable.img1_1, R.drawable.img1_2, R.drawable.img1_3, R.drawable.img1_4}, //전시관마다 최대 사진 4개씩
+//            {},         //2전시관 사진X
+//            {R.drawable.img3_1, R.drawable.img3_2, R.drawable.img3_3, R.drawable.img3_4},
+//            {},         //4전시관 사진X
+//            {R.drawable.img5_1, R.drawable.img5_2, R.drawable.img5_3, R.drawable.img5_4},
+//            {R.drawable.img6_1, R.drawable.img6_2, R.drawable.img6_3, R.drawable.img6_4}};   //찍을 이미지들
     List<Integer> qExhibitionNum = new ArrayList<Integer>();
     List<Integer> qType = new ArrayList<Integer>();     //0 - QR / 1 - Image
     List<Integer> qNumOfImg = new ArrayList<Integer>();
@@ -128,36 +153,16 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             actionBar.hide();
         }
 
-        initBitmap();
-
-        final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsLocationListener);
-        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, gpsLocationListener);
-
-        totalImgNum = ImgNumByExhibition * 6;
-
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
         Intent intent = getIntent();
         startDate = intent.getLongExtra("Time", 0);
-
-        mapView = new MapView(this);
-        mapView.setPOIItemEventListener(this);
-        mapView.setMapViewEventListener(this);
-        mapViewContainer.addView(mapView);
-
         getExhibitionData();  // DB 전시관 데이터 받아오기(오픈여부, 전시관 별 QR코드)
         if(!infoData.getBoolean("IS_RANDOM_IMG", false)) {      //한번만 실행
             chooseRandomImg(4, ImgNumByExhibition); //이미지를 랜덤으로 선택(Random돌릴 이미지 개수, 몇개뽑을건지)
         }
         loadInfo();           // 저장된 값 가져오기 - 각 전시관 QR코드 체크 여부, 튜토리얼 여부
-        Mode = 0;
-        setTogglebut(Mode);
-        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(36.784116, 127.222147), 1, true);
-        setIn_exhibition();
 
+        /*튜토리얼*/
         RelativeLayout bt_back_layout = findViewById(R.id.bt_back_layout);
         bt_back_layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,7 +175,15 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             startActivityForResult(intent, 3000);
         }
 
-        //list test
+        /*서비스 통신*/
+        timer.schedule(onMessageTimerTask, 0, 1500);
+        Intent intentService = new Intent();
+        intentService.setClassName(this, "grad_project.myapplication.NotiService");
+        bindService(intentService ,conn, Context.BIND_AUTO_CREATE);
+
+        totalImgNum = ImgNumByExhibition * 6;
+
+        /*리스트*/
         listView = findViewById(R.id.questList);
         questItems = new ArrayList<questViewItems>();
 
@@ -185,14 +198,29 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
         QuestviewClick();
 
+        /*MapView 초기화*/
+        initBitmap();
+        mapView = new MapView(this);
+        mapView.setPOIItemEventListener(this);
+        mapView.setMapViewEventListener(this);
+        mapViewContainer.addView(mapView);
+        ImageButton imageButton = (ImageButton)findViewById(R.id.in_exhibition);
+        imageButton.performClick();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+        unbindService(conn);
     }
 
     //보낸 Intent 정보 받음
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (resultCode == RESULT_OK) {
-            switch (requestCode) {   // NormalActivity에서 TutorialActivity로 요청할 때 보낸 요청 코드 (3000)
+            switch (requestCode) {   //TutorialActivity에서 돌아왔을 때
                 case 3000:
-                    break;//TutorialActivity에서 돌아왔을 때
+                    break;
                 case 49374: {  //QrActivity에서 돌아왔을 때
                     String qrUrl = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent).getContents();
                     //URL 비교
@@ -211,11 +239,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
                                 for(int j = 0 ; j < questItems.size() ; j++) { //Listview에서 해당 Qr 제거해줌
                                     questViewItems q = questItems.get(j);
-                                    //Log.d("qitemType", q.QTypeItem + "");
-                                    //Log.d("qitemQExhibitionNum", q.QExhibitionNum + "");
                                     if(q.QTypeItem == 0 && q.QExhibitionNum == i) { //전시관 번호가 같고 QR이면
                                         boolean b = questItems.remove(q);                   //해당 item 제거
-                                        //Log.d("qitemBool", b + "");
                                         adapter = new QuestAdapter(NormalActivity.this, questItems);
                                         listView.setAdapter(adapter);
                                         listCountTv.setText(questItems.size() + "");
@@ -243,7 +268,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                         questItems.remove(nowPosition);
                         adapter = new QuestAdapter(NormalActivity.this, questItems);
                         listView.setAdapter(adapter);
-                        //Toast.makeText(NormalActivity.this, "찍은사진 삭제", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 }
@@ -251,41 +275,16 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         }
     }
 
-    final LocationListener gpsLocationListener = new LocationListener() {
-        public void onLocationChanged(Location location) {
-            provider = location.getProvider();
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
-            altitude = location.getAltitude();
-            Log.d("gps", "위치정보 : " + provider + "\n" + "위도 : " + longitude + "\n" + "경도 : " + latitude + "\n" + "고도  : " + altitude);
-            curPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
-            setGpsTracking();
-            checkBoundary();
-        }
-
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-        }
-
-        public void onProviderEnabled(String provider) {
-        }
-
-        public void onProviderDisabled(String provider) {
-        }
-    };
-
     // 저장된 값 가져오기 - 각 전시관 QR코드 체크 여부, 사진 체크여부, 튜토리얼 여부, 선택된 랜덤 사진들
     public void loadInfo() {
         for (int i = 0; i < 6; i++) {
             int num = i + 1;
             isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_QR_" + num, false);     //전시관 QR코드 체크 여부
-            Log.d(TAG, "isCheckQrArr" + num + ": " + isCheckQrArr[i]);
             for(int j = 0 ; j < ImgNumByExhibition ; j++) {     //전시관 이미지들 찍었는지 여부
                 isCheckImgArr[i][j] = infoData.getBoolean("IS_CHECK_PIC_" + num + "-" + (j + 1), false);
-                Log.d(TAG, "isCheckImgArr" + num + ": " + isCheckImgArr[i][j]);
             }
             for(int j = 0 ; j < ImgNumByExhibition ; j++) {     //선택된 랜덤 사진들 번호
                 randomImgNumArr[i][j] = infoData.getInt("RANDOM_IMG_" + num + "_" + (j + 1), -1);
-                Log.d(TAG, "randomImgNumArr" + num + ": " + randomImgNumArr[i][j]);
             }
         }
         isShowTutorial = infoData.getBoolean("IS_SHOW_TUTORIAL", false);        //튜토리얼 여부
@@ -308,7 +307,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                     } else {
                         a = (a + 1) % maxImgNum;
                     }
-                    //Log.d("aaaaa", j + "_" + a + "_" + random[a]);
                 }
             }
             int a = 1;  //몇번째 사진인지
@@ -365,18 +363,16 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         }
     }
 
-    public void checkBoundary() {
-        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.786625, 127.218318);
-        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.776687, 127.233477);
-
-        MapPointBounds boundary = new MapPointBounds(leftB, RightT);
-        boolean isContain = boundary.contains(curPosition);
-
-        if (isContain) {
-            Toast.makeText(getApplicationContext(), "독립기념관 안입니다.", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "위치를 이탈하였습니다.", Toast.LENGTH_SHORT).show();
+    /** Service 로 부터 message를 받음 */
+    public void onMessage() {
+        if (!isService) {
+            Log.d("Noti","서비스가 실행 중이 아닙니다. ");
+            return;
         }
+        //서비스에서 가져온 데이터
+        longitude = ms.getLongitude();
+        latitude = ms.gatLatitude();
+        setGpsTracking();
     }
 
     public void setGpsTracking() {
@@ -414,22 +410,23 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             markerArr[i].setTag(i);
             markerArr[i].setItemName("");
             markerArr[i].setShowCalloutBalloonOnTouch(false);
+            markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
 
             if (i < 6) {
                 if (exhibitionState[i].equals("1") && !isCheckQrArr[i]) {
-
-                    markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                     markerArr[i].setCustomImageBitmap(in_exhibition_marker[0]);
                 } else if (exhibitionState[i].equals("1") && isCheckQrArr[i]) {
-                    markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                     markerArr[i].setCustomImageBitmap(in_exhibition_marker[1]);
                 } else if (exhibitionState[i].equals("0")) {
-                    markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
                     markerArr[i].setCustomImageBitmap(in_exhibition_marker[2]);
                 }
             } else {
-                markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
-                markerArr[i].setCustomImageBitmap(in_exhibition_marker[1]);
+                if(i == 7) {
+                    markerArr[i].setCustomImageBitmap(in_exhibition_marker[4]);
+                }
+                else {
+                    markerArr[i].setCustomImageBitmap(in_exhibition_marker[3]);
+                }
             }
             mapView.addPOIItem(markerArr[i]);
         }
@@ -592,7 +589,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         ToggleGps = !ToggleGps;
         if (ToggleGps) {
             mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(latitude, longitude), zoomLevel, true);
-            setGpsTracking();
             findViewById(R.id.but_gps).setBackgroundResource(R.drawable.gps_on);
         } else {
             mapView.removePOIItem(markerGps);
@@ -781,6 +777,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         in_exhibition_marker[0] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker00);
         in_exhibition_marker[1] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker01);
         in_exhibition_marker[2] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker02);
+        in_exhibition_marker[3] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker03);
+        in_exhibition_marker[4] = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.in_exhibition_marker04);
         for (int i = 0; i < in_exhibition_marker.length; i++) {
             in_exhibition_marker[i] = Bitmap.createScaledBitmap(in_exhibition_marker[i], 110, 110, true);
         }
@@ -938,24 +936,26 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void attributeSetting() {
         for(int i = 0 ; i < 6 ; i++){
             if(exhibitionState[i].equals("1")) {
-                if (isCheckQrArr[i] == false) {
-                    qTitle.add(Title[i]);
-                    qDescription.add(qrDescription[i]);
-                    qImages.add(qrImages[i]);
-                    qExhibitionNum.add(i);
-                    qType.add(0);
-                    qNumOfImg.add(-1);
-                }
-                if(i == 3) continue;    //4전시관은 사진 패스
+
                 for(int j = 0 ; j < ImgNumByExhibition ; j++) {
+                    if(i == 3) break;    //4전시관은 사진 패스
                     if(isCheckImgArr[i][j] == false) {
                         qTitle.add(Title[i]);
-                        qDescription.add(imgDescription[i][(randomImgNumArr[i][j])]);
+                        qDescription.add("해당 전시관의 전시물 \"" + imgDescription[i][(randomImgNumArr[i][j])] + "\"를 찾아 사진을 찍으세요.");
                         qImages.add(images[i][(randomImgNumArr[i][j])]);     //찍을 이미지로 바꿔줘야함**
                         qExhibitionNum.add(i);
                         qType.add(1);
                         qNumOfImg.add(j);
                     }
+                }
+
+                if (isCheckQrArr[i] == false) {
+                    qTitle.add(Title[i]);
+                    qDescription.add(qrDescription);
+                    qImages.add(qrImages);
+                    qExhibitionNum.add(i);
+                    qType.add(0);
+                    qNumOfImg.add(-1);
                 }
             }
         }

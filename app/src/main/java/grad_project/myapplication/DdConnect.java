@@ -32,18 +32,18 @@ import java.net.URL;
 
 public class DdConnect extends AsyncTask<String, Void, String> {
     private static final String BASE_PATH = "http://35.221.108.183/android/";
-    public static final String ADD_AUDIENCE = BASE_PATH+ "add_audience.php";
-    public static final String LOGIN = BASE_PATH+ "login.php";
-    public static final String GET_AUDIENCE = BASE_PATH+ "get_audience.php";
-    public static final String GET_PARTICIPATION = BASE_PATH+ "get_participation.php";
-    public static final String GET_ISSTART = BASE_PATH+ "get_isStart.php";
-    public static final String SET_ISEND = BASE_PATH+ "set_isEnd.php";
-    public static final String GET_ISEND = BASE_PATH+ "get_isEnd.php";
-    public static final String GET_EXHIBITION = BASE_PATH+ "get_exhibition.php";
-    public static final String GET_QR = BASE_PATH+ "get_qr.php";
-    public static final String GET_MAC = BASE_PATH+ "get_mac.php";
-    public static final String GET_NARRATOR = BASE_PATH+ "get_narrator.php";
-    public static final String GET_SURVEY = BASE_PATH+"get_survey.php";
+    public static final String ADD_AUDIENCE = BASE_PATH + "add_audience.php";
+    public static final String LOGIN = BASE_PATH + "login.php";
+    public static final String GET_AUDIENCE = BASE_PATH + "get_audience.php";
+    public static final String GET_PARTICIPATION = BASE_PATH + "get_participation.php";
+    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";
+    public static final String SET_ISEND = BASE_PATH + "set_isEnd.php";
+    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";
+    public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";
+    public static final String GET_QR = BASE_PATH + "get_qr.php";
+    public static final String GET_MAC = BASE_PATH + "get_mac.php";
+    public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";
+    public static final String GET_SURVEY = BASE_PATH + "get_survey.php";
 
     private WeakReference<Context> activityReference = null;
     private ProgressDialog progressDialog;

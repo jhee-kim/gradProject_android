@@ -1,19 +1,14 @@
 package grad_project.myapplication;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.hardware.Camera;
-import android.net.Uri;
+import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.service.autofill.FieldClassification;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -31,19 +26,10 @@ import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.DMatch;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfDMatch;
-import org.opencv.core.MatOfKeyPoint;
 import org.opencv.features2d.BFMatcher;
-import org.opencv.features2d.ORB;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.List;
-
-import static org.opencv.core.Core.NORM_HAMMING;
 
 public class CompareActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private static final String TAG = CompareActivity.class.getSimpleName();
@@ -59,6 +45,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
     private long mLastClickTime = 0;
 
     public native void ConvertRGBtoGray(long matAddrInput, long matAddrResult);
+    public native int imageprocessing(long objectImage, long sceneImage);
 
     static {
         System.loadLibrary("opencv_java4");
@@ -119,22 +106,20 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
-                uploadImage(matResult);
+
+                /*90도 회전*/
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                Bitmap bitmap = Bitmap.createBitmap(matResult.width(), matResult.height(), Bitmap.Config.ARGB_8888);
+                Utils.matToBitmap(matResult, bitmap);
+                Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+                AsyncTask<Bitmap, Void, Integer> task = new FeatureComparingTask();
+                task.execute(rotated);
             }
         });
     }
 
-    public void uploadImage(Mat mat) {
-        if (mat != null) {
-            Bitmap bitmap = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(matResult, bitmap);
-            checkImg.setImageBitmap(bitmap);
-            Log.d(TAG, "bitmap matResult: " + bitmap.getWidth() + " " + bitmap.getHeight() + " " + bitmap.getConfig());
-        }
-        else {
-            Log.d(TAG, "Image picker gave us a null image.");
-        }
-    }
     @Override
     public void onPause()
     {
@@ -144,8 +129,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         if (!OpenCVLoader.initDebug()) {
@@ -186,16 +170,14 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         return matResult;
     }
 
-/*
-    private class FeatureComparingTask extends AsyncTask<Mat, Void, Integer> {
+    private class FeatureComparingTask extends AsyncTask<Bitmap, Void, Integer> {
         private final static int MIN_CORRECT_NUM = 20;
         private WeakReference<CompareActivity> mActivityWeakReference;
-        private ProgressDialog asyncDialog;
+        private ProgressDialog asyncDialog = new ProgressDialog(CompareActivity.this);
 
         @Override
         protected void onPreExecute() {
             mActivityWeakReference = new WeakReference<>(CompareActivity.this);
-            asyncDialog = new ProgressDialog(CompareActivity.this);
             asyncDialog.setCancelable(false);
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             asyncDialog.setMessage("처리중입니다..");
@@ -206,84 +188,33 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         }
 
         @Override
-        protected Integer doInBackground(Mat... mat) {
-            Bitmap bit = Bitmap.createBitmap(mat[0].cols(), mat[0].rows(), Bitmap.Config.RGB_565);
-            Utils.matToBitmap(mat[0], bit);
-            return 0;
-
-            int correctNum = 0;
-            try {
-                final int k = 2;
-                final float nndrRatio = 0.65f;
-                Bitmap bmp = BitmapFactory.decodeResource(getResources(), imgAddr);
-                Mat correctImg =  new Mat(0,0, CvType. CV_32FC2);
-                Utils.bitmapToMat(bmp, correctImg);
-                Mat compareImg =  mat[0];
-                Log.d(TAG, "sssscor: " + correctImg.size().area());
-                Log.d(TAG, "sssscom: " + compareImg.size().area());
-                MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
-                MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
-                Mat descriptors1 = new Mat();
-                Mat descriptors2 = new Mat();
-
-                ORB orb = ORB.create(2000);
-                orb.detectAndCompute(correctImg, new Mat(), keypoints1, descriptors1);
-                Log.d(TAG, "11111: ");
-                orb.detectAndCompute(compareImg, new Mat(), keypoints2, descriptors2);
-                if(keypoints2.size().area() == 0) {
-                    Log.d(TAG, "keypoints_size: " + descriptors2.size().area());
-                    return -1;
-                }
-                if(descriptors2.size().area() == 0) {
-                    Log.d(TAG, "descriptors2_size: " + descriptors2.size().area());
-                    return -1;
-                }
-                Log.d(TAG, "22222: ");
-                Log.d(TAG, "ssss1: " + keypoints1.size().area());
-                Log.d(TAG, "ssss2: " + descriptors1.size().area());
-                Log.d(TAG, "ssss3: " + keypoints2.size().area());
-                Log.d(TAG, "ssss4: " + descriptors2.size().area());
-                List<MatOfDMatch> matches = new ArrayList<MatOfDMatch>();
-                BFMatcher bfMatcher = new BFMatcher(NORM_HAMMING);
-                Log.d(TAG, "33333: ");
-                bfMatcher.knnMatch(descriptors1, descriptors2, matches,k);
-                Log.d(TAG, "matches size: " + matches.size());
-
-                List<DMatch> goodMatches = new ArrayList<DMatch>();
-                for(int i = 0 ; i < matches.size() ; i++) {
-                    if(matches.get(i).size().area() == 2 &&
-                            matches.get(i).toArray()[0].distance <=  nndrRatio * matches.get(i).toArray()[1].distance) {
-                        goodMatches.add(matches.get(i).toArray()[0]);
-                    }
-                }
-                Log.d(TAG, "goodMatches size: " + goodMatches.size());
-                correctNum = goodMatches.size();
-            } catch (NullPointerException e) {
-                Log.d(TAG, "algorithm NullPointerException" + e.getMessage());
-                e.printStackTrace();
-            } catch (ArrayIndexOutOfBoundsException e) {
-                Log.d(TAG, "algorithm ArrayIndexOutOfBoundsException " +
-                        e.getMessage());
-                e.printStackTrace();
-            }
-            return correctNum;
+        protected Integer doInBackground(Bitmap... bitmaps) {
+            final int k = 2;
+            final float nndrRatio = 0.65f;
+            Bitmap bmp = BitmapFactory.decodeResource(getResources(), imgAddr);
+            Mat correctImg =  new Mat(0,0, CvType. CV_32FC2);
+            Utils.bitmapToMat(bmp, correctImg);
+            Mat compareImg =  new Mat(0,0, CvType. CV_32FC2);
+            Utils.bitmapToMat(bitmaps[0], compareImg);
+//////////////////////////////////////////////////////
+            return imageprocessing(correctImg.getNativeObjAddr(), compareImg.getNativeObjAddr());
         }
 
-        protected void onPostExecute(int correctNum) {
+        @Override
+        protected void onPostExecute(Integer correctNum) {
             String resultMessage;
             boolean isSuccess = false;
             if(correctNum < MIN_CORRECT_NUM) {
                 resultMessage = "사진이 일치하지 않습니다.";
             } else {    //사진이 일치하는 경우
-                SharedPreferences.Editor editor = infoData.edit();  //Share preference 설정해주고
+                SharedPreferences.Editor editor = infoData.edit();  //Share preference 설정
                 editor.putBoolean("IS_CHECK_PIC_" + (exhibitionNum  + 1) + "-" + (imgNum + 1), true);
                 editor.apply();
                 resultMessage = "사진이 일치합니다.";   //띄울 메시지
                 isSuccess = true;
             }
             asyncDialog.dismiss();
-            Toast.makeText(getApplicationContext(), resultMessage + correctNum + "/" + MIN_CORRECT_NUM, Toast.LENGTH_LONG).show();
-//resultMessage 띄워줌
+            Toast.makeText(getApplicationContext(), resultMessage, Toast.LENGTH_LONG).show();//resultMessage 띄워줌
             CompareActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 Intent intent = new Intent(CompareActivity.this, NormalActivity.class);
@@ -294,5 +225,5 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
                 finish();
             }
         }
-    }*/
+    }
 }

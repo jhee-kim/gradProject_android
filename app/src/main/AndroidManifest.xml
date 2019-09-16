@@ -84,6 +84,7 @@
             android:theme="@style/zxing_CaptureTheme"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".TutorialActivity"></activity>
+      
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="63c2eeea64bff757d4f3fbb253f2ff59" />
@@ -106,8 +107,13 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
-        <service android:name=".NotiService" />
+  
+        <service android:name=".NotiService"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name=".NotiService" />
+            </intent-filter>
+        </service>
 
         <uses-library
             android:name="org.apache.http.legacy"
