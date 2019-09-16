@@ -43,7 +43,7 @@ public class DdConnect extends AsyncTask<String, Void, String> {
     public static final String GET_QR = BASE_PATH+ "get_qr.php";
     public static final String GET_MAC = BASE_PATH+ "get_mac.php";
     public static final String GET_NARRATOR = BASE_PATH+ "get_narrator.php";
-    public static final String GET_SURVEY = "get_survey.php";
+    public static final String GET_SURVEY = BASE_PATH+"get_survey.php";
 
     private WeakReference<Context> activityReference = null;
     private ProgressDialog progressDialog;
