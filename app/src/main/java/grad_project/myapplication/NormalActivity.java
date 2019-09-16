@@ -113,26 +113,27 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     String Title[] = {"제1전시관 겨레의뿌리", "제2전시관 겨례의시련", "제3전시관 겨레의함성", "제4전시관 평화누리", "제5전시관 나라되찾기", "제6전시관 새나라세우기"};
     List<String> qDescription = new ArrayList<String>();
     String qrDescription = "해당 전시관 출입구에 있는 QR코드를 찍으세요.";
-    String imgDescription[][] = {{"사진1-1", "사진1-2", "사진1-3", "사진1-4"},      //images배열과 매칭
+    String imgDescription[][] = {{"훈민정음 해례본", "승정원일기", "주먹도끼", "반달모양 돌칼"},      //images배열과 매칭
             {},
-            {"사진3-1", "사진3-2", "사진3-3", "사진3-4"},
+            {"간민회 조직 총회소집 통지서", "무궁화 자수 지도", "대한독립선언서", "고종 국장 화보"},
             {},
-            {"사진5-1", "사진5-2", "사진5-3", "사진5-4"},
-            {"사진6-1", "사진6-2", "사진6-3", "사진6-4"},  };  //찍을 사진들 이름 적으면 될듯
+            {"만주 한국독립당의 호소문", "한국광복군 서명 태극기", "한국광복군총사령부 성립전례식", "신채호 친필 편지"},
+            {"독립열사", "일제강정기 학교", "어린이날 포스터", "일제수탈에 항쟁하는 농민들"}};  //찍을 사진들 이름 적으면 될듯
     List<Integer> qImages = new ArrayList<Integer>();
     int qrImages = R.drawable.qr_img;
-    int images[][] = {{R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1}, //전시관마다 최대 사진 4개씩
-            {},         //2전시관 사진X
-            {R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1},
-            {},         //4전시관 사진X
-            {R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1},
-            {R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1, R.drawable.img1_1}};   //찍을 이미지들
-//    int images[][] = {{R.drawable.img1_1, R.drawable.img1_2, R.drawable.img1_3, R.drawable.img1_4}, //전시관마다 최대 사진 4개씩
-//            {},         //2전시관 사진X
-//            {R.drawable.img3_1, R.drawable.img3_2, R.drawable.img3_3, R.drawable.img3_4},
-//            {},         //4전시관 사진X
-//            {R.drawable.img5_1, R.drawable.img5_2, R.drawable.img5_3, R.drawable.img5_4},
-//            {R.drawable.img6_1, R.drawable.img6_2, R.drawable.img6_3, R.drawable.img6_4}};   //찍을 이미지들
+    int smallImages[][] = {{R.drawable.simg1_1, R.drawable.simg1_2, R.drawable.simg1_3, R.drawable.simg1_4}, //전시관마다 최대 사진 4개씩
+                            {},         //2전시관 사진X
+                            {R.drawable.simg3_1, R.drawable.simg3_2, R.drawable.simg3_3, R.drawable.simg3_4},
+                            {},         //4전시관 사진X
+                            {R.drawable.simg5_1, R.drawable.simg5_2, R.drawable.simg5_3, R.drawable.simg5_4},
+                            {R.drawable.simg6_1, R.drawable.simg6_2, R.drawable.simg6_3, R.drawable.simg6_4}};   //찍을 이미지들
+
+    int bigImages[][] = {{R.drawable.img1_1, R.drawable.img1_2, R.drawable.img1_3, R.drawable.img1_4}, //전시관마다 최대 사진 4개씩
+                        {},         //2전시관 사진X
+                        {R.drawable.img3_1, R.drawable.img3_2, R.drawable.img3_3, R.drawable.img3_4},
+                        {},         //4전시관 사진X
+                        {R.drawable.img5_1, R.drawable.img5_2, R.drawable.img5_3, R.drawable.img5_4},
+                        {R.drawable.img6_1, R.drawable.img6_2, R.drawable.img6_3, R.drawable.img6_4}};   //찍을 이미지들
     List<Integer> qExhibitionNum = new ArrayList<Integer>();
     List<Integer> qType = new ArrayList<Integer>();     //0 - QR / 1 - Image
     List<Integer> qNumOfImg = new ArrayList<Integer>();
@@ -278,7 +279,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     // 저장된 값 가져오기 - 각 전시관 QR코드 체크 여부, 사진 체크여부, 튜토리얼 여부, 선택된 랜덤 사진들
     public void loadInfo() {
         for (int i = 0; i < 6; i++) {
-            int num = i + 1;
+            int num = i + 1;    //전시관 번호
             isCheckQrArr[i] = infoData.getBoolean("IS_CHECK_QR_" + num, false);     //전시관 QR코드 체크 여부
             for(int j = 0 ; j < ImgNumByExhibition ; j++) {     //전시관 이미지들 찍었는지 여부
                 isCheckImgArr[i][j] = infoData.getBoolean("IS_CHECK_PIC_" + num + "-" + (j + 1), false);
@@ -866,7 +867,9 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 else if(type == 1) {    //사진인 경우
                     nowPosition = position;
                     Intent intent = new Intent(NormalActivity.this, CompareActivity.class);
-                    intent.putExtra("imgAddress", questItems.get(position).QImageItem);
+                    intent.putExtra("smallImgAddr", questItems.get(position).QImageItem);
+                    intent.putExtra("bigImgAddr", bigImages[questItems.get(position).QExhibitionNum]
+                            [randomImgNumArr[questItems.get(position).QExhibitionNum][questItems.get(position).QNumOfImg]]);
                     intent.putExtra("exhibitionNum", questItems.get(position).QExhibitionNum);      //전시관 번호(0~5)
                     intent.putExtra("imgNum", questItems.get(position).QNumOfImg);                  //몇번째 이미지인지(0~max-1)
                     startActivityForResult(intent, 1000);
@@ -942,7 +945,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                     if(isCheckImgArr[i][j] == false) {
                         qTitle.add(Title[i]);
                         qDescription.add("해당 전시관의 전시물 \"" + imgDescription[i][(randomImgNumArr[i][j])] + "\"를 찾아 사진을 찍으세요.");
-                        qImages.add(images[i][(randomImgNumArr[i][j])]);     //찍을 이미지로 바꿔줘야함**
+                        qImages.add(smallImages[i][(randomImgNumArr[i][j])]);     //찍을 이미지로 바꿔줘야함**
                         qExhibitionNum.add(i);
                         qType.add(1);
                         qNumOfImg.add(j);

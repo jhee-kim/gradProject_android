@@ -9,7 +9,7 @@
   },
   {
     "level": "INFO",
-    "message": "- CMake found in SDK at \u0027C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\u0027 had version \u00273.10.2\u0027"
+    "message": "- CMake found in SDK at \u0027C:\\Users\\best\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\u0027 had version \u00273.10.2\u0027"
   },
   {
     "level": "INFO",
@@ -17,7 +17,51 @@
   },
   {
     "level": "INFO",
-    "message": "JSON \u0027C:\\Users\\Administrator\\AndroidStudioProjects\\android\\app\\.cxx\\cmake\\debug\\armeabi-v7a\\android_gradle_build.json\u0027 was up-to-date"
+    "message": "rebuilding JSON D:\\Programming\\4_graduation\\android2\\app\\.cxx\\cmake\\debug\\armeabi-v7a\\android_gradle_build.json due to:"
+  },
+  {
+    "level": "INFO",
+    "message": "- command changed from previous, will remove stale json folder"
+  },
+  {
+    "level": "INFO",
+    "message": "- a dependent build file changed"
+  },
+  {
+    "level": "INFO",
+    "message": "  - C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\build\\cmake\\android.toolchain.cmake"
+  },
+  {
+    "level": "INFO",
+    "message": "  - C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\build\\cmake\\platforms.cmake"
+  },
+  {
+    "level": "INFO",
+    "message": "  - C:\\Users\\Administrator\\AndroidStudioProjects\\android\\app\\src\\main\\cpp\\CMakeLists.txt"
+  },
+  {
+    "level": "INFO",
+    "message": "removing stale contents from \u0027D:\\Programming\\4_graduation\\android2\\app\\.cxx\\cmake\\debug\\armeabi-v7a\u0027"
+  },
+  {
+    "level": "INFO",
+    "message": "created folder \u0027D:\\Programming\\4_graduation\\android2\\app\\.cxx\\cmake\\debug\\armeabi-v7a\u0027"
+  },
+  {
+    "level": "INFO",
+    "message": "executing cmake Executable : C:\\Users\\best\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe\narguments : \n-HD:\\Programming\\4_graduation\\android2\\app\\src\\main\\cpp\n-BD:\\Programming\\4_graduation\\android2\\app\\.cxx\\cmake\\debug\\armeabi-v7a\n-DANDROID_ABI\u003darmeabi-v7a\n-DANDROID_PLATFORM\u003dandroid-21\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dD:\\Programming\\4_graduation\\android2\\app\\build\\intermediates\\cmake\\debug\\obj\\armeabi-v7a\n-DCMAKE_BUILD_TYPE\u003dDebug\n-DANDROID_NDK\u003dC:\\Users\\best\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_ANDROID_ARCH_ABI\u003darmeabi-v7a\n-DCMAKE_SYSTEM_VERSION\u003d21\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_ANDROID_NDK\u003dC:\\Users\\best\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\n-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Users\\best\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570\\build\\cmake\\android.toolchain.cmake\n-G Ninja\n-DCMAKE_MAKE_PROGRAM\u003dC:\\Users\\best\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe\njvmArgs : \n\n"
+  },
+  {
+    "level": "INFO",
+    "message": "done executing cmake"
+  },
+  {
+    "level": "INFO",
+    "message": "write build output D:\\Programming\\4_graduation\\android2\\app\\.cxx\\cmake\\debug\\armeabi-v7a\\build_output.txt"
+  },
+  {
+    "level": "INFO",
+    "message": "write command file D:\\Programming\\4_graduation\\android2\\app\\.cxx\\cmake\\debug\\armeabi-v7a\\build_command.txt"
   },
   {
     "level": "INFO",

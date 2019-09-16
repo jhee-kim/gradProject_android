@@ -35,6 +35,9 @@
             android:name=".OcrActivity"
             android:screenOrientation="portrait"></activity>
         <activity
+            android:name=".CompareActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".HelpNorActivity"
             android:screenOrientation="portrait"></activity>
         <activity

@@ -1,5 +1,5 @@
 {
-  "ndkFolder": "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570",
+  "ndkFolder": "C:\\Users\\best\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570",
   "messages": [
     {
       "level": "INFO",
@@ -15,19 +15,23 @@
     },
     {
       "level": "INFO",
-      "message": "sdkFolder is C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk"
+      "message": "sdkFolder is C:\\Users\\best\\AppData\\Local\\Android\\Sdk"
     },
     {
       "level": "INFO",
-      "message": "Considering C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk-bundle in SDK ndk-bundle folder"
+      "message": "Considering C:\\Users\\best\\AppData\\Local\\Android\\Sdk\\ndk-bundle in SDK ndk-bundle folder"
     },
     {
       "level": "INFO",
-      "message": "Considering C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570 in SDK ndk folder"
+      "message": "Considering C:\\Users\\best\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570 in SDK ndk folder"
     },
     {
       "level": "INFO",
-      "message": "No user requested version, choosing C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570 which is version 20.0.5594570"
+      "message": "Rejected C:\\Users\\best\\AppData\\Local\\Android\\Sdk\\ndk-bundle in SDK ndk-bundle folder because that location has no source.properties"
+    },
+    {
+      "level": "INFO",
+      "message": "No user requested version, choosing C:\\Users\\best\\AppData\\Local\\Android\\Sdk\\ndk\\20.0.5594570 which is version 20.0.5594570"
     }
   ]
 }

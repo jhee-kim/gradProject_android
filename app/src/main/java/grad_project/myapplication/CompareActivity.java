@@ -16,6 +16,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -34,8 +35,11 @@ import java.util.ArrayList;
 public class CompareActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private static final String TAG = CompareActivity.class.getSimpleName();
     private SharedPreferences infoData;
-    private ImageView checkImg;
-    private int imgAddr;
+    private ImageView smallCheckImg;
+    private ImageView bigCheckImg;
+    private TextView text;
+    private int smallImgAddr;
+    private int bigImgAddr;
     private int imgNum;
     private int exhibitionNum;
 
@@ -85,19 +89,29 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         mOpenCvCameraView.setCameraIndex(0); // front-camera(1),  back-camera(0)
         mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
 
-        checkImg = (ImageView)findViewById(R.id.correct_img);
+        bigCheckImg = (ImageView)findViewById(R.id.correct_img1);
+        smallCheckImg = (ImageView)findViewById(R.id.correct_img2);
+        text = (TextView)findViewById(R.id.showHowText);
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
         Intent intent = getIntent();
         //해당 이미지의 주소(R.drawable...), 사진번호, 해당 이미지의 전시관 가져옴
-        imgAddr = intent.getIntExtra("imgAddress", -1);
+        smallImgAddr = intent.getIntExtra("smallImgAddr", -1);
+        bigImgAddr = intent.getIntExtra("bigImgAddr", -1);
         exhibitionNum = intent.getIntExtra("exhibitionNum", -1);     //전시관 번호(0~5)
         imgNum = intent.getIntExtra("imgNum", -1);                   //몇번째 이미지인지(0~max-1)
-        Log.d(TAG, "imgAddr: " + imgAddr);
+        Log.d(TAG, "smallImgAddr: " + smallImgAddr);
+        Log.d(TAG, "bigImgAddr: " + bigImgAddr);
         Log.d(TAG, "exhibitionNum: " + exhibitionNum);
         Log.d(TAG, "imgNum: " + imgNum);
-        checkImg.setImageResource(imgAddr);  //이미지 왼쪽 위에 띄움
+        bigCheckImg.setImageResource(bigImgAddr);  //이미지 전체에 띄움(큰이미지)
+    }
 
+    public void imgClick(View view){
+        bigCheckImg.setVisibility(View.GONE);
+        text.setVisibility(View.GONE);
+
+        smallCheckImg.setImageResource(smallImgAddr);   //이미지 왼쪽에 띄움
         ImageButton shutter = (ImageButton) findViewById(R.id.button_capture1);
         shutter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,6 +133,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
             }
         });
     }
+
 
     @Override
     public void onPause()
@@ -171,7 +186,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
     }
 
     private class FeatureComparingTask extends AsyncTask<Bitmap, Void, Integer> {
-        private final static int MIN_CORRECT_NUM = 20;
+        private final static int MIN_CORRECT_NUM = 35;
         private WeakReference<CompareActivity> mActivityWeakReference;
         private ProgressDialog asyncDialog = new ProgressDialog(CompareActivity.this);
 
@@ -189,9 +204,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
 
         @Override
         protected Integer doInBackground(Bitmap... bitmaps) {
-            final int k = 2;
-            final float nndrRatio = 0.65f;
-            Bitmap bmp = BitmapFactory.decodeResource(getResources(), imgAddr);
+            Bitmap bmp = BitmapFactory.decodeResource(getResources(), bigImgAddr);
             Mat correctImg =  new Mat(0,0, CvType. CV_32FC2);
             Utils.bitmapToMat(bmp, correctImg);
             Mat compareImg =  new Mat(0,0, CvType. CV_32FC2);
@@ -203,6 +216,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         @Override
         protected void onPostExecute(Integer correctNum) {
             String resultMessage;
+            Log.d(TAG, "correctNum: " + correctNum);
             boolean isSuccess = false;
             if(correctNum < MIN_CORRECT_NUM) {
                 resultMessage = "사진이 일치하지 않습니다.";
