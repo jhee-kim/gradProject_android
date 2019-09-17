@@ -306,11 +306,11 @@ public class NotiService extends Service {
     };
 
     public boolean checkInLocation() {
-        //MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.786625, 127.218318);
-        //MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.776687, 127.233477);
+        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.786625, 127.218318);
+        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.776687, 127.233477);
 
-        MapPoint leftB = MapPoint.mapPointWithGeoCoord( 36.243457, 126.886106);
-        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.244253, 126.888423);
+//        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.769286, 127.276795);
+//        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.760179, 127.286539);
 
         MapPointBounds boundary = new MapPointBounds(leftB, RightT);
         gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);

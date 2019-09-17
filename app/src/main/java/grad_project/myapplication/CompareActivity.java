@@ -228,7 +228,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
                 isSuccess = true;
             }
             asyncDialog.dismiss();
-            Toast.makeText(getApplicationContext(), resultMessage, Toast.LENGTH_LONG).show();//resultMessage 띄워줌
+            Toast.makeText(getApplicationContext(), resultMessage+correctNum, Toast.LENGTH_LONG).show();//resultMessage 띄워줌
             CompareActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 Intent intent = new Intent(CompareActivity.this, NormalActivity.class);

@@ -20,6 +20,7 @@ import java.net.URL;
  시작 여부 : get_isStart.php                 input : id                   return : start_date or 0
  관람종료 : set_isEnd.php                    input : id                   return : 1 or 0
  종료 여부 : get_isEnd.php                   input : id                   return : end_date or 0
+ 관람 초기화 : set_isStart.php               input : id                   return : 1 or 0
 
  전시관 개설 여부 : get_exhibition.php       input : non                  return : { "result": [ { "number": "1", "isOpen": "1" }, { "number": "2", "isOpen": "0" }, { "number": "3", "isOpen": "1" }, { "number": "4", "isOpen": "1" }, { "number": "5", "isOpen": "1" }, { "number": "6", "isOpen": "1" } ] }
  전시관 QR코드 : get_qr.php                  input : non                  return : { "result": [ { "number": "1", "address": "" }, { "number": "2", "address": "" }, { "number": "3", "address": "" }, { "number": "4", "address": "" }, { "number": "5", "" }, { "number": "6", "address": "" } ] }
