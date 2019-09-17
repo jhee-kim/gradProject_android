@@ -312,9 +312,6 @@ public class NotiService extends Service {
         MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.786625, 127.218318);
         MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.776687, 127.233477);
 
-//        MapPoint leftB = MapPoint.mapPointWithGeoCoord( 36.243457, 126.886106);
-//        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.244253, 126.888423);
-
         MapPointBounds boundary = new MapPointBounds(leftB, RightT);
         gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
 
