@@ -309,11 +309,11 @@ public class NotiService extends Service {
     };
 
     public boolean checkInLocation() {
-        //MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.786625, 127.218318);
-        //MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.776687, 127.233477);
+        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.786625, 127.218318);
+        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.776687, 127.233477);
 
-        MapPoint leftB = MapPoint.mapPointWithGeoCoord( 36.243457, 126.886106);
-        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.244253, 126.888423);
+//        MapPoint leftB = MapPoint.mapPointWithGeoCoord( 36.243457, 126.886106);
+//        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.244253, 126.888423);
 
         MapPointBounds boundary = new MapPointBounds(leftB, RightT);
         gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
@@ -516,7 +516,7 @@ public class NotiService extends Service {
                     this.sendEmptyMessageDelayed(LOCATION_TIMER_START, LOCATION_DELAY * 1000);
                 } else {
                     location_count++;
-                    if (location_count > 1) {
+                    if (location_count > 3) {
                         is_inLocation = false;
                         Log.d("LOCATIONTIMER", "영역 밖에 있음");
                         if (is_start) {
