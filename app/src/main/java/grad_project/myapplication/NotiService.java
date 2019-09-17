@@ -419,7 +419,8 @@ public class NotiService extends Service {
                             }
                         }
                     }
-                    if (l_elapseTime > 7140000) {
+//                    if (l_elapseTime > 7140000) {
+                    if (l_elapseTime > 0) {
                         Log.d("NOTISERVICE", "두시간 넘었음!");
                         if (isEnd()) {
                             // 관람 종료되었으면 관람 종료했다고 띄워줌

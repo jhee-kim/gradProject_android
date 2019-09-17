@@ -328,7 +328,8 @@ public class CheckActivity extends AppCompatActivity {
             s_startTime = sdfStart.format(startDate);
             Log.d("START TIME", s_startTime);
 
-            l_endTime = l_startTime + 7200000 + l_delayTime;
+//            l_endTime = l_startTime + 7200000 + l_delayTime;
+            l_endTime = l_startTime + 720000 + l_delayTime;
             Date endDate = new Date(l_endTime);
             SimpleDateFormat sdfEnd = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
             s_endTime = sdfEnd.format(endDate);
