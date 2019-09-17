@@ -47,6 +47,8 @@ public class NotiService extends Service {
     boolean is_notify = false;  // 커스텀 노티 기능 ON/OFF 여부(SharedPreferences 사용)
     boolean is_start = false;   // 관람 시작 여부
     boolean is_end = false;     // 관람 종료 여부
+    boolean is_initialize = false;  // 초기화 진행 여부
+    boolean is_setIsStart = false;
     String s_id = "";             // 로그인된 사용자 아이디
     String s_stateNoti = "";     // 커스텀 노티에 표시될 관람 상태 내용(관람 시작 전/관람 진행 중/관람 종료)
     long l_startTime = 0;       // 시작시간 서버에서 받아옴
@@ -135,7 +137,21 @@ public class NotiService extends Service {
             stopSelf();
         }
 
+        // 초기화
+        is_notification = false;
+        stateTimerhandler = new StateTimerHandler();
+        timeTimerHandler = new TimeTimerHandler();
+        locationTimerHandler = new LocationTimerHandler();
+
+        location_count = 0;
+        is_inLocation = false;
+        is_warned = false;
+
+        notiManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notiManager_default = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notiManager_warning = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         ConnectivityManager cm = (ConnectivityManager) getSystemService( Context.CONNECTIVITY_SERVICE );
+
         NetworkRequest.Builder builder = new NetworkRequest.Builder();
         cm.registerNetworkCallback(builder.build(),
                 new ConnectivityManager.NetworkCallback()
@@ -152,23 +168,8 @@ public class NotiService extends Service {
                     {
                         //네트워크 끊어짐
                         networkNotification();
-//                        stopSelf();
                     }
                 } );
-
-        // 초기화
-        is_notification = false;
-        stateTimerhandler = new StateTimerHandler();
-        timeTimerHandler = new TimeTimerHandler();
-        locationTimerHandler = new LocationTimerHandler();
-
-        location_count = 0;
-        is_inLocation = false;
-        is_warned = false;
-
-        notiManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notiManager_default = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notiManager_warning = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // 오레오 이상 노티 채널 생성
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -178,9 +179,10 @@ public class NotiService extends Service {
             mChannel.setShowBadge(false);
             notiManager.createNotificationChannel(mChannel);
             // 커스텀 노티 기능 OFF일 때 기본 생성될 알림 채널(중요도 NONE:무음 및 최소화인데 최소화는 자동으로 안되는듯)
-            int importance_default = NotificationManager.IMPORTANCE_NONE;
+            int importance_default = NotificationManager.IMPORTANCE_MIN;
             NotificationChannel mChannel_default = new NotificationChannel(channelId_default, channelName_default, importance_default);
             mChannel_default.setShowBadge(false);
+            mChannel_default.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
             notiManager_default.createNotificationChannel(mChannel_default);
             // 위치 이탈했을 때 경고 알림용 채널(중요도 HIGH:소리 및 팝업)
             int importance_warning = NotificationManager.IMPORTANCE_HIGH;
@@ -242,6 +244,7 @@ public class NotiService extends Service {
                         .setAutoCancel(false)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setSmallIcon(android.R.drawable.btn_star)
+                        .setVisibility(Notification.VISIBILITY_SECRET)
                         .setOngoing(true)
                         .setContentIntent(pendingIntent);
 
@@ -319,12 +322,54 @@ public class NotiService extends Service {
     }
 
     public void setOutLocation() {
-        Log.d("위치 초기화", "위치 초기화!!");
-//        stopSelf(); // 서비스 끄면 안되고... 다른 조치
+        Log.d("위치 초기화", "위치 초기화 시작!!");
 
-        // 초기화되었다는 정보를 broadcast 한다
-        Intent intent = new Intent("Process Initialized");
-        LocalBroadcastManager.getInstance(NotiService.this).sendBroadcast(intent);
+        if (i_state == 1) {
+            Log.d("SERVICE", "위치 초기화 진행 0단계");
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (is_initialize) {
+                        Log.d("SERVICE", "위치 초기화 진행 1단계");
+                        if (setInitialize()) {
+                            if (is_setIsStart) {
+                                Log.d("SERVICE", "위치 초기화 진행 2단계");
+                                stateTimerhandler.removeMessages(END_TIMER_START);
+                                stateTimerhandler.sendEmptyMessage(START_TIMER_START);
+                                i_state = 0;
+                                s_stateNoti = "관람 시작 전";
+                                updateNotification(nFLAG_INITIALIZE);
+                                is_start = false;
+                                is_initialize = false;
+                                is_setIsStart = false;
+                                // 초기화되었다는 정보를 broadcast 한다
+                                Intent intent = new Intent("Initialized!");
+                                LocalBroadcastManager.getInstance(NotiService.this).sendBroadcast(intent);
+                                try {
+                                    Thread.sleep(2000);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                Intent in_main = new Intent(NotiService.this, MainActivity.class);
+                                startActivity(in_main);
+                            } else {
+//                                Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+//                            Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                        }
+                        try {
+                            Thread.sleep(2000);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            thread.run();
+        }
+
+        Log.d("위치 초기화", "위치 초기화 끝!!");
     }
 
     // 지정한 시간 단위로 시작/종료 여부 서버에서 받아옴
@@ -370,6 +415,7 @@ public class NotiService extends Service {
                                 i_state = 0;
                                 s_stateNoti = "관람 시작 전";
                                 updateNotification(nFLAG_INITIALIZE);
+                                is_start = false;
                             }
                         }
                     }
@@ -432,20 +478,24 @@ public class NotiService extends Service {
         public void handleMessage(Message msg) {
             if (msg.what == NOWTIME_TIMER_START) {
                 Log.d("TimeTimerHandler", "Running");
-                if (is_start) {
-                    l_nowTime = System.currentTimeMillis();
-                    l_elapseTime = l_nowTime - l_startTime;
-                    long temp_time = l_elapseTime / 1000;
-                    if (temp_time % 60 >= 0 && temp_time % 60 < 30) {
-                        Date elapseDate = new Date(l_elapseTime);
-                        SimpleDateFormat sdfElapse = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                        sdfElapse.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        s_elapseTime = sdfElapse.format(elapseDate);
-                        updateNotification(nFLAG_TIME);
-                        Log.d("TIME TIMER", "NOTI UPDATE");
+                if (is_notification) {
+                    if (is_start) {
+                        l_nowTime = System.currentTimeMillis();
+                        l_elapseTime = l_nowTime - l_startTime;
+                        long temp_time = l_elapseTime / 1000;
+                        if (temp_time % 60 >= 0 && temp_time % 60 < 30) {
+                            Date elapseDate = new Date(l_elapseTime);
+                            SimpleDateFormat sdfElapse = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                            sdfElapse.setTimeZone(TimeZone.getTimeZone("UTC"));
+                            s_elapseTime = sdfElapse.format(elapseDate);
+                            updateNotification(nFLAG_TIME);
+                            Log.d("TIME TIMER", "NOTI UPDATE");
+                        }
+                        Log.d("TIME TIMER", Long.toString(l_elapseTime));
+                        this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
+                    } else {
+                        this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
                     }
-                    Log.d("TIME TIMER", Long.toString(l_elapseTime));
-                    this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
                 } else {
                     this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
                 }
@@ -466,17 +516,18 @@ public class NotiService extends Service {
                     this.sendEmptyMessageDelayed(LOCATION_TIMER_START, LOCATION_DELAY * 1000);
                 } else {
                     location_count++;
-                    if (location_count > 3) {
+                    if (location_count > 1) {
                         is_inLocation = false;
                         Log.d("LOCATIONTIMER", "영역 밖에 있음");
                         if (is_start) {
                             if (is_warned) {
                                 location_count = 0;
                                 is_warned = false;
+                                is_initialize = true;
+                                Log.d("I_STATE", Integer.toString(i_state));
+                                setOutLocation();
                                 builder_warning.setContentText("관람 기록이 초기화되었습니다.\n안내센터에 문의하세요.");
                                 notiManager_warning.notify(NOTIFICATION_ID_warning, builder_warning.build());
-
-                                setOutLocation();
                             } else {
                                 builder_warning = new NotificationCompat.Builder(getApplicationContext(), channelId_warning);
 
@@ -519,6 +570,7 @@ public class NotiService extends Service {
                     if (is_end) {
                         s_stateNoti = "관람 종료";
                         i_state = 2;
+                        stopSelf();
                     }
                 } else {    // 네트워크 통신 오류 예외처리
 //                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
@@ -666,6 +718,21 @@ public class NotiService extends Service {
             Log.d("GET_ISEND", result);
             if (!result.equals("-1")) {
                 is_end = !result.equals("0");
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean setInitialize() {
+        DdConnect dbConnect = new DdConnect();
+        try {
+            String result = dbConnect.execute(dbConnect.SET_ISSTART, s_id).get();
+            Log.d("SET_ISSTART", result);
+            if (!result.equals("-1")) {
+                is_setIsStart = !result.equals("0");
                 return true;
             }
         } catch (Exception e) {

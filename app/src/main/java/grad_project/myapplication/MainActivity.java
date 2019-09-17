@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
@@ -240,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(processFinishedReceiver, new IntentFilter("Finished!"));
 
         resumeActivity();
     }
@@ -250,6 +250,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceDestroyedReceiver, new IntentFilter("Service Destroyed"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(processFinishedReceiver, new IntentFilter("Finished!"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(processInitializedReceiver, new IntentFilter("Initialized!"));
     }
 
     @Override
@@ -570,6 +572,15 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // 관람 종료됐을때
             Log.d("SERVICE", "processFinishedReceiver!@#");
+        }
+    };
+
+    private BroadcastReceiver processInitializedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 관람 종료됐을때
+            Log.d("SERVICE", "processInitializedReceiver!@#");
+            ActivityCompat.finishAffinity(MainActivity.this);
         }
     };
 
