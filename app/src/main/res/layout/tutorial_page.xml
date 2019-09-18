@@ -11,13 +11,4 @@
         android:layout_height="match_parent"
         app:srcCompat="@drawable/tutorial1"
         android:scaleType="fitXY"/>
-
-    <ImageButton
-        android:id="@+id/end_button"
-        android:layout_width="110dp"
-        android:layout_height="60dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/end_button" />
 </RelativeLayout>

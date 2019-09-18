@@ -17,7 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 public class TutorialActivity extends AppCompatActivity {
-    private final static int totalPageNum = 3;
+    private final static int totalPageNum = 4;
     private SharedPreferences infoData;
     private ViewPager viewPager;
     private ViewPagerAdapter pagerAdapter ;
@@ -47,7 +47,6 @@ public class TutorialActivity extends AppCompatActivity {
 
     class ViewPagerAdapter extends PagerAdapter {
         // LayoutInflater 서비스 사용을 위한 Context 참조 저장.
-        private ImageButton endBut;
         private ImageView img;
         private Context context = null ;
 
@@ -66,27 +65,20 @@ public class TutorialActivity extends AppCompatActivity {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.tutorial_page, container, false);
 
-                endBut = (ImageButton)view.findViewById(R.id.end_button);
                 img = (ImageView) view.findViewById(R.id.tutorial_image) ;
-                if(position == 0) {
-                    img.setImageResource(R.drawable.tutorial1);
-                    endBut.setVisibility(View.GONE);
-                }
-                else if(position == 1) {
-                    img.setImageResource(R.drawable.tutorial2);
-                    endBut.setVisibility(View.GONE);
-                }
-                else {
-                    img.setImageResource(R.drawable.tutorial3);
-                    endBut.setVisibility(View.VISIBLE);
-                    endBut.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent resultIntent = new Intent();
-                            setResult(RESULT_OK, resultIntent);
-                            finish();
-                        }
-                    });
+                switch(position) {
+                    case 0:
+                        img.setImageResource(R.drawable.tutorial1);
+                        break;
+                    case 1:
+                        img.setImageResource(R.drawable.tutorial2);
+                        break;
+                    case 2:
+                        img.setImageResource(R.drawable.tutorial3);
+                        break;
+                    case 3:
+                        img.setImageResource(R.drawable.tutorial4);
+                        break;
                 }
             }
 
@@ -104,7 +96,6 @@ public class TutorialActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // 전체 페이지 수는 3개로 고정.
             return totalPageNum;
         }
 
