@@ -38,6 +38,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,12 +53,11 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
     private Mat matInput;
     private Mat matResult;
     private long mLastClickTime = 0;
-    public Mat objectImg;
 
     ImageView imageVIewScene;
 
     public native void ConvertRGBtoGray(long matAddrInput, long matAddrResult);
-    //public native void imageprocessing(long objectImage, long sceneImage);
+    public native void warp(long mat_img);
 
     static {
         System.loadLibrary("opencv_java4");
@@ -91,11 +91,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
         }
 
         imageVIewScene = (ImageView)findViewById(R.id.img);
-        if ( objectImg == null ) {
-            Bitmap object = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.holiday);
-            objectImg = new Mat(0, 0, CvType.CV_32FC2);
-            Utils.bitmapToMat(object, objectImg);
-        }
 
         mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -112,14 +107,18 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
+                warp(matInput.getNativeObjAddr());
+                Bitmap test = Bitmap.createBitmap(matInput.width(), matInput.height(), Bitmap.Config.ARGB_8888);
+                Utils.matToBitmap(matInput, test);
+                imageVIewScene.setImageBitmap(test);
+
                 /*90도 회전*/
                 Matrix matrix = new Matrix();
                 matrix.postRotate(90);
+
                 Bitmap bitmap = Bitmap.createBitmap(matResult.width(), matResult.height(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(matResult, bitmap);
                 Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-                //imageVIewScene.setImageBitmap(bitmapOutput);
 
                 callCloudVision(rotated);
             }
@@ -174,10 +173,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             matResult = new Mat(matInput.rows(), matInput.cols(), CvType.CV_32FC2);
         }
 
-        //imageprocessing(objectImg.getNativeObjAddr() ,matResult.getNativeObjAddr());
-        Bitmap bitmapOutput = Bitmap.createBitmap(matResult.cols(), matResult.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(matResult, bitmapOutput);
-
         ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
 
         return matResult;
@@ -216,7 +211,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             asyncDialog.setMessage("인식중입니다..");
 
             /*show dialog*/
-            asyncDialog.show();
+            //asyncDialog.show();
             super.onPreExecute();
         }
 
@@ -244,7 +239,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
                 intent.putExtra("result", result);
                 setResult(RESULT_OK, intent);
 
-                finish();
+                //finish();
             }
         }
     }

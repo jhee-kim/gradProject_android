@@ -2,7 +2,7 @@
     <string name="app_name">독립기념관 관람</string>
     <string name="check_str">관람 현황</string>
     <string name="myinfo_str">내 정보</string>
-    <string name="registration_str">최초 등록</string>
+    <string name="registration_str">관람 신청</string>
     <string name="certificate_str">확인증</string>
     <string name="regist_info_str">센터 등록 안내</string>
     <string name="login_str">로그인</string>
@@ -32,7 +32,7 @@
     <string name="clause_str">이용 약관</string>
     <string name="clause_detail_1_str">개인정보 수집 및 활용</string>
     <string name="clause_detail_2_str">에 동의하십니까?</string>
-    <string name="registration_apply_str">관람 등록</string>
+    <string name="registration_apply_str">관람 신청</string>
     <string name="apply_str">네</string>
     <string name="cancel_str">아니오</string>
     <string name="hyphen">-</string>
@@ -55,8 +55,6 @@
     <string name="destination_popup_str">행선지 : </string>
     <string name="question_popup_str">정확히 입력하셨나요?</string>
 
-    <!-- test -->
-    <string name="hello">Hello World, CamTestActivity!</string>
     <!-- UI Elements -->
     <string name="btn_capture">Click</string>
     <!-- Toast Messages -->

@@ -165,6 +165,7 @@
         android:id="@+id/layout_exhibition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:layout_below="@id/layout_time"
         android:layout_centerHorizontal="true">
 
@@ -326,28 +327,13 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/bt_toMap"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_below="@id/layout_exhibition"
-        android:onClick="onClick"
-        android:text="@string/openMap_str"
-        android:textSize="16sp"
-        android:fontFamily="@font/m_gothic_normal"
-        android:background="@drawable/custom_button"
-        style="?android:attr/borderlessButtonStyle"/>
-
-    <Button
         android:id="@+id/bt_finish"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="50dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_below="@id/bt_toMap"
+        android:layout_below="@id/layout_exhibition"
         android:onClick="onClick"
         android:text="@string/finish_str"
         android:textSize="16sp"

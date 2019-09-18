@@ -83,7 +83,6 @@ public class CheckActivity extends AppCompatActivity {
         iv_ex[3] = findViewById(R.id.iv_ex_4);
         iv_ex[4] = findViewById(R.id.iv_ex_5);
         iv_ex[5] = findViewById(R.id.iv_ex_6);
-        bt_toMap = findViewById(R.id.bt_toMap);
         bt_finish = findViewById(R.id.bt_finish); 
 
         l_startTime = getStartTime();
@@ -218,35 +217,6 @@ public class CheckActivity extends AppCompatActivity {
 
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.bt_toMap : {
-                if (getStartState()) {
-                    if (is_start) {
-                        Intent intent = new Intent(CheckActivity.this, NormalActivity.class);
-                        intent.putExtra("Time", l_startTime);
-                        startActivity(intent);
-                    } else {
-                       switch (getParticipation()) {
-                           case "0": {
-                               Intent intent = new Intent(CheckActivity.this, HelpNorActivity.class);
-                               startActivity(intent);
-                               break;
-                           }
-                           case "1": {
-                               Intent intent = new Intent(CheckActivity.this, HelpComActivity.class);
-                               startActivity(intent);
-                               break;
-                           }
-                           default: {
-                               Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
-                               break;
-                           }
-                       }
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
             case R.id.bt_finish :
                 if (getFinish()) {
                     if (setFinish()) {

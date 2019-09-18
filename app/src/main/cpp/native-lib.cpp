@@ -56,6 +56,20 @@ float resize(UMat img_src, UMat &img_resize, int resize_width){
     return scale;
 }
 
+float resize(Mat img_src, Mat &img_resize, int resize_width){
+
+    float scale = resize_width / (float)img_src.cols ;
+
+    if (img_src.cols > resize_width) {
+        int new_height = cvRound(img_src.rows * scale);
+        resize(img_src, img_resize, Size(resize_width, new_height));
+    }
+    else {
+        img_resize = img_src;
+    }
+    return scale;
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_grad_1project_myapplication_OcrActivity_ConvertRGBtoGray(JNIEnv *env, jobject thiz,
@@ -138,150 +152,130 @@ Java_grad_1project_myapplication_CompareActivity_imageprocessing(JNIEnv *env, jo
 
     return good_matches.size();
 }
-//
-/////////////////////////////////////////////////////////////////////////////////
-//template<class KPMatcher>
-//struct SURFMatcher
-//{
-//    KPMatcher matcher;
-//    template<class T>
-//    void match(const T& in1, const T& in2, std::vector<cv::DMatch>& matches)
-//    {
-//        matcher.match(in1, in2, matches);
-//    }
-//};
-//
-//static Mat drawGoodMatches(
-//        const Mat& img1,
-//        const Mat& img2,
-//        const std::vector<KeyPoint>& keypoints1,
-//        const std::vector<KeyPoint>& keypoints2,
-//        std::vector<DMatch>& matches,
-//        std::vector<Point2f>& scene_corners_
-//)
-//{
-//    //-- Sort matches and preserve top 10% matches
-//    std::sort(matches.begin(), matches.end());
-//    std::vector< DMatch > good_matches;
-//    double minDist = matches.front().distance;
-//    double maxDist = matches.back().distance;
-//
-//    const int ptsPairs = std::min(GOOD_PTS_MAX, (int)(matches.size() * GOOD_PORTION));
-//    for (int i = 0; i < ptsPairs; i++)
-//    {
-//        good_matches.push_back(matches[i]);
-//    }
-//    std::cout << "\nMax distance: " << maxDist << std::endl;
-//    std::cout << "Min distance: " << minDist << std::endl;
-//
-//    std::cout << "Calculating homography using " << ptsPairs << " point pairs." << std::endl;
-//
-//    // drawing the results
-//    Mat img_matches;
-//
-//
-//    drawMatches(img1, keypoints1, img2, keypoints2,
-//                good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-//                std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
-//
-//
-//    //-- Localize the object
-//    std::vector<Point2f> obj;
-//    std::vector<Point2f> scene;
-//
-//    for (size_t i = 0; i < good_matches.size(); i++)
-//    {
-//        //-- Get the keypoints from the good matches
-//        obj.push_back(keypoints1[good_matches[i].queryIdx].pt);
-//        scene.push_back(keypoints2[good_matches[i].trainIdx].pt);
-//    }
-//    //-- Get the corners from the image_1 ( the object to be "detected" )
-//    std::vector<Point2f> obj_corners(4);
-//    obj_corners[0] = Point(0, 0);
-//    obj_corners[1] = Point(img1.cols, 0);
-//    obj_corners[2] = Point(img1.cols, img1.rows);
-//    obj_corners[3] = Point(0, img1.rows);
-//    std::vector<Point2f> scene_corners(4);
-//
-//    Mat H = findHomography(obj, scene, RANSAC);
-//    perspectiveTransform(obj_corners, scene_corners, H);
-//
-//    scene_corners_ = scene_corners;
-//
-//    //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-//    line(img_matches,
-//         scene_corners[0] + Point2f((float)img1.cols, 0), scene_corners[1] + Point2f((float)img1.cols, 0),
-//         Scalar(0, 255, 0), 2, LINE_AA);
-//    line(img_matches,
-//         scene_corners[1] + Point2f((float)img1.cols, 0), scene_corners[2] + Point2f((float)img1.cols, 0),
-//         Scalar(0, 255, 0), 2, LINE_AA);
-//    line(img_matches,
-//         scene_corners[2] + Point2f((float)img1.cols, 0), scene_corners[3] + Point2f((float)img1.cols, 0),
-//         Scalar(0, 255, 0), 2, LINE_AA);
-//    line(img_matches,
-//         scene_corners[3] + Point2f((float)img1.cols, 0), scene_corners[0] + Point2f((float)img1.cols, 0),
-//         Scalar(0, 255, 0), 2, LINE_AA);
-//
-//    return img_matches;
-//}
-//
-//extern "C"
-//JNIEXPORT void JNICALL
-//Java_grad_1project_myapplication_OcrActivity_imageprocessing(JNIEnv *env, jobject thiz,
-//                                                             jlong object_image,
-//                                                             jlong scene_image) {
-//    ocl::setUseOpenCL(true);
-//
-//    UMat img1, img2;
-//
-//    Mat &img_object = *(Mat *) object_image;
-//    Mat &img_scene = *(Mat *) scene_image;
-//
-//    img_object.copyTo(img1);
-//    img_scene.copyTo(img2);
-//
-//    float resizeRatio = resize(img2, img2, 400);
-//    resize(img1, img1, 400);
-//
-//    cvtColor( img1, img1, COLOR_RGBA2GRAY);
-//    cvtColor( img2, img2, COLOR_RGBA2GRAY);
-//
-//    //declare input/output
-//    std::vector<KeyPoint> keypoints1, keypoints2;
-//    std::vector<DMatch> matches;
-//
-//    UMat _descriptors1, _descriptors2;
-//    Mat descriptors1 = _descriptors1.getMat(ACCESS_RW),
-//            descriptors2 = _descriptors2.getMat(ACCESS_RW);
-//
-//    //instantiate detectors/matchers
-//    ORBDetector orb;
-//
-//    SURFMatcher<BFMatcher> matcher;
-//
-//    //-- start of timing section
-//
-//    for (int i = 0; i <= LOOP_NUM; i++) {
-//        orb(img1.getMat(ACCESS_READ), Mat(), keypoints1, descriptors1);
-//        orb(img2.getMat(ACCESS_READ), Mat(), keypoints2, descriptors2);
-//        matcher.match(descriptors1, descriptors2, matches);
-//    }
-//
-//    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ",
-//                        "%d keypoints on object image", keypoints1.size());
-//    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ",
-//                        "%d keypoints on scene image", keypoints2.size());
-//
-//    std::vector<Point2f> corner;
-//    Mat img_matches = drawGoodMatches(img1.getMat(ACCESS_READ), img2.getMat(ACCESS_READ), keypoints1, keypoints2, matches, corner);
-//
-//    line(img_scene, Point2f(corner[0].x/resizeRatio, corner[0].y/resizeRatio), Point2f(corner[1].x/resizeRatio, corner[1].y/resizeRatio), Scalar(0, 255, 0, 255), 10);
-//    line(img_scene, Point2f(corner[1].x/resizeRatio, corner[1].y/resizeRatio), Point2f(corner[2].x/resizeRatio, corner[2].y/resizeRatio), Scalar(0, 255, 0, 255), 10);
-//    line(img_scene, Point2f(corner[2].x/resizeRatio, corner[2].y/resizeRatio), Point2f(corner[3].x/resizeRatio, corner[3].y/resizeRatio), Scalar(0, 255, 0, 255), 10);
-//    line(img_scene, Point2f(corner[3].x/resizeRatio, corner[3].y/resizeRatio), Point2f(corner[0].x/resizeRatio, corner[0].y/resizeRatio), Scalar(0, 255, 0, 255), 10);
-//
-//    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "draw box %f %f", corner[0].x/resizeRatio, corner[0].y/resizeRatio );
-//    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "draw box %f %f", corner[1].x/resizeRatio, corner[1].y/resizeRatio );
-//    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "draw box %f %f", corner[2].x/resizeRatio, corner[2].y/resizeRatio );
-//    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "draw box %f %f", corner[3].x/resizeRatio, corner[3].y/resizeRatio );
-//}
+
+///////////////////////////////////////////////////////////////////////////////
+void sortCorners(std::vector<cv::Point2f>& corners)         //Ecken ausrichten von Karten
+{
+    std::vector<cv::Point2f> top, bot;
+    cv::Point2f center;
+    // Get mass center
+    for (int i = 0; i < corners.size(); i++)
+        center += corners[i];
+    center *= (1. / corners.size());
+
+    for (int i = 0; i < corners.size(); i++)
+    {
+        if (corners[i].y < center.y)
+            top.push_back(corners[i]);
+        else
+            bot.push_back(corners[i]);
+    }
+    corners.clear();
+
+    if (top.size() == 2 && bot.size() == 2) {
+        cv::Point2f tl = top[0].x > top[1].x ? top[1] : top[0];
+        cv::Point2f tr = top[0].x > top[1].x ? top[0] : top[1];
+        cv::Point2f bl = bot[0].x > bot[1].x ? bot[1] : bot[0];
+        cv::Point2f br = bot[0].x > bot[1].x ? bot[0] : bot[1];
+
+        corners.push_back(tl);
+        corners.push_back(tr);
+        corners.push_back(br);
+        corners.push_back(bl);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_grad_1project_myapplication_OcrActivity_warp(JNIEnv *env, jobject thiz,
+                                                  jlong input_mat) {
+    ocl::setUseOpenCL(true);
+
+    Mat &img = *(Mat *) input_mat;
+
+    Mat quad;
+
+    /*전처리*/
+    //resize(img, img, 800);
+    Mat reImg = img.clone();
+
+    cvtColor( img, img, COLOR_BGR2GRAY);
+    GaussianBlur(img, img, Size(5, 5), 1.5, 1.5);
+
+    erode(img, img, Mat());// these lines may need to be optimized
+    dilate(img, img, Mat());
+    dilate(img, img, Mat());
+    erode(img, img, Mat());
+
+    Canny(img, img, 50, 150, 3); // canny parameters may need to be optimized
+
+    vector<Point> selected_points;
+    vector<vector<Point>> contours;
+    Mat hierarchy;
+
+    findContours(img, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    sort(contours.begin(), contours.end(), [](const vector<Point>& c1, const vector<Point>& c2) {
+        return contourArea(c1, false) > contourArea(c2, false);
+    });
+
+    double maxArr = 0;
+    for (size_t i = 0; i < contours.size(); i++) {
+        vector<Point> approx;
+        approxPolyDP(contours[i], approx, 0.02 * arcLength(contours[i], true), true);
+
+            if (approx.size() == 4 && contourArea(contours[i]) > maxArr) {
+                maxArr = contourArea(contours[i]);
+                selected_points.insert(selected_points.end(), contours[i].begin(), contours[i].end());
+                break;
+            }
+    }
+
+    vector<Point2f> selected_points_f;
+    vector<Point2f> corners;
+    Mat(selected_points).convertTo(selected_points_f, CV_32F);
+    Mat hull;
+    convexHull(selected_points_f, hull, true, true);            //외각선 찾기(점 잇기 알고리즘)
+
+    RotatedRect RRect = minAreaRect(hull);
+    std::vector<cv::Point2f> RR_corners;
+    Point2f four_points[4];
+    RRect.points(four_points);
+    RR_corners.push_back(four_points[0]);
+    RR_corners.push_back(four_points[1]);
+    RR_corners.push_back(four_points[2]);
+    RR_corners.push_back(four_points[3]);
+
+    for (int j = 0; j < 4; j++)
+    {
+        Point2f pt = RR_corners[j];
+        Point2f nearest_pt = hull.at<Point2f>(j, 0);
+        float dist = norm(pt - nearest_pt);
+        for (int k = 1; k < hull.rows; k++)
+        {
+            Point2f hull_point = hull.at<Point2f>(k, 0);
+            if (norm(pt - hull_point) < dist)
+            {
+                dist = norm(pt - hull_point);
+                nearest_pt = hull_point;
+            }
+        }
+        corners.push_back(nearest_pt);
+    }
+    sortCorners(corners);
+
+    Mat(corners).convertTo(selected_points, CV_32S);
+
+    Rect r = boundingRect(corners);
+    quad = cv::Mat::zeros(norm(corners[1] - corners[2]), norm(corners[2] - corners[3]), CV_8UC3);
+
+    std::vector<cv::Point2f> quad_pts;
+    quad_pts.push_back(cv::Point2f(0, 0));
+    quad_pts.push_back(cv::Point2f(quad.cols, 0));
+    quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));
+    quad_pts.push_back(cv::Point2f(0, quad.rows));
+
+    cv::Mat transmtx = cv::getPerspectiveTransform(corners, quad_pts);
+    cv::warpPerspective(reImg, quad, transmtx, quad.size());
+
+    img = quad;
+}
