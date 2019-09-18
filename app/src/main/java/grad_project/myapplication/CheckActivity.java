@@ -329,7 +329,7 @@ public class CheckActivity extends AppCompatActivity {
             Log.d("START TIME", s_startTime);
 
 //            l_endTime = l_startTime + 7200000 + l_delayTime;
-            l_endTime = l_startTime + 720000 + l_delayTime;
+            l_endTime = l_startTime + 10000 + l_delayTime;
             Date endDate = new Date(l_endTime);
             SimpleDateFormat sdfEnd = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
             s_endTime = sdfEnd.format(endDate);
@@ -455,7 +455,10 @@ public class CheckActivity extends AppCompatActivity {
     public void loadData() {
         s_id = infoData.getString("ID", "");
         for (int i = 1; i < 7; i++) {
-            is_success[i-1] = infoData.getBoolean("IS_CHECK_" + i, false);
+            if(i == 4) is_success[i-1] = infoData.getBoolean("IS_CHECK_QR_" + i, false);
+            else is_success[i-1] = infoData.getBoolean("IS_CHECK_QR_" + i, false) && infoData.getBoolean("IS_CHECK_PIC_" + i, false);
+            //Log.d("IS_CHECK_QR",infoData.getBoolean("IS_CHECK_QR_" + i, false) + "");
+            //Log.d("IS_CHECK_PIC_",infoData.getBoolean("IS_CHECK_PIC_" + i, false) + "");
         }
     }
 

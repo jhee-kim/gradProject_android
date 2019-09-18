@@ -35,11 +35,8 @@ import java.util.ArrayList;
 public class CompareActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private static final String TAG = CompareActivity.class.getSimpleName();
     private SharedPreferences infoData;
-    private ImageView smallCheckImg;
-    private ImageView bigCheckImg;
     private TextView text;
-    private int smallImgAddr;
-    private int bigImgAddr;
+    private int imgAddr;
     private int imgNum;
     private int exhibitionNum;
 
@@ -89,29 +86,16 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         mOpenCvCameraView.setCameraIndex(0); // front-camera(1),  back-camera(0)
         mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
 
-        bigCheckImg = (ImageView)findViewById(R.id.correct_img1);
-        smallCheckImg = (ImageView)findViewById(R.id.correct_img2);
-        text = (TextView)findViewById(R.id.showHowText);
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
-
         Intent intent = getIntent();
         //해당 이미지의 주소(R.drawable...), 사진번호, 해당 이미지의 전시관 가져옴
-        smallImgAddr = intent.getIntExtra("smallImgAddr", -1);
-        bigImgAddr = intent.getIntExtra("bigImgAddr", -1);
+        imgAddr = intent.getIntExtra("ImgAddr", -1);
         exhibitionNum = intent.getIntExtra("exhibitionNum", -1);     //전시관 번호(0~5)
         imgNum = intent.getIntExtra("imgNum", -1);                   //몇번째 이미지인지(0~max-1)
-        Log.d(TAG, "smallImgAddr: " + smallImgAddr);
-        Log.d(TAG, "bigImgAddr: " + bigImgAddr);
+        Log.d(TAG, "imgAddr: " + imgAddr);
         Log.d(TAG, "exhibitionNum: " + exhibitionNum);
         Log.d(TAG, "imgNum: " + imgNum);
-        bigCheckImg.setImageResource(bigImgAddr);  //이미지 전체에 띄움(큰이미지)
-    }
 
-    public void imgClick(View view){
-        bigCheckImg.setVisibility(View.GONE);
-        text.setVisibility(View.GONE);
-
-        smallCheckImg.setImageResource(smallImgAddr);   //이미지 왼쪽에 띄움
         ImageButton shutter = (ImageButton) findViewById(R.id.button_capture1);
         shutter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,7 +117,6 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
             }
         });
     }
-
 
     @Override
     public void onPause()
@@ -186,7 +169,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
     }
 
     private class FeatureComparingTask extends AsyncTask<Bitmap, Void, Integer> {
-        private final static int MIN_CORRECT_NUM = 35;
+        private final static int MIN_CORRECT_NUM = 100;
         private WeakReference<CompareActivity> mActivityWeakReference;
         private ProgressDialog asyncDialog = new ProgressDialog(CompareActivity.this);
 
@@ -204,7 +187,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
 
         @Override
         protected Integer doInBackground(Bitmap... bitmaps) {
-            Bitmap bmp = BitmapFactory.decodeResource(getResources(), bigImgAddr);
+            Bitmap bmp = BitmapFactory.decodeResource(getResources(), imgAddr);
             Mat correctImg =  new Mat(0,0, CvType. CV_32FC2);
             Utils.bitmapToMat(bmp, correctImg);
             Mat compareImg =  new Mat(0,0, CvType. CV_32FC2);
@@ -231,7 +214,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
             Toast.makeText(getApplicationContext(), resultMessage+correctNum, Toast.LENGTH_LONG).show();//resultMessage 띄워줌
             CompareActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
-                Intent intent = new Intent(CompareActivity.this, NormalActivity.class);
+                Intent intent = new Intent(CompareActivity.this, ShowImageActivity.class);
                 if(isSuccess) {
                     intent.putExtra("isSuccess", true);
                 }

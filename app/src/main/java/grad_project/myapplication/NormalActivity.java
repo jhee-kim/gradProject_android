@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBar;
@@ -100,7 +101,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     };
 
     /*** list test ***/
-    private final int ImgNumByExhibition = 1;                    //각 전시관 사진 갯수
+    private final int ImgNumByExhibition = 2;                    //각 전시관 사진 갯수
     private int totalImgNum;
     private boolean[][] isCheckImgArr = new boolean[6][ImgNumByExhibition];  //전시관 사진 확인 체크
     private int[][] randomImgNumArr = new int[6][ImgNumByExhibition];   //랜덤으로 뽑은 이미지 번호
@@ -118,7 +119,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             {"간민회 조직 총회소집 통지서", "무궁화 자수 지도", "대한독립선언서", "고종 국장 화보"},
             {},
             {"만주 한국독립당의 호소문", "한국광복군 서명 태극기", "한국광복군총사령부 성립전례식", "신채호 친필 편지"},
-            {"독립열사", "일제강정기 학교", "어린이날 포스터", "일제수탈에 항쟁하는 농민들"}};  //찍을 사진들 이름 적으면 될듯
+            {"독립열사", "6.10만세운동 관련 보도 기사", "어린이날 포스터", "일제수탈에 항쟁하는 농민들"}};  //찍을 사진들 이름 적으면 될듯
     List<Integer> qImages = new ArrayList<Integer>();
     int qrImages = R.drawable.qr_img;
     int smallImages[][] = {{R.drawable.simg1_1, R.drawable.simg1_2, R.drawable.simg1_3, R.drawable.simg1_4}, //전시관마다 최대 사진 4개씩
@@ -190,14 +191,18 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
         attributeSetting();
         QuestItemSet();
-
-        listCountTv.setText(questItems.size() + "");
-        listCountTv.setVisibility(View.VISIBLE);
-
         adapter = new QuestAdapter(this, questItems);
         listView.setAdapter(adapter); // 리스트뷰 생성됨
-
         QuestviewClick();
+
+        /*listCountTv 설정 */
+        if(questItems.size() == 0) {
+            listCountTv.setVisibility(View.GONE);
+        }
+        else {
+            listCountTv.setText(questItems.size() + "");
+            listCountTv.setVisibility(View.VISIBLE);
+        }
 
         /*MapView 초기화*/
         initBitmap();
@@ -266,9 +271,32 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 }
                 case 1000: {
                     if(intent.getBooleanExtra("isSuccess", false)) {
+                        //해당 전시관의 사진이 전부 찍혔는지
+                        boolean isAllPicChecked = true;
+                        int nowExhibitionNum = questItems.get(nowPosition).QExhibitionNum;  //체크된 사진의 전시관만 체크하기
+                        int nowImgNum = questItems.get(nowPosition).QNumOfImg;
+                        isCheckImgArr[nowExhibitionNum][nowImgNum] = true;     //사진 체크됬다고 표시
+                        if(exhibitionState[nowExhibitionNum].equals("1") && nowExhibitionNum != 3) {    //연 전시관이고 4전시관 아닐때 체크
+                            for(int j = 0 ; j < ImgNumByExhibition ; j++) {
+                                isAllPicChecked &= isCheckImgArr[nowExhibitionNum][j];     //비트연산자 사용
+                            }
+                        }
+                        //Log.d("isAllPicChecked", isAllPicChecked + "");
+                        if(isAllPicChecked) {
+                            SharedPreferences.Editor editor = infoData.edit();
+                            editor.putBoolean("IS_CHECK_PIC_" + (nowExhibitionNum + 1), true);
+                            editor.apply();
+                        }
                         questItems.remove(nowPosition);
                         adapter = new QuestAdapter(NormalActivity.this, questItems);
                         listView.setAdapter(adapter);
+                        listCountTv.setText(questItems.size() + "");
+                        if(questItems.size() == 0) {
+                            listCountTv.setVisibility(View.GONE);
+                        }
+                        else {
+                            listCountTv.setVisibility(View.VISIBLE);
+                        }
                     }
                     break;
                 }
@@ -314,6 +342,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             for(int j = 0 ; j < maxImgNum ; j++) {
                 if(random[j]) {
                     editor.putInt("RANDOM_IMG_" + (i + 1) + "_" + a, j);
+                    Log.d("random: ", "" + j);
                     a++;
                 }
             }
@@ -866,12 +895,13 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                 }
                 else if(type == 1) {    //사진인 경우
                     nowPosition = position;
-                    Intent intent = new Intent(NormalActivity.this, CompareActivity.class);
-                    intent.putExtra("smallImgAddr", questItems.get(position).QImageItem);
-                    intent.putExtra("bigImgAddr", bigImages[questItems.get(position).QExhibitionNum]
+                    Intent intent = new Intent(NormalActivity.this, ShowImageActivity.class);
+                    intent.putExtra("ImgAddr", bigImages[questItems.get(position).QExhibitionNum]
                             [randomImgNumArr[questItems.get(position).QExhibitionNum][questItems.get(position).QNumOfImg]]);
                     intent.putExtra("exhibitionNum", questItems.get(position).QExhibitionNum);      //전시관 번호(0~5)
                     intent.putExtra("imgNum", questItems.get(position).QNumOfImg);                  //몇번째 이미지인지(0~max-1)
+                    intent.putExtra("imgTitle", imgDescription[questItems.get(position).QExhibitionNum]
+                            [(randomImgNumArr[questItems.get(position).QExhibitionNum][questItems.get(position).QNumOfImg])]);                  //몇번째 이미지인지(0~max-1)
                     startActivityForResult(intent, 1000);
                 }
             }
@@ -939,7 +969,6 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void attributeSetting() {
         for(int i = 0 ; i < 6 ; i++){
             if(exhibitionState[i].equals("1")) {
-
                 for(int j = 0 ; j < ImgNumByExhibition ; j++) {
                     if(i == 3) break;    //4전시관은 사진 패스
                     if(isCheckImgArr[i][j] == false) {

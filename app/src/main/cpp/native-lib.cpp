@@ -114,7 +114,7 @@ Java_grad_1project_myapplication_CompareActivity_imageprocessing(JNIEnv *env, jo
     for (int i = 0; i <= LOOP_NUM; i++){
         orb(img1.getMat(ACCESS_READ), Mat(), keypoints1, descriptors1);
         orb(img2.getMat(ACCESS_READ), Mat(), keypoints2, descriptors2);
-        if(descriptors1.size == 0 || descriptors2.size == 0) {
+        if(keypoints1.size() == 0 || keypoints2.size() == 0) {
             continue;
         }
         matcher(descriptors1, descriptors2, matches, 2);

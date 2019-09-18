@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 public class TutorialActivity extends AppCompatActivity {
+    private final static int totalPageNum = 3;
     private SharedPreferences infoData;
     private ViewPager viewPager;
     private ViewPagerAdapter pagerAdapter ;
@@ -104,7 +105,7 @@ public class TutorialActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // 전체 페이지 수는 3개로 고정.
-            return 3;
+            return totalPageNum;
         }
 
         @Override
