@@ -278,6 +278,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceDestroyedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(processFinishedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(processInitializedReceiver);
     }
 
     @Override
@@ -385,8 +387,13 @@ public class MainActivity extends AppCompatActivity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(Settings.ACTION_DATA_USAGE_SETTINGS);
-                            startActivity(intent);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                Intent intent = new Intent(Settings.ACTION_DATA_USAGE_SETTINGS);
+                                startActivity(intent);
+                            } else {
+                                Intent intent = new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS);
+                                startActivity(intent);
+                            }
                         }
                     });
             builder.setNegativeButton("종료",
