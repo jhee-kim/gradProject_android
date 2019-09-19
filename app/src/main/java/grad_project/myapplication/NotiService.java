@@ -61,6 +61,7 @@ public class NotiService extends Service {
     boolean is_warned;          // 위치 벗어났을 때 1회 경고가 되었는지 여부
     boolean is_inLocation;      // 검사한 위치 상태 임시 저장용 변수
     int location_count;         // 위치 검사 결과가 연속 false일 때 초기화하기 위해 카운트
+    boolean is_timeendNoti;
 
     /* 노티 채널 */
     Notification notification;
@@ -155,6 +156,7 @@ public class NotiService extends Service {
         location_count = 0;
         is_inLocation = false;
         is_warned = false;
+        is_timeendNoti = true;
 
         notiManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notiManager_default = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -482,10 +484,10 @@ public class NotiService extends Service {
         public void handleMessage(Message msg) {
             if (msg.what == NOWTIME_TIMER_START) {
                 Log.d("TimeTimerHandler", "Running");
-                if (is_notification) {
-                    if (is_start) {
-                        l_nowTime = System.currentTimeMillis();
-                        l_elapseTime = l_nowTime - l_startTime;
+                if (is_start) {
+                    l_nowTime = System.currentTimeMillis();
+                    l_elapseTime = l_nowTime - l_startTime;
+                    if (is_notification) {
                         long temp_time = l_elapseTime / 1000;
                         if (temp_time % 60 >= 0 && temp_time % 60 < 30) {
                             Date elapseDate = new Date(l_elapseTime);
@@ -495,15 +497,18 @@ public class NotiService extends Service {
                             updateNotification(nFLAG_TIME);
                             Log.d("TIME TIMER", "NOTI UPDATE");
                         }
-                        Log.d("TIME TIMER", Long.toString(l_elapseTime));
-                        if (l_elapseTime > 7200000) {
+                    }
+                    Log.d("TIME TIMER", Long.toString(l_elapseTime));
+                    if (l_elapseTime > 7200000) {
+                        if (!is_timeendNoti) {
                             makeAlarmNotification("알림", "관람 시간이 2시간을 경과했습니다.",
                                     NOTIFICATION_ID_timeend, notificationCheckIntent);
+                            is_timeendNoti = true;
                         }
-                        this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
                     } else {
-                        this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
+                        is_timeendNoti = false;
                     }
+                    this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
                 } else {
                     this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
                 }
