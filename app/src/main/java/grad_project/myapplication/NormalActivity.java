@@ -611,6 +611,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void onCheck(View view) {
         Intent intent = new Intent(NormalActivity.this, CheckActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public void onTutorial(View v) {
@@ -619,13 +620,15 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     }
 
     public void onLocation(View view) {
-        ToggleGps = !ToggleGps;
-        if (ToggleGps) {
-            mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(latitude, longitude), zoomLevel, true);
-            findViewById(R.id.but_gps).setBackgroundResource(R.drawable.gps_on);
-        } else {
-            mapView.removePOIItem(markerGps);
-            findViewById(R.id.but_gps).setBackgroundResource(R.drawable.gps_off);
+        if(latitude != 0 && longitude != 0) {
+            ToggleGps = !ToggleGps;
+            if (ToggleGps) {
+                mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(latitude, longitude), zoomLevel, true);
+                findViewById(R.id.but_gps).setBackgroundResource(R.drawable.gps_on);
+            } else {
+                mapView.removePOIItem(markerGps);
+                findViewById(R.id.but_gps).setBackgroundResource(R.drawable.gps_off);
+            }
         }
     }
 

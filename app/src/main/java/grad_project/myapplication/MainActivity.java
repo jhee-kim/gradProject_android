@@ -118,6 +118,12 @@ public class MainActivity extends AppCompatActivity {
         bt_closeMenu = findViewById(R.id.bt_close_menu);
 
         bt_notificationOn = findViewById(R.id.bt_notification_on);
+        if(infoData.getBoolean("NOTIFICATION", false)) {
+            bt_notificationOn.setBackgroundResource(R.drawable.notification_off);
+        }
+        else {
+            bt_notificationOn.setBackgroundResource(R.drawable.notification_on);
+        }
         bt_notificationOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                                         refreshService();
 
                                         Toast.makeText(getApplicationContext(), "알림 ON", Toast.LENGTH_SHORT).show();
+                                        bt_notificationOn.setBackgroundResource(R.drawable.notification_off);
                                         dialog.dismiss();
                                     }
                                 });
@@ -157,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
                                         editer.apply();
                                         refreshService();
                                         Toast.makeText(getApplicationContext(), "알림 OFF", Toast.LENGTH_SHORT).show();
+                                        bt_notificationOn.setBackgroundResource(R.drawable.notification_on);
                                         dialog.dismiss();
                                     }
                                 });

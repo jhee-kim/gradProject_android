@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -38,7 +39,8 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,8 +48,19 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Semaphore;
 
 public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
+
+    private final Semaphore writeLock = new Semaphore(1);
+
+    public void getWriteLock() throws InterruptedException {
+        writeLock.acquire();
+    }
+
+    public void releaseWriteLock() {
+        writeLock.release();
+    }
 
     private CameraBridgeViewBase mOpenCvCameraView;
     private Mat matInput;
@@ -57,7 +70,8 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
     ImageView imageVIewScene;
 
     public native void ConvertRGBtoGray(long matAddrInput, long matAddrResult);
-    public native void warp(long mat_img);
+    public native void bounding(long input_mat);
+    public native void warp(long input_mat);
 
     static {
         System.loadLibrary("opencv_java4");
@@ -92,6 +106,9 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
 
         imageVIewScene = (ImageView)findViewById(R.id.img);
 
+
+
+
         mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
@@ -109,6 +126,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
 
                 warp(matInput.getNativeObjAddr());
                 Bitmap test = Bitmap.createBitmap(matInput.width(), matInput.height(), Bitmap.Config.ARGB_8888);
+                ConvertRGBtoGray(matInput.getNativeObjAddr(), matInput.getNativeObjAddr());
                 Utils.matToBitmap(matInput, test);
                 imageVIewScene.setImageBitmap(test);
 
@@ -120,7 +138,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
                 Utils.matToBitmap(matResult, bitmap);
                 Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
-                callCloudVision(rotated);
+                callCloudVision(test);
             }
         });
     }
@@ -166,15 +184,23 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        try {
+            getWriteLock();
 
-        matInput = inputFrame.rgba();
+            matInput = inputFrame.rgba();
 
-        if ( matResult == null ) {
-            matResult = new Mat(matInput.rows(), matInput.cols(), CvType.CV_32FC2);
+            if ( matResult == null ) {
+                matResult = new Mat(matInput.rows(), matInput.cols(), CvType.CV_32FC2);
+            }
+            //bounding(matInput.getNativeObjAddr());
+            ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
-
+        releaseWriteLock();
         return matResult;
     }
 
@@ -211,7 +237,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             asyncDialog.setMessage("인식중입니다..");
 
             /*show dialog*/
-            //asyncDialog.show();
+            asyncDialog.show();
             super.onPreExecute();
         }
 
@@ -232,14 +258,14 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
 
         @Override
         protected void onPostExecute(String result) {
-            //asyncDialog.dismiss();
+            asyncDialog.dismiss();
             OcrActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 Intent intent = new Intent(OcrActivity.this, RegistActivity.class);
                 intent.putExtra("result", result);
                 setResult(RESULT_OK, intent);
 
-                //finish();
+                finish();
             }
         }
     }

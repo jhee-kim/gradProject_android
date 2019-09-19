@@ -464,23 +464,28 @@ public class RegistActivity extends AppCompatActivity {
                     }
                     for (int i = 0; i < results.size(); i++) {
                         if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("군번"))) {
-                            String temp_num[] = results.get(i+1).split("-");
-                            boolean is_success_sp = false;
-                            for (int j = 0; j < sp_number_0.getCount(); j++) {
-                                if (sp_number_0.getItemAtPosition(j).toString().equals(temp_num[0])) {
-                                    sp_number_0.setSelection(j);
-                                    is_success_sp = true;
+                            try {
+                                String temp_num[] = results.get(i + 1).split("-");
+                                boolean is_success_sp = false;
+                                for (int j = 0; j < sp_number_0.getCount(); j++) {
+                                    if (sp_number_0.getItemAtPosition(j).toString().equals(temp_num[0])) {
+                                        sp_number_0.setSelection(j);
+                                        is_success_sp = true;
+                                    }
                                 }
+                                if (!is_success_sp) {
+                                    Toast.makeText(getApplicationContext(), "텍스트 읽어오기 오류!", Toast.LENGTH_SHORT).show();
+                                }
+                                et_number_1.setText(temp_num[1]);
+                                break;
                             }
-                            if (!is_success_sp) {
-                                Toast.makeText(getApplicationContext(), "텍스트 읽어오기 오류!", Toast.LENGTH_SHORT).show();
+                            catch (Exception e) {
+
                             }
-                            et_number_1.setText(temp_num[1]);
-                            break;
                         }
                     }
                     for (int i = 0; i < results.size(); i++) {
-                        if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("행선지"))) {
+                        if(hangul.jasoEqual(hangul.hangulToJaso(results.get(i)), hangul.hangulToJaso("행선"))) {
                             et_destination.setText(results.get(i+1));
                             break;
                         }
