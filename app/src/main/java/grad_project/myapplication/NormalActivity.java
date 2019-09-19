@@ -101,7 +101,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     };
 
     /*** list test ***/
-    private final int ImgNumByExhibition = 2;                    //각 전시관 사진 갯수
+    private static final int ImgNumByExhibition = 2;                    //각 전시관 사진 갯수
     private int totalImgNum;
     private boolean[][] isCheckImgArr = new boolean[6][ImgNumByExhibition];  //전시관 사진 확인 체크
     private int[][] randomImgNumArr = new int[6][ImgNumByExhibition];   //랜덤으로 뽑은 이미지 번호
@@ -990,6 +990,12 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                     qNumOfImg.add(-1);
                 }
             }
+        }
+    }
+
+    static class NormalClass {
+        int getImgNumByExhibition() {
+            return ImgNumByExhibition;
         }
     }
 }
