@@ -1,7 +1,6 @@
 package grad_project.myapplication;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,11 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ImageView;
 
 public class TutorialActivity extends AppCompatActivity {
-    private final static int totalPageNum = 4;
+    private final static int totalPageNum = 5;
     private SharedPreferences infoData;
     private ViewPager viewPager;
     private ViewPagerAdapter pagerAdapter ;
@@ -48,6 +47,7 @@ public class TutorialActivity extends AppCompatActivity {
     class ViewPagerAdapter extends PagerAdapter {
         // LayoutInflater 서비스 사용을 위한 Context 참조 저장.
         private ImageView img;
+        private Button but;
         private Context context = null ;
 
         // Context를 전달받아 저장하는 생성자 추가.
@@ -63,25 +63,39 @@ public class TutorialActivity extends AppCompatActivity {
             if (context != null) {
                 // LayoutInflater를 통해 각 xml파일을 뷰로 생성.
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.tutorial_page, container, false);
 
-                img = (ImageView) view.findViewById(R.id.tutorial_image) ;
                 switch(position) {
                     case 0:
+                        view = inflater.inflate(R.layout.tutorial_page1, container, false);
+                        img = (ImageView) view.findViewById(R.id.tutorial_image) ;
                         img.setImageResource(R.drawable.tutorial1);
                         break;
                     case 1:
+                        view = inflater.inflate(R.layout.tutorial_page1, container, false);
+                        img = (ImageView) view.findViewById(R.id.tutorial_image) ;
                         img.setImageResource(R.drawable.tutorial2);
                         break;
                     case 2:
+                        view = inflater.inflate(R.layout.tutorial_page1, container, false);
+                        img = (ImageView) view.findViewById(R.id.tutorial_image) ;
                         img.setImageResource(R.drawable.tutorial3);
                         break;
                     case 3:
+                        view = inflater.inflate(R.layout.tutorial_page1, container, false);
+                        img = (ImageView) view.findViewById(R.id.tutorial_image) ;
                         img.setImageResource(R.drawable.tutorial4);
+                        break;
+                    case 4:
+                        view = inflater.inflate(R.layout.tutorial_page2, container, false);
+                        but = view.findViewById(R.id.end_button);
+                        but.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                finish();
+                            }
+                        });
                         break;
                 }
             }
-
             // 뷰페이저에 추가.
             container.addView(view) ;
 

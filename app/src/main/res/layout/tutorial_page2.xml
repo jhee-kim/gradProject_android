@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#353535"/>
+    <TextView
+        android:id="@+id/end_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="40sp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="마지막\n페이지"
+        android:layout_marginTop="100dp"
+        android:layout_alignParentTop="true"/>
+
+    <Button
+        android:id="@+id/end_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/all_round_button"
+        android:padding="30dp"
+        android:textSize="50sp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:text="종료하기"
+        android:layout_marginTop="200dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/end_text"/>
+</RelativeLayout>
