@@ -443,6 +443,9 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             markerArr[i].setMarkerType(MapPOIItem.MarkerType.CustomImage);
 
             if (i < 6) {
+                if (!(exhibitionState[i].equals("1") || exhibitionState[i].equals("0"))) { //exibitionState에 값 잘못들어가 있을 때
+                    markerArr[i].setCustomImageBitmap(in_exhibition_marker[2]);
+                }
                 if (exhibitionState[i].equals("1") && !isCheckQrArr[i]) {
                     markerArr[i].setCustomImageBitmap(in_exhibition_marker[0]);
                 } else if (exhibitionState[i].equals("1") && isCheckQrArr[i]) {
