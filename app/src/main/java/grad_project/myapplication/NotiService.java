@@ -326,12 +326,12 @@ public class NotiService extends Service {
 
     public boolean checkInLocation() {
         /*독립기념관*/
-//        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.782945, 127.213537);
-//        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.779085, 127.237411);
+        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.782945, 127.213537);
+        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.779085, 127.237411);
 
         /*한기대*/
-        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.770386, 127.276913);
-        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.760433, 127.286772);
+        //MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.770386, 127.276913);
+        //MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.760433, 127.286772);
 
         MapPointBounds boundary = new MapPointBounds(leftB, RightT);
         gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
