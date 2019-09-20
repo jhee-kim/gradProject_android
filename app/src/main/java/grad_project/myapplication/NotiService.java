@@ -100,7 +100,7 @@ public class NotiService extends Service {
     TimeTimerHandler timeTimerHandler;
     final int NOWTIME_TIMER_START = 101;
 
-    final int LOCATION_DELAY = 100; // 위치검사 시간 간격 : 값 변경할 때는 초 단위로 변경, 3회 연속 검사함(100이면 5분마다 검사)
+    final int LOCATION_DELAY = 50; // 위치검사 시간 간격 : 값 변경할 때는 초 단위로 변경, 3회 연속 검사함(100이면 5분마다 검사)
     LocationTimerHandler locationTimerHandler;
     final int LOCATION_TIMER_START = 300;
 
@@ -124,6 +124,7 @@ public class NotiService extends Service {
     public double gatLatitude(){
         return latitude;
     }
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -326,17 +327,28 @@ public class NotiService extends Service {
 
     public boolean checkInLocation() {
         /*독립기념관*/
-        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.782945, 127.213537);
-        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.779085, 127.237411);
+/*
+        MapPoint leftB1 = MapPoint.mapPointWithGeoCoord(36.786875, 127.217846);
+        MapPoint RightT1 = MapPoint.mapPointWithGeoCoord(36.779143, 127.229699);
+        MapPoint leftB2 = MapPoint.mapPointWithGeoCoord(36.780762, 127.227234);
+        MapPoint RightT2 = MapPoint.mapPointWithGeoCoord(36.775997, 127.234365);
 
+        MapPointBounds boundary1 = new MapPointBounds(leftB1, RightT1);
+        MapPointBounds boundary2 = new MapPointBounds(leftB2, RightT2);
+        gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
+
+        return boundary1.contains(gpsPosition) || boundary2.contains(gpsPosition);
+/*
         /*한기대*/
-        //MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.770386, 127.276913);
-        //MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.760433, 127.286772);
+
+        MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.769856, 127.276194);
+        MapPoint RightT = MapPoint.mapPointWithGeoCoord(36.758904, 127.287651);
 
         MapPointBounds boundary = new MapPointBounds(leftB, RightT);
         gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
 
         return boundary.contains(gpsPosition);
+
     }
 
     public void setOutLocation() {
@@ -529,7 +541,7 @@ public class NotiService extends Service {
                     this.sendEmptyMessageDelayed(LOCATION_TIMER_START, LOCATION_DELAY * 1000);
                 } else {
                     location_count++;
-                    if (location_count > 2) {
+                    if (location_count > 5) {
                         is_inLocation = false;
                         Log.d("LOCATIONTIMER", "영역 밖에 있음");
                         if (is_start) {
@@ -544,7 +556,7 @@ public class NotiService extends Service {
                                 makeAlarmNotification("경고", "관람 기록이 초기화되었습니다. 안내 센터에 문의하세요.",
                                         NOTIFICATION_ID_warning, notificationMainIntent);
                             } else {
-                                makeAlarmNotification("경고", "외부로 나가면 관람 기록이 초기화됩니다!",
+                                makeAlarmNotification("경고", "독립기념관 외부로 나가면 관람 기록이 초기화됩니다!",
                                         NOTIFICATION_ID_warning, notificationMainIntent);
                                 is_warned = true;
                                 location_count = 0;

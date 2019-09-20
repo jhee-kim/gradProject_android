@@ -225,7 +225,7 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                     if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)){
                         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                     }
-                    parameters.setZoom(10);
+                    parameters.setZoom(5);
                     mCamera.setParameters(parameters);
                     ////////////////////////////////////////////////////////////////////////////////////
                     mCamera.startPreview();

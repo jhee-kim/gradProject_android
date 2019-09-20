@@ -70,7 +70,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
     ImageView imageVIewScene;
 
     public native void ConvertRGBtoGray(long matAddrInput, long matAddrResult);
-    public native void bounding(long input_mat);
     public native void warp(long input_mat);
 
     static {
@@ -106,9 +105,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
 
         imageVIewScene = (ImageView)findViewById(R.id.img);
 
-
-
-
         mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
@@ -125,20 +121,18 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
                 mLastClickTime = SystemClock.elapsedRealtime();
 
                 warp(matInput.getNativeObjAddr());
-                Bitmap test = Bitmap.createBitmap(matInput.width(), matInput.height(), Bitmap.Config.ARGB_8888);
+                Bitmap warp = Bitmap.createBitmap(matInput.width(), matInput.height(), Bitmap.Config.ARGB_8888);
                 ConvertRGBtoGray(matInput.getNativeObjAddr(), matInput.getNativeObjAddr());
-                Utils.matToBitmap(matInput, test);
-                imageVIewScene.setImageBitmap(test);
+                Utils.matToBitmap(matInput, warp);
+
 
                 /*90도 회전*/
                 Matrix matrix = new Matrix();
                 matrix.postRotate(90);
+                Bitmap rotated = Bitmap.createBitmap(warp, 0, 0, warp.getWidth(), warp.getHeight(), matrix, true);
 
-                Bitmap bitmap = Bitmap.createBitmap(matResult.width(), matResult.height(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(matResult, bitmap);
-                Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-                callCloudVision(test);
+                imageVIewScene.setImageBitmap(rotated);
+                callCloudVision(rotated);
             }
         });
     }
@@ -172,6 +166,7 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             mOpenCvCameraView.disableView();
     }
 
+
     @Override
     public void onCameraViewStarted(int width, int height) {
 
@@ -192,7 +187,6 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             if ( matResult == null ) {
                 matResult = new Mat(matInput.rows(), matInput.cols(), CvType.CV_32FC2);
             }
-            //bounding(matInput.getNativeObjAddr());
             ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
 
 

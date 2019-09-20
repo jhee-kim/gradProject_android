@@ -93,9 +93,9 @@
       
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="63c2eeea64bff757d4f3fbb253f2ff59"/>
+            android:value="21ffa07922b8766d3349a293a2888c94"/>
             <!--디버깅용 키 : "63c2eeea64bff757d4f3fbb253f2ff59"-->
-            <!--배포용 키 : "21ffa07922b8766d3349a293a2888c94"-->
+            <!--릴리즈용 키 : "21ffa07922b8766d3349a293a2888c94"-->
 
         <provider
             android:name="android.support.v4.content.FileProvider"

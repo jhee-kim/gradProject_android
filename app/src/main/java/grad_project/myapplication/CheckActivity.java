@@ -34,7 +34,7 @@ public class CheckActivity extends AppCompatActivity {
     LinearLayout[] ll_ex = new LinearLayout[6];
     ImageView[] iv_ex = new ImageView[6];
     boolean[] is_success = new boolean[6];
-    Button bt_toMap, bt_finish;
+    Button bt_finish;
     boolean surveyState = false;
     String surveyUrl = "";
 

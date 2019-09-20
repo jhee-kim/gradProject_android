@@ -65,6 +65,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     double longitude;  //위도
     double latitude;   //경도
     private boolean ToggleGps = false;
+    private boolean checkInLocation = false;
 
     /*맵 마커*/
     private MapView mapView;
@@ -100,7 +101,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         }
     };
 
-    /*** list test ***/
+    /*List View*/
     private static final int ImgNumByExhibition = 2;                    //각 전시관 사진 갯수
     private int totalImgNum;
     private boolean[][] isCheckImgArr = new boolean[6][ImgNumByExhibition];  //전시관 사진 확인 체크
@@ -122,7 +123,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             {"독립열사", "6.10만세운동 관련 보도 기사", "어린이날 포스터", "일제수탈에 항쟁하는 농민들"}};  //찍을 사진들 이름 적으면 될듯
     List<Integer> qImages = new ArrayList<Integer>();
     int qrImages = R.drawable.qr_img;
-    int smallImages[][] = {{R.drawable.simg1_1, R.drawable.simg1_2, R.drawable.simg1_3, R.drawable.simg1_4}, //전시관마다 최대 사진 4개씩
+    int smallImages[][] = {{R.drawable.simg1_1, R.drawable.simg1_2, R.drawable.simg1_3, R.drawable.simg1_4}, //전시관마다 사진 4개씩
                             {},         //2전시관 사진X
                             {R.drawable.simg3_1, R.drawable.simg3_2, R.drawable.simg3_3, R.drawable.simg3_4},
                             {},         //4전시관 사진X
@@ -402,6 +403,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         //서비스에서 가져온 데이터
         longitude = ms.getLongitude();
         latitude = ms.gatLatitude();
+        checkInLocation = ms.checkInLocation();
         setGpsTracking();
     }
 
@@ -885,33 +887,36 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
     //QuestView의 리스트들 클릭됬을 때
     public void QuestviewClick() {
-        //list test
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int type = questItems.get(position).QTypeItem;
-                if(type == 0) { //QR코드인 경우
-                    IntentIntegrator qrScan = new IntentIntegrator(NormalActivity.this);
-                    qrScan.setCaptureActivity(QrActivity.class);
-                    qrScan.setBeepEnabled(false);
-                    qrScan.setPrompt("전시관의 QR코드를 스캔해주세요.");
-                    qrScan.setCameraId(0);
-                    qrScan.setOrientationLocked(false);
-                    qrScan.initiateScan();
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if(checkInLocation) {
+                        int type = questItems.get(position).QTypeItem;
+                        if (type == 0) { //QR코드인 경우
+                            IntentIntegrator qrScan = new IntentIntegrator(NormalActivity.this);
+                            qrScan.setCaptureActivity(QrActivity.class);
+                            qrScan.setBeepEnabled(false);
+                            qrScan.setPrompt("전시관의 QR코드를 스캔해주세요.");
+                            qrScan.setCameraId(0);
+                            qrScan.setOrientationLocked(false);
+                            qrScan.initiateScan();
+                        } else if (type == 1) {    //사진인 경우
+                            nowPosition = position;
+                            Intent intent = new Intent(NormalActivity.this, ShowImageActivity.class);
+                            intent.putExtra("ImgAddr", bigImages[questItems.get(position).QExhibitionNum]
+                                    [randomImgNumArr[questItems.get(position).QExhibitionNum][questItems.get(position).QNumOfImg]]);
+                            intent.putExtra("exhibitionNum", questItems.get(position).QExhibitionNum);      //전시관 번호(0~5)
+                            intent.putExtra("imgNum", questItems.get(position).QNumOfImg);                  //몇번째 이미지인지(0~max-1)
+                            intent.putExtra("imgTitle", imgDescription[questItems.get(position).QExhibitionNum]
+                                    [(randomImgNumArr[questItems.get(position).QExhibitionNum][questItems.get(position).QNumOfImg])]);                  //몇번째 이미지인지(0~max-1)
+                            startActivityForResult(intent, 1000);
+                        }
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "독립기념관 외부로 나가면 기록이 되지 않습니다.!", Toast.LENGTH_SHORT).show();
+                    }
                 }
-                else if(type == 1) {    //사진인 경우
-                    nowPosition = position;
-                    Intent intent = new Intent(NormalActivity.this, ShowImageActivity.class);
-                    intent.putExtra("ImgAddr", bigImages[questItems.get(position).QExhibitionNum]
-                            [randomImgNumArr[questItems.get(position).QExhibitionNum][questItems.get(position).QNumOfImg]]);
-                    intent.putExtra("exhibitionNum", questItems.get(position).QExhibitionNum);      //전시관 번호(0~5)
-                    intent.putExtra("imgNum", questItems.get(position).QNumOfImg);                  //몇번째 이미지인지(0~max-1)
-                    intent.putExtra("imgTitle", imgDescription[questItems.get(position).QExhibitionNum]
-                            [(randomImgNumArr[questItems.get(position).QExhibitionNum][questItems.get(position).QNumOfImg])]);                  //몇번째 이미지인지(0~max-1)
-                    startActivityForResult(intent, 1000);
-                }
-            }
-        });
+            });
     }
 
     class QuestAdapter extends BaseAdapter {
