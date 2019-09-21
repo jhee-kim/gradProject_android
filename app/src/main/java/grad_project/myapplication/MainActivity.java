@@ -25,7 +25,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -335,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean getStartState() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+            String result = dbConnect.execute(DdConnect.GET_ISSTART, s_id).get();
             if (!result.equals("-1")) {
                 is_start = !result.equals("0");
                 if (is_start) {

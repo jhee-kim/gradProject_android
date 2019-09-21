@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -38,10 +38,10 @@ public class CheckActivity extends AppCompatActivity {
     boolean surveyState = false;
     String surveyUrl = "";
 
-    TimerHandler timerhandler;
-    private static int MESSAGE_TIMER_START = 100;
-    private static int REFRESH_TIMER_START = 200;
-    private static int NOWTIME_REFRESH_TIMER_START = 199;
+    private final TimerHandler timerhandler = new TimerHandler(this);
+    private static final int MESSAGE_TIMER_START = 100;
+    private static final int REFRESH_TIMER_START = 200;
+    private static final int NOWTIME_REFRESH_TIMER_START = 199;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +92,6 @@ public class CheckActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             finish();
         }
-
-        timerhandler = new TimerHandler();
     }
 
     @Override
@@ -346,33 +344,42 @@ public class CheckActivity extends AppCompatActivity {
         SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
         s_nowTime = sdfNow.format(nowDate);
     }
-
+    public void handleMessage(Message msg) {
+        if  (msg.what == MESSAGE_TIMER_START) {
+            getTimeRefresh();
+            timerhandler.sendEmptyMessageDelayed(MESSAGE_TIMER_START, 1000);
+        }
+        else if (msg.what == REFRESH_TIMER_START) {
+            if (getStartState()) {
+                if (is_start) {
+                    timerhandler.removeMessages(REFRESH_TIMER_START);
+                    onPause();
+                    l_startTime = getStartTime();
+                    getTimeData();
+                    onResume();
+                } else {
+                    timerhandler.sendEmptyMessageDelayed(REFRESH_TIMER_START, 1000);
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        } else if (msg.what == NOWTIME_REFRESH_TIMER_START) {
+            nowTimeRefresh();
+            timerhandler.sendEmptyMessageDelayed(NOWTIME_REFRESH_TIMER_START, 1000);
+        }
+    }
     // 3초 단위로 시작 여부 서버에서 받아옴
-    private class TimerHandler extends Handler {
+    private static class TimerHandler extends Handler {
+        private final WeakReference<CheckActivity> mActivity;
+        TimerHandler(CheckActivity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
         @Override
         public void handleMessage(Message msg) {
-            if  (msg.what == MESSAGE_TIMER_START) {
-                getTimeRefresh();
-                this.sendEmptyMessageDelayed(MESSAGE_TIMER_START, 1000);
-            }
-            else if (msg.what == REFRESH_TIMER_START) {
-                if (getStartState()) {
-                    if (is_start) {
-                        timerhandler.removeMessages(REFRESH_TIMER_START);
-                        onPause();
-                        l_startTime = getStartTime();
-                        getTimeData();
-                        onResume();
-                    } else {
-                        this.sendEmptyMessageDelayed(REFRESH_TIMER_START, 1000);
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            } else if (msg.what == NOWTIME_REFRESH_TIMER_START) {
-                nowTimeRefresh();
-                this.sendEmptyMessageDelayed(NOWTIME_REFRESH_TIMER_START, 1000);
+            CheckActivity activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
             }
         }
     }

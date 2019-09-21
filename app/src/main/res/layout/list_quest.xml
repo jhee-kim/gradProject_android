@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:text="Main Title"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:text="Sub Title"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:textStyle="bold" />
     </LinearLayout>
 
