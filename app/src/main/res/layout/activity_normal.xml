@@ -44,6 +44,7 @@
             android:layout_height="30dp"
             android:layout_centerHorizontal="true"
             android:text="Time"
+            android:textColor="@color/white"
             android:background="@drawable/round_button"
             android:onClick="timeOn"/>
 

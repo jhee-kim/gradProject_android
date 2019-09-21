@@ -230,7 +230,6 @@ public class NotiService extends Service {
 //                disconnectedNetwork();
             }
         }
-
         // 노티피케이션 생성
         if (is_notify) {    // 사용자가 알림 기능을 ON 했으면
             createNotification();   // 커스텀 노티 만들고
@@ -277,6 +276,11 @@ public class NotiService extends Service {
                 }
             }
         }
+
+        if (is_end) {
+            stopSelf();
+        }
+
         // 시작여부 일정 시간마다 받아오는 핸들러 실행
         stateTimerhandler.sendEmptyMessage(START_TIMER_START);
         timeTimerHandler.sendEmptyMessage(NOWTIME_TIMER_START);
@@ -580,7 +584,7 @@ public class NotiService extends Service {
                     if (is_end) {
                         s_stateNoti = "관람 종료";
                         i_state = 2;
-                        stopSelf();
+//                        stopSelf();
                     }
                 } else {    // 네트워크 통신 오류 예외처리
 //                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
