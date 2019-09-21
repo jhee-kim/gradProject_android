@@ -2,7 +2,6 @@ package grad_project.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -12,13 +11,10 @@ import android.widget.TextView;
 
 public class ShowImageActivity extends AppCompatActivity {
     private static final String TAG = CompareActivity.class.getSimpleName();
-    private ImageView imgView;
-    private TextView textView;
     /*intent로 받아오는 값들*/
     private int imgAddr;
     private int imgNum;
     private int exhibitionNum;
-    private String imgTitle;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,6 +27,10 @@ public class ShowImageActivity extends AppCompatActivity {
         } else {
             actionBar.hide();
         }
+
+        ImageView imgView;
+        TextView textView;
+        String imgTitle;
 
         Intent intent = getIntent();
         imgAddr = intent.getIntExtra("ImgAddr", -1);

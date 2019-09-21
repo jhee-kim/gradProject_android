@@ -25,7 +25,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -104,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         infoData = getSharedPreferences("infoData", MODE_PRIVATE);
 
         is_service = isNotiServiceRunning();
-        Log.d("ISSERVICE", Boolean.toString(is_service));
 
         // 메인 화면 버튼
         bt_openMap = findViewById(R.id.bt_open_map);
@@ -195,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                 }
-//                builder.setCancelable(false);
                 builder.show();
             }
         });
@@ -258,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceDestroyedReceiver, new IntentFilter("Service Destroyed"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(processFinishedReceiver, new IntentFilter("Finished!"));
         LocalBroadcastManager.getInstance(this).registerReceiver(processInitializedReceiver, new IntentFilter("Initialized!"));
     }
 
@@ -286,7 +282,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceDestroyedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(processFinishedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(processInitializedReceiver);
     }
 
@@ -339,8 +334,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean getStartState() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
-            Log.d("GET_ISSTART", result);
+            String result = dbConnect.execute(DdConnect.GET_ISSTART, s_id).get();
             if (!result.equals("-1")) {
                 is_start = !result.equals("0");
                 if (is_start) {
@@ -358,8 +352,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean isEnd() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
-            Log.d("GET_ISEND", result);
+            String result = dbConnect.execute(DdConnect.GET_ISEND, s_id).get();
             if (!result.equals("-1")) {
                 if (result.equals("0")) {
                     is_end = false;
@@ -377,9 +370,7 @@ public class MainActivity extends AppCompatActivity {
     public String getParticipation() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_PARTICIPATION, s_id).get();
-            Log.d("GET_PARTICIPATION", result);
-            return result;
+            return dbConnect.execute(DdConnect.GET_PARTICIPATION, s_id).get();
         } catch (Exception e) {
             e.printStackTrace();
             return "-1";
@@ -555,15 +546,9 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 startNotiService();
-                Log.d("LOGIN COMPLETE", s_id);
             }
         }
-        // 최초 등록 완료했을 경우(자동 로그인 됨)
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-//                is_login = true;
-            }
-        }
+
         // 관람 완료 후 메인 액티비티로 자동 진입할 때
         if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
@@ -577,16 +562,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // 서비스 꺼졌을 때
-            Log.d("SERVICE", "SerserviceDestroyedReceiver!@#");
             resumeActivity();
-        }
-    };
-
-    private BroadcastReceiver processFinishedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // 관람 종료됐을때
-            Log.d("SERVICE", "processFinishedReceiver!@#");
         }
     };
 
@@ -594,7 +570,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // 관람 종료됐을때
-            Log.d("SERVICE", "processInitializedReceiver!@#");
             ActivityCompat.finishAffinity(MainActivity.this);
         }
     };

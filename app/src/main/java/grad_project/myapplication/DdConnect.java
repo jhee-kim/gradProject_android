@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /**
  회원가입 : add_audience.php                 input : 회원가입정보         return : id or 0
@@ -33,19 +34,19 @@ import java.net.URL;
 
 public class DdConnect extends AsyncTask<String, Void, String> {
     private static final String BASE_PATH = "http://35.221.108.183/android/";
-    public static final String ADD_AUDIENCE = BASE_PATH + "add_audience.php";
-    public static final String LOGIN = BASE_PATH + "login.php";
-    public static final String GET_AUDIENCE = BASE_PATH + "get_audience.php";
-    public static final String GET_PARTICIPATION = BASE_PATH + "get_participation.php";
-    public static final String GET_ISSTART = BASE_PATH + "get_isStart.php";
-    public static final String SET_ISEND = BASE_PATH + "set_isEnd.php";
-    public static final String GET_ISEND = BASE_PATH + "get_isEnd.php";
-    public static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";
-    public static final String GET_QR = BASE_PATH + "get_qr.php";
-    public static final String GET_MAC = BASE_PATH + "get_mac.php";
-    public static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";
-    public static final String GET_SURVEY = BASE_PATH + "get_survey.php";
-    public static final String SET_ISSTART = BASE_PATH + "set_isStart.php";
+    static final String ADD_AUDIENCE = BASE_PATH + "add_audience.php";
+    static final String LOGIN = BASE_PATH + "login.php";
+    static final String GET_AUDIENCE = BASE_PATH + "get_audience.php";
+    static final String GET_PARTICIPATION = BASE_PATH + "get_participation.php";
+    static final String GET_ISSTART = BASE_PATH + "get_isStart.php";
+    static final String SET_ISEND = BASE_PATH + "set_isEnd.php";
+    static final String GET_ISEND = BASE_PATH + "get_isEnd.php";
+    static final String GET_EXHIBITION = BASE_PATH + "get_exhibition.php";
+    static final String GET_QR = BASE_PATH + "get_qr.php";
+//    static final String GET_MAC = BASE_PATH + "get_mac.php";
+    static final String GET_NARRATOR = BASE_PATH + "get_narrator.php";
+    static final String GET_SURVEY = BASE_PATH + "get_survey.php";
+    static final String SET_ISSTART = BASE_PATH + "set_isStart.php";
 
     private WeakReference<Context> activityReference = null;
     private ProgressDialog progressDialog;
@@ -91,7 +92,7 @@ public class DdConnect extends AsyncTask<String, Void, String> {
             httpURLConnection.setRequestMethod("POST");
             httpURLConnection.connect();
             OutputStream outputStream = httpURLConnection.getOutputStream();
-            outputStream.write(postParameters.getBytes("UTF-8"));
+            outputStream.write(postParameters.getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
             outputStream.close();
             int responseStatusCode = httpURLConnection.getResponseCode();
@@ -102,7 +103,7 @@ public class DdConnect extends AsyncTask<String, Void, String> {
             else{
                 inputStream = httpURLConnection.getErrorStream();
             }
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             StringBuilder sb = new StringBuilder();
             String line;

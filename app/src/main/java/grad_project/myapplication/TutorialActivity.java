@@ -3,6 +3,7 @@ package grad_project.myapplication;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,16 +18,17 @@ import android.widget.ImageView;
 
 public class TutorialActivity extends AppCompatActivity {
     private final static int totalPageNum = 5;
-    private SharedPreferences infoData;
-    private ViewPager viewPager;
-    private ViewPagerAdapter pagerAdapter ;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tutorial_main);
 
-        viewPager = (ViewPager)findViewById(R.id.viewPager) ;
+        SharedPreferences infoData;
+        ViewPager viewPager;
+        ViewPagerAdapter pagerAdapter ;
+
+        viewPager = findViewById(R.id.viewPager) ;
         pagerAdapter = new ViewPagerAdapter(this) ;
         viewPager.setAdapter(pagerAdapter);
 
@@ -46,19 +48,21 @@ public class TutorialActivity extends AppCompatActivity {
 
     class ViewPagerAdapter extends PagerAdapter {
         // LayoutInflater 서비스 사용을 위한 Context 참조 저장.
-        private ImageView img;
-        private Button but;
-        private Context context = null ;
+        private Context context ;
 
         // Context를 전달받아 저장하는 생성자 추가.
-        public ViewPagerAdapter(Context context) {
+        ViewPagerAdapter(Context context) {
             super();
             this.context = context ;
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            View view = null ;
+        @NonNull
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+            View view = null;
+
+            ImageView img;
+            Button but;
 
             if (context != null) {
                 // LayoutInflater를 통해 각 xml파일을 뷰로 생성.
@@ -67,22 +71,22 @@ public class TutorialActivity extends AppCompatActivity {
                 switch(position) {
                     case 0:
                         view = inflater.inflate(R.layout.tutorial_page1, container, false);
-                        img = (ImageView) view.findViewById(R.id.tutorial_image) ;
+                        img = view.findViewById(R.id.tutorial_image) ;
                         img.setImageResource(R.drawable.tutorial1);
                         break;
                     case 1:
                         view = inflater.inflate(R.layout.tutorial_page1, container, false);
-                        img = (ImageView) view.findViewById(R.id.tutorial_image) ;
+                        img = view.findViewById(R.id.tutorial_image) ;
                         img.setImageResource(R.drawable.tutorial2);
                         break;
                     case 2:
                         view = inflater.inflate(R.layout.tutorial_page1, container, false);
-                        img = (ImageView) view.findViewById(R.id.tutorial_image) ;
+                        img = view.findViewById(R.id.tutorial_image) ;
                         img.setImageResource(R.drawable.tutorial3);
                         break;
                     case 3:
                         view = inflater.inflate(R.layout.tutorial_page1, container, false);
-                        img = (ImageView) view.findViewById(R.id.tutorial_image) ;
+                        img = view.findViewById(R.id.tutorial_image) ;
                         img.setImageResource(R.drawable.tutorial4);
                         break;
                     case 4:
@@ -103,7 +107,7 @@ public class TutorialActivity extends AppCompatActivity {
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(ViewGroup container, int position, @NonNull Object object) {
             // 뷰페이저에서 삭제.
             container.removeView((View) object);
         }
@@ -114,8 +118,8 @@ public class TutorialActivity extends AppCompatActivity {
         }
 
         @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == (View)object;
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+            return view == object;
         }
     }
 }

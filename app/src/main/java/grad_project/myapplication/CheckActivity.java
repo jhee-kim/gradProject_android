@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -38,10 +38,10 @@ public class CheckActivity extends AppCompatActivity {
     boolean surveyState = false;
     String surveyUrl = "";
 
-    TimerHandler timerhandler;
-    private static int MESSAGE_TIMER_START = 100;
-    private static int REFRESH_TIMER_START = 200;
-    private static int NOWTIME_REFRESH_TIMER_START = 199;
+    private final TimerHandler timerhandler = new TimerHandler(this);
+    private static final int MESSAGE_TIMER_START = 100;
+    private static final int REFRESH_TIMER_START = 200;
+    private static final int NOWTIME_REFRESH_TIMER_START = 199;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +92,6 @@ public class CheckActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
             finish();
         }
-
-        timerhandler = new TimerHandler();
     }
 
     @Override
@@ -172,7 +170,6 @@ public class CheckActivity extends AppCompatActivity {
                 Date elapseDate = new Date(l_elapseTime);
                 SimpleDateFormat sdfElapse = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
                 s_elapseTime = sdfElapse.format(elapseDate);
-                Log.d("ELAPSE TIME", s_elapseTime);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -216,8 +213,7 @@ public class CheckActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.bt_finish :
+        if (v.getId() == R.id.bt_finish) {
                 if (getFinish()) {
                     if (setFinish()) {
                         surveyUrl = getSurveyUrl();
@@ -240,7 +236,6 @@ public class CheckActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(getApplicationContext(), "아직 관람이 끝나지 않았습니다.", Toast.LENGTH_SHORT).show();
                 }
-                break;
         }
     }
 
@@ -261,26 +256,23 @@ public class CheckActivity extends AppCompatActivity {
     public String getEndTime() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
-            Log.d("GET_ISEND", result);
-            return result;
+            return dbConnect.execute(DdConnect.GET_ISEND, s_id).get();
         } catch (Exception e) {
             e.printStackTrace();
             return "-1";
         }
 
     }
-    public String getParticipation() {
-        DdConnect dbConnect = new DdConnect(this);
-        try {
-            String result = dbConnect.execute(dbConnect.GET_PARTICIPATION, s_id).get();
-            Log.d("GET_PARTICIPATION", result);
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "-1";
-        }
-    }
+//    public String getParticipation() {
+//        DdConnect dbConnect = new DdConnect(this);
+//        try {
+//            String result = dbConnect.execute(DdConnect.GET_PARTICIPATION, s_id).get();
+//            return result;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "-1";
+//        }
+//    }
 
     public void getTimeData() {
         if (!is_start) {
@@ -296,13 +288,11 @@ public class CheckActivity extends AppCompatActivity {
             Date startDate = new Date(l_startTime);
             SimpleDateFormat sdfStart = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
             s_startTime = sdfStart.format(startDate);
-            Log.d("START TIME", s_startTime);
 
             l_endTime = l_startTime + 7200000 + l_delayTime;
             Date endDate = new Date(l_endTime);
             SimpleDateFormat sdfEnd = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
             s_endTime = sdfEnd.format(endDate);
-            Log.d("END TIME", s_endTime);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -331,7 +321,6 @@ public class CheckActivity extends AppCompatActivity {
             Date elapseDate = new Date(l_elapseTime);
             SimpleDateFormat sdfElapse = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
             s_elapseTime = sdfElapse.format(elapseDate);
-            Log.d("ELAPSE TIME", s_elapseTime);
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -355,33 +344,42 @@ public class CheckActivity extends AppCompatActivity {
         SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
         s_nowTime = sdfNow.format(nowDate);
     }
-
+    public void handleMessage(Message msg) {
+        if  (msg.what == MESSAGE_TIMER_START) {
+            getTimeRefresh();
+            timerhandler.sendEmptyMessageDelayed(MESSAGE_TIMER_START, 1000);
+        }
+        else if (msg.what == REFRESH_TIMER_START) {
+            if (getStartState()) {
+                if (is_start) {
+                    timerhandler.removeMessages(REFRESH_TIMER_START);
+                    onPause();
+                    l_startTime = getStartTime();
+                    getTimeData();
+                    onResume();
+                } else {
+                    timerhandler.sendEmptyMessageDelayed(REFRESH_TIMER_START, 1000);
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        } else if (msg.what == NOWTIME_REFRESH_TIMER_START) {
+            nowTimeRefresh();
+            timerhandler.sendEmptyMessageDelayed(NOWTIME_REFRESH_TIMER_START, 1000);
+        }
+    }
     // 3초 단위로 시작 여부 서버에서 받아옴
-    private class TimerHandler extends Handler {
+    private static class TimerHandler extends Handler {
+        private final WeakReference<CheckActivity> mActivity;
+        TimerHandler(CheckActivity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
         @Override
         public void handleMessage(Message msg) {
-            if  (msg.what == MESSAGE_TIMER_START) {
-                getTimeRefresh();
-                this.sendEmptyMessageDelayed(MESSAGE_TIMER_START, 1000);
-            }
-            else if (msg.what == REFRESH_TIMER_START) {
-                if (getStartState()) {
-                    if (is_start) {
-                        timerhandler.removeMessages(REFRESH_TIMER_START);
-                        onPause();
-                        l_startTime = getStartTime();
-                        getTimeData();
-                        onResume();
-                    } else {
-                        this.sendEmptyMessageDelayed(REFRESH_TIMER_START, 1000);
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            } else if (msg.what == NOWTIME_REFRESH_TIMER_START) {
-                nowTimeRefresh();
-                this.sendEmptyMessageDelayed(NOWTIME_REFRESH_TIMER_START, 1000);
+            CheckActivity activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
             }
         }
     }
@@ -389,8 +387,7 @@ public class CheckActivity extends AppCompatActivity {
     public boolean getStartState() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
-            Log.d("GET_ISSTART", result);
+            String result = dbConnect.execute(DdConnect.GET_ISSTART, s_id).get();
             if (!result.equals("-1")) {
                 is_start = !result.equals("0");
                 getTimeRefresh();
@@ -426,21 +423,17 @@ public class CheckActivity extends AppCompatActivity {
         for (int i = 1; i < 7; i++) {
             if(i == 4) is_success[i-1] = infoData.getBoolean("IS_CHECK_QR_" + i, false);
             else is_success[i-1] = infoData.getBoolean("IS_CHECK_QR_" + i, false) && infoData.getBoolean("IS_CHECK_PIC_" + i, false);
-            //Log.d("IS_CHECK_QR",infoData.getBoolean("IS_CHECK_QR_" + i, false) + "");
-            //Log.d("IS_CHECK_PIC_",infoData.getBoolean("IS_CHECK_PIC_" + i, false) + "");
         }
     }
 
     public long getStartTime() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
-            Log.d("GET_ISSTART", result);
+            String result = dbConnect.execute(DdConnect.GET_ISSTART, s_id).get();
             is_start = !result.equals("0");
             if (is_start) {
                 SimpleDateFormat sdfStart = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
-                long time = sdfStart.parse(result).getTime();
-                return time;
+                return sdfStart.parse(result).getTime();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -450,8 +443,7 @@ public class CheckActivity extends AppCompatActivity {
     public boolean setFinish() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.SET_ISEND, s_id).get();
-            Log.d("SET_ISEND", result);
+            String result = dbConnect.execute(DdConnect.SET_ISEND, s_id).get();
             if (result.equals("1")) {
                 Toast.makeText(getApplicationContext(), "관람 종료 확인이 되었습니다.", Toast.LENGTH_SHORT).show();
                 return true;
@@ -464,15 +456,13 @@ public class CheckActivity extends AppCompatActivity {
     public boolean getExhibitionData() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_EXHIBITION).get();
-            Log.d("GET_EXHIBITION", result);
+            String result = dbConnect.execute(DdConnect.GET_EXHIBITION).get();
             if(!result.equals("-1")) {
                 JSONObject jResult = new JSONObject(result);
                 JSONArray jArray = jResult.getJSONArray("result");
                 for (int i = 0; i < jArray.length(); i++) {
                     JSONObject jObject = jArray.getJSONObject(i);
                     exhibitionState[i] = jObject.getString("isOpen");
-                    Log.d("EXHIBITION", i + " : " + exhibitionState[i]);
                 }
                 return true;
             }
@@ -484,8 +474,7 @@ public class CheckActivity extends AppCompatActivity {
     public String getSurveyUrl() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_SURVEY).get();
-            Log.d("GET_SURVEY", result);
+            String result = dbConnect.execute(DdConnect.GET_SURVEY).get();
             if(!result.equals("-1")) {
                 JSONObject jResult = new JSONObject(result);
                 JSONArray jArray = jResult.getJSONArray("result");

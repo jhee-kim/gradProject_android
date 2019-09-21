@@ -35,13 +35,14 @@ import android.widget.Toast;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapPointBounds;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class NotiService extends Service {
-    public static final int MSG_SEND_TO_ACTIVITY = 0;
+//    public static final int MSG_SEND_TO_ACTIVITY = 0;
     SharedPreferences infoData;
     IBinder mBinder = new NotiBinder();
     boolean is_notify = false;  // 커스텀 노티 기능 ON/OFF 여부(SharedPreferences 사용)
@@ -66,50 +67,51 @@ public class NotiService extends Service {
     /* 노티 채널 */
     Notification notification;
     NotificationManager notiManager, notiManager_default, notiManager_warning;
-    final String channelId = "notiChannel";
-    final String channelName = "관람 상태 알림";
-    final String channelId_default = "notiChannel_2";
-    final String channelName_default = "위치 검사";
-    final String channelId_warning = "notiChannel_warning";
-    final String channelName_warning = "중요 알림";
-    final int NOTIFICATION_ID = 1;
-    final int NOTIFICATION_ID_default = 2;
-    final int NOTIFICATION_ID_warning = 3;
-    final int NOTIFICATION_ID_network = 4;
-    final int NOTIFICATION_ID_timeend = 5;
+    final static String channelId = "notiChannel";
+    final static String channelName = "관람 상태 알림";
+    final static String channelId_default = "notiChannel_2";
+    final static String channelName_default = "위치 검사";
+    final static String channelId_warning = "notiChannel_warning";
+    final static String channelName_warning = "중요 알림";
+    final static int NOTIFICATION_ID = 1;
+    final static int NOTIFICATION_ID_default = 2;
+    final static int NOTIFICATION_ID_warning = 3;
+    final static int NOTIFICATION_ID_network = 4;
+    final static int NOTIFICATION_ID_timeend = 5;
     int requestId, requestId_default, requestId_warning;
     NotificationCompat.Builder builder;
     NotificationCompat.Builder builder_default;
     NotificationCompat.Builder builder_warning;
-    final int nFLAG_INITIALIZE = 0;
-    final int nFLAG_START = 1;
-    final int nFLAG_FINISH = 2;
-    final int nFLAG_TIME = 10;
+    final static int nFLAG_INITIALIZE = 0;
+    final static int nFLAG_START = 1;
+    final static int nFLAG_FINISH = 2;
+    final static int nFLAG_TIME = 10;
 
     Intent notificationMainIntent;
     Intent notificationCheckIntent;
+    Intent notificationConfirmIntent;
 
     boolean network_state;
 
     /* 타이머 */
-    final int NETWORK_DELAY = 60; // 네트워크 통신 시간 간격 : 값 변경할 때는 초 단위로 변경
-    StateTimerHandler stateTimerhandler;
-    final int START_TIMER_START = 100;
 
-    final int END_TIMER_START = 200;
-    TimeTimerHandler timeTimerHandler;
-    final int NOWTIME_TIMER_START = 101;
+    final static int NETWORK_DELAY = 60; // 네트워크 통신 시간 간격 : 값 변경할 때는 초 단위로 변경
+    private final StateTimerHandler stateTimerhandler = new StateTimerHandler(this);
+    final static int START_TIMER_START = 100;
 
-    final int LOCATION_DELAY = 50; // 위치검사 시간 간격 : 값 변경할 때는 초 단위로 변경, 3회 연속 검사함(100이면 5분마다 검사)
-    LocationTimerHandler locationTimerHandler;
-    final int LOCATION_TIMER_START = 300;
+    final static int END_TIMER_START = 200;
+    private final TimeTimerHandler timeTimerHandler = new TimeTimerHandler(this);
+    final static int NOWTIME_TIMER_START = 101;
+
+    final static int LOCATION_DELAY = 50; // 위치검사 시간 간격 : 값 변경할 때는 초 단위로 변경, 3회 연속 검사함(100이면 5분마다 검사)
+    private final LocationTimerHandler locationTimerHandler = new LocationTimerHandler(this);
+    final static int LOCATION_TIMER_START = 300;
 
     /*GPS*/
     String provider;    //위치정보
     double longitude;  //위도
     double latitude;   //경도
     double altitude;   //고도
-    private MapPoint gpsPosition;  //현재 GPS 위치
 
     class NotiBinder extends Binder {
         NotiService getService() {
@@ -141,18 +143,14 @@ public class NotiService extends Service {
         s_id = infoData.getString("ID", "");
         is_notify = infoData.getBoolean("NOTIFICATION", false);
         if (!infoData.getBoolean("IS_LOGIN", false)) {
-            Log.d("서비스", "로그인 안되어있음");
             stopSelf();
         }
 
         // 초기화
         is_notification = false;
-        stateTimerhandler = new StateTimerHandler();
-        timeTimerHandler = new TimeTimerHandler();
-        locationTimerHandler = new LocationTimerHandler();
-
         notificationMainIntent = new Intent(getApplicationContext(), MainActivity.class);
         notificationCheckIntent = new Intent(getApplicationContext(), CheckActivity.class);
+        notificationConfirmIntent = new Intent(getApplicationContext(), ConfirmActivity.class);
 
         location_count = 0;
         is_inLocation = false;
@@ -173,7 +171,6 @@ public class NotiService extends Service {
                     public void onAvailable( Network network )
                     {
                         //네트워크 연결됨
-                        Log.d("NETWORK", "연결됨");
                         notiManager_warning.cancel(NOTIFICATION_ID_network);
                         network_state = true;
                     }
@@ -182,7 +179,6 @@ public class NotiService extends Service {
                     public void onLost( Network network )
                     {
                         //네트워크 끊어짐
-                        Log.d("NETWORK", "연결 끊어짐");
                         network_state = getNetworkInfo();
                         networkDisconnected();
                     }
@@ -316,7 +312,7 @@ public class NotiService extends Service {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
             altitude = location.getAltitude();
-            Log.d("gps", "위치정보 : " + provider + "\n" + "위도 : " + longitude + "\n" + "경도 : " + latitude + "\n" + "고도  : " + altitude);
+//            Log.d("gps", "위치정보 : " + provider + "\n" + "위도 : " + longitude + "\n" + "경도 : " + latitude + "\n" + "고도  : " + altitude);
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -330,19 +326,21 @@ public class NotiService extends Service {
     };
 
     public boolean checkInLocation() {
+        MapPoint gpsPosition;  //현재 GPS 위치
+
         /*독립기념관*/
-/*
-        MapPoint leftB1 = MapPoint.mapPointWithGeoCoord(36.786875, 127.217846);
-        MapPoint RightT1 = MapPoint.mapPointWithGeoCoord(36.779143, 127.229699);
-        MapPoint leftB2 = MapPoint.mapPointWithGeoCoord(36.780762, 127.227234);
-        MapPoint RightT2 = MapPoint.mapPointWithGeoCoord(36.775997, 127.234365);
 
-        MapPointBounds boundary1 = new MapPointBounds(leftB1, RightT1);
-        MapPointBounds boundary2 = new MapPointBounds(leftB2, RightT2);
-        gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
+//        MapPoint leftB1 = MapPoint.mapPointWithGeoCoord(36.786875, 127.217846);
+//        MapPoint RightT1 = MapPoint.mapPointWithGeoCoord(36.779143, 127.229699);
+//        MapPoint leftB2 = MapPoint.mapPointWithGeoCoord(36.780762, 127.227234);
+//        MapPoint RightT2 = MapPoint.mapPointWithGeoCoord(36.775997, 127.234365);
+//
+//        MapPointBounds boundary1 = new MapPointBounds(leftB1, RightT1);
+//        MapPointBounds boundary2 = new MapPointBounds(leftB2, RightT2);
+//        gpsPosition = MapPoint.mapPointWithGeoCoord(latitude, longitude);
+//
+//        return boundary1.contains(gpsPosition) || boundary2.contains(gpsPosition);
 
-        return boundary1.contains(gpsPosition) || boundary2.contains(gpsPosition);
-/*
         /*한기대*/
 
         MapPoint leftB = MapPoint.mapPointWithGeoCoord(36.769856, 127.276194);
@@ -356,17 +354,12 @@ public class NotiService extends Service {
     }
 
     public void setOutLocation() {
-        Log.d("위치 초기화", "위치 초기화 시작!!");
-
-        Log.d("SERVICE", "위치 초기화 진행 0단계");
         Thread init_thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (is_initialize) {
-                    Log.d("SERVICE", "위치 초기화 진행 1단계");
                     if (setInitialize()) {
                         if (is_setIsStart) {
-                            Log.d("SERVICE", "위치 초기화 진행 2단계");
                             stateTimerhandler.removeMessages(END_TIMER_START);
                             stateTimerhandler.sendEmptyMessage(START_TIMER_START);
                             i_state = 0;
@@ -412,164 +405,179 @@ public class NotiService extends Service {
             }
         });
         init_thread.run();
-
-        Log.d("위치 초기화", "위치 초기화 끝!!");
     }
 
-    // 지정한 시간 단위로 시작/종료 여부 서버에서 받아옴
-    private class StateTimerHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == START_TIMER_START) {
-                if (is_inLocation) {
-                    // 관람 시작 전 : 관람 시작 여부 검사
-                    if (getStartState()) {
-                        Log.d("ISSTART_SERVICE", Boolean.toString(is_start));
-                        // 관람 시작 했으면 관람 진행 상태로 넘어감
-                        if (is_start) {
-                            stateTimerhandler.removeMessages(START_TIMER_START);
-                            if (i_state == 0) {
-                                i_state = 1;
-                                s_stateNoti = "관람 진행 중";
-                                updateNotification(nFLAG_START);
-                            }
-                            this.sendEmptyMessage(END_TIMER_START);
-                            Log.d("START TIMER", "RUNNING");
-                        } else {
-                            this.sendEmptyMessageDelayed(START_TIMER_START, NETWORK_DELAY * 1000);
+    // 핸들러 메시지 처리
+    public void handleMessage(Message msg) {
+        if (msg.what == START_TIMER_START) {
+            if (is_inLocation) {
+                // 관람 시작 전 : 관람 시작 여부 검사
+                if (getStartState()) {
+                    // 관람 시작 했으면 관람 진행 상태로 넘어감
+                    if (is_start) {
+                        Log.d("서비스-진행상태", "시작됨");
+                        stateTimerhandler.removeMessages(START_TIMER_START);
+                        if (i_state == 0) {
+                            i_state = 1;
+                            s_stateNoti = "관람 진행 중";
+                            updateNotification(nFLAG_START);
                         }
-                    }
-                } else {
-                    Log.d("ISINLOCATION_SERVICE", "밖에 나가있음");
-                    this.sendEmptyMessageDelayed(START_TIMER_START, NETWORK_DELAY * 1000);
-                }
-            }
-            // 관람 진행 중 : 관람 종료 여부 및 초기화 여부 검사
-            else if (msg.what == END_TIMER_START) {
-                if (is_inLocation) {    // 독립기념관 내부에 있을 때만 검사
-                    if (getStartState()) {
-                        // 서버에서 관람기록 초기화했을 경우 앱에서도 초기화
-                        if (!is_start) {
-                            if (i_state == 1) {
-                                stateTimerhandler.removeMessages(END_TIMER_START);
-                                this.sendEmptyMessage(START_TIMER_START);
-                                i_state = 0;
-                                s_stateNoti = "관람 시작 전";
-                                updateNotification(nFLAG_INITIALIZE);
-                                is_start = false;
-                            }
-                        }
-                    }
-                    if (l_elapseTime > 7140000) {
-//                    if (l_elapseTime > 0) {
-                        Log.d("NOTISERVICE", "두시간 넘었음!");
-                        if (isEnd()) {
-                            // 관람 종료되었으면 관람 종료했다고 띄워줌
-                            if (is_end) {
-                                stateTimerhandler.removeMessages(END_TIMER_START);
-                                timeTimerHandler.removeMessages(NOWTIME_TIMER_START);
-                                s_stateNoti = "관람 종료";
-                                i_state = 2;
-
-                                makeAlarmNotification("알림", "관람 종료 확인되었습니다.",
-                                        NOTIFICATION_ID_timeend, notificationCheckIntent);
-
-                                Intent intent = new Intent("Finished!");
-                                LocalBroadcastManager.getInstance(NotiService.this).sendBroadcast(intent);
-
-                                Log.d("END TIMER", "RUNNING");
-                                stopSelf();
-                            } else {
-                                this.sendEmptyMessageDelayed(END_TIMER_START, NETWORK_DELAY * 1000);
-                            }
-                        }
+                        stateTimerhandler.sendEmptyMessage(END_TIMER_START);
                     } else {
-                        Log.d("NOTISERVICE", "두시간 안 넘었음!");
+                        stateTimerhandler.sendEmptyMessageDelayed(START_TIMER_START, NETWORK_DELAY * 1000);
                     }
                 }
             } else {
-                Log.d("ISINLOCATION_SERVICE", "밖에 나가있음");
-                this.sendEmptyMessageDelayed(END_TIMER_START, NETWORK_DELAY * 1000);
+                stateTimerhandler.sendEmptyMessageDelayed(START_TIMER_START, NETWORK_DELAY * 1000);
+            }
+        }
+        // 관람 진행 중 : 관람 종료 여부 및 초기화 여부 검사
+        else if (msg.what == END_TIMER_START) {
+            if (is_inLocation) {    // 독립기념관 내부에 있을 때만 검사
+                if (getStartState()) {
+                    // 서버에서 관람기록 초기화했을 경우 앱에서도 초기화
+                    if (!is_start) {
+                        Log.d("서비스-진행상태", "초기화됨");
+                        if (i_state == 1) {
+                            stateTimerhandler.removeMessages(END_TIMER_START);
+                            stateTimerhandler.sendEmptyMessage(START_TIMER_START);
+                            i_state = 0;
+                            s_stateNoti = "관람 시작 전";
+                            updateNotification(nFLAG_INITIALIZE);
+                            is_start = false;
+                        }
+                    }
+                }
+                Log.d("서비스-진행상태", "진행중");
+//                if (l_elapseTime > 7140000) {
+                if (l_elapseTime > 0) {
+                    if (isEnd()) {
+                        // 관람 종료되었으면 관람 종료했다고 띄워줌
+                        if (is_end) {
+                            Log.d("서비스-진행상태", "종료됨");
+                            stateTimerhandler.removeMessages(END_TIMER_START);
+                            timeTimerHandler.removeMessages(NOWTIME_TIMER_START);
+                            s_stateNoti = "관람 종료";
+                            i_state = 2;
+
+                            makeAlarmNotification("알림", "관람 종료 확인되었습니다.",
+                                    NOTIFICATION_ID_timeend, notificationConfirmIntent);
+
+                            stopSelf();
+                        } else {
+                            stateTimerhandler.sendEmptyMessageDelayed(END_TIMER_START, NETWORK_DELAY * 1000);
+                        }
+                    }
+                }
+            }
+        } else {
+            stateTimerhandler.sendEmptyMessageDelayed(END_TIMER_START, NETWORK_DELAY * 1000);
+        }
+        if (msg.what == NOWTIME_TIMER_START) {
+            if (is_start) {
+                l_nowTime = System.currentTimeMillis();
+                l_elapseTime = l_nowTime - l_startTime;
+                Log.d("서비스-진행시간", Long.toString(l_elapseTime));
+                if (is_notification) {
+                    long temp_time = l_elapseTime / 1000;
+                    if (temp_time % 60 >= 0 && temp_time % 60 < 30) {
+                        Date elapseDate = new Date(l_elapseTime);
+                        SimpleDateFormat sdfElapse = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                        sdfElapse.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        s_elapseTime = sdfElapse.format(elapseDate);
+                        updateNotification(nFLAG_TIME);
+                    }
+                }
+                if (l_elapseTime > 7200000) {
+                    if (!is_timeendNoti) {
+                        makeAlarmNotification("알림", "관람 시간이 2시간을 경과했습니다.",
+                                NOTIFICATION_ID_timeend, notificationCheckIntent);
+                        is_timeendNoti = true;
+                    }
+                } else {
+                    is_timeendNoti = false;
+                }
+                timeTimerHandler.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
+            } else {
+                timeTimerHandler.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
+            }
+        }
+        if (msg.what == LOCATION_TIMER_START) {
+            if (checkInLocation()) {
+                Log.d("서비스-위치", "내부에 있음");
+                location_count = 0;
+                is_inLocation = true;
+                is_warned = false;
+                locationTimerHandler.sendEmptyMessageDelayed(LOCATION_TIMER_START, LOCATION_DELAY * 1000);
+            } else {
+                location_count++;
+                if (location_count > 5) {
+                    Log.d("서비스-위치", "외부로 나감");
+                    is_inLocation = false;
+                    if (is_start) {
+                        if (is_warned) {
+                            location_count = 0;
+                            is_warned = false;
+                            is_initialize = true;
+                            setOutLocation();
+                            builder_warning.setContentText("관람 기록이 초기화되었습니다.\n안내센터에 문의하세요.");
+                            notiManager_warning.notify(NOTIFICATION_ID_warning, builder_warning.build());
+                            makeAlarmNotification("경고", "관람 기록이 초기화되었습니다. 안내 센터에 문의하세요.",
+                                    NOTIFICATION_ID_warning, notificationMainIntent);
+                        } else {
+                            makeAlarmNotification("경고", "독립기념관 외부로 나가면 관람 기록이 초기화됩니다!",
+                                    NOTIFICATION_ID_warning, notificationMainIntent);
+                            is_warned = true;
+                            location_count = 0;
+                        }
+                    }
+                }
+                locationTimerHandler.sendEmptyMessageDelayed(LOCATION_TIMER_START, LOCATION_DELAY * 1000);
+            }
+        }
+    }
+
+    // 지정한 시간 단위로 시작/종료 여부 서버에서 받아옴
+    private static class StateTimerHandler extends Handler {
+        private final WeakReference<NotiService> mService;
+        StateTimerHandler(NotiService service) {
+            mService = new WeakReference<>(service);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            NotiService service = mService.get();
+            if (service != null) {
+                service.handleMessage(msg);
             }
         }
     }
 
     // 경과시간 새로고침
-    private class TimeTimerHandler extends Handler {
+    private static class TimeTimerHandler extends Handler {
+        private final WeakReference<NotiService> mService;
+        TimeTimerHandler(NotiService service) {
+            mService = new WeakReference<>(service);
+        }
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == NOWTIME_TIMER_START) {
-                Log.d("TimeTimerHandler", "Running");
-                if (is_start) {
-                    l_nowTime = System.currentTimeMillis();
-                    l_elapseTime = l_nowTime - l_startTime;
-                    if (is_notification) {
-                        long temp_time = l_elapseTime / 1000;
-                        if (temp_time % 60 >= 0 && temp_time % 60 < 30) {
-                            Date elapseDate = new Date(l_elapseTime);
-                            SimpleDateFormat sdfElapse = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                            sdfElapse.setTimeZone(TimeZone.getTimeZone("UTC"));
-                            s_elapseTime = sdfElapse.format(elapseDate);
-                            updateNotification(nFLAG_TIME);
-                            Log.d("TIME TIMER", "NOTI UPDATE");
-                        }
-                    }
-                    Log.d("TIME TIMER", Long.toString(l_elapseTime));
-                    if (l_elapseTime > 7200000) {
-                        if (!is_timeendNoti) {
-                            makeAlarmNotification("알림", "관람 시간이 2시간을 경과했습니다.",
-                                    NOTIFICATION_ID_timeend, notificationCheckIntent);
-                            is_timeendNoti = true;
-                        }
-                    } else {
-                        is_timeendNoti = false;
-                    }
-                    this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
-                } else {
-                    this.sendEmptyMessageDelayed(NOWTIME_TIMER_START, 30000);
-                }
+            NotiService service = mService.get();
+            if (service != null) {
+                service.handleMessage(msg);
             }
         }
     }
 
     // 시간단위 위치추적
-    private class LocationTimerHandler extends Handler {
+    private static class LocationTimerHandler extends Handler {
+        private final WeakReference<NotiService> mService;
+        LocationTimerHandler(NotiService service) {
+            mService = new WeakReference<>(service);
+        }
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == LOCATION_TIMER_START) {
-                if (checkInLocation()) {
-                    location_count = 0;
-                    is_inLocation = true;
-                    is_warned = false;
-                    Log.d("LOCATIONTIMER", "영역 안에 있음");
-                    this.sendEmptyMessageDelayed(LOCATION_TIMER_START, LOCATION_DELAY * 1000);
-                } else {
-                    location_count++;
-                    if (location_count > 5) {
-                        is_inLocation = false;
-                        Log.d("LOCATIONTIMER", "영역 밖에 있음");
-                        if (is_start) {
-                            if (is_warned) {
-                                location_count = 0;
-                                is_warned = false;
-                                is_initialize = true;
-                                Log.d("I_STATE", Integer.toString(i_state));
-                                setOutLocation();
-                                builder_warning.setContentText("관람 기록이 초기화되었습니다.\n안내센터에 문의하세요.");
-                                notiManager_warning.notify(NOTIFICATION_ID_warning, builder_warning.build());
-                                makeAlarmNotification("경고", "관람 기록이 초기화되었습니다. 안내 센터에 문의하세요.",
-                                        NOTIFICATION_ID_warning, notificationMainIntent);
-                            } else {
-                                makeAlarmNotification("경고", "독립기념관 외부로 나가면 관람 기록이 초기화됩니다!",
-                                        NOTIFICATION_ID_warning, notificationMainIntent);
-                                is_warned = true;
-                                location_count = 0;
-                            }
-                        }
-                    }
-
-                    this.sendEmptyMessageDelayed(LOCATION_TIMER_START, LOCATION_DELAY * 1000);
-                }
+            NotiService service = mService.get();
+            if (service != null) {
+                service.handleMessage(msg);
             }
         }
     }
@@ -584,11 +592,8 @@ public class NotiService extends Service {
                     if (is_end) {
                         s_stateNoti = "관람 종료";
                         i_state = 2;
-//                        stopSelf();
                     }
                 } else {    // 네트워크 통신 오류 예외처리
-//                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
-//                    disconnectedNetwork();
                     s_stateNoti = "Error";
                     i_state = -1;
                 }
@@ -597,8 +602,6 @@ public class NotiService extends Service {
                 i_state = 0;
             }
         } else {    // 네트워크 통신 오류 예외처리
-//                Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
-//            disconnectedNetwork();
             s_stateNoti = "Error";
             i_state = -1;
         }
@@ -640,7 +643,6 @@ public class NotiService extends Service {
         builder.setContent(remoteViews)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setAutoCancel(false)
-//                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
                 .setContentIntent(pendingIntent);
@@ -710,8 +712,7 @@ public class NotiService extends Service {
     private boolean getStartState() {
         DdConnect dbConnect = new DdConnect();
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
-            Log.d("GET_ISSTART", result);
+            String result = dbConnect.execute(DdConnect.GET_ISSTART, s_id).get();
             if (!result.equals("-1")) {
                 is_start = !result.equals("0");
                 if (is_start) {
@@ -729,8 +730,7 @@ public class NotiService extends Service {
     private boolean isEnd() {
         DdConnect dbConnect = new DdConnect();
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
-            Log.d("GET_ISEND", result);
+            String result = dbConnect.execute(DdConnect.GET_ISEND, s_id).get();
             if (!result.equals("-1")) {
                 is_end = !result.equals("0");
                 return true;
@@ -744,8 +744,7 @@ public class NotiService extends Service {
     private boolean setInitialize() {
         DdConnect dbConnect = new DdConnect();
         try {
-            String result = dbConnect.execute(dbConnect.SET_ISSTART, s_id).get();
-            Log.d("SET_ISSTART", result);
+            String result = dbConnect.execute(DdConnect.SET_ISSTART, s_id).get();
             if (!result.equals("-1")) {
                 is_setIsStart = !result.equals("0");
                 return true;
@@ -775,8 +774,6 @@ public class NotiService extends Service {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                Log.d("NETWORK", Boolean.toString(network_state));
                 if (!network_state) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         Intent intent = new Intent(Settings.ACTION_DATA_USAGE_SETTINGS);

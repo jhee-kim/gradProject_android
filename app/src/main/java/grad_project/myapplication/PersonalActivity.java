@@ -97,7 +97,7 @@ public class PersonalActivity extends AppCompatActivity {
     public boolean getUserData() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_AUDIENCE, s_id).get();
+            String result = dbConnect.execute(DdConnect.GET_AUDIENCE, s_id).get();
             Log.d("GET_AUDIENCE", result);
             if (!result.equals("-1")) {
                 JSONObject jResult = new JSONObject(result);

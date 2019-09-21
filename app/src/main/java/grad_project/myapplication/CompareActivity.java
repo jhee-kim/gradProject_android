@@ -11,12 +11,9 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -25,17 +22,13 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
-import org.opencv.core.DMatch;
 import org.opencv.core.Mat;
-import org.opencv.features2d.BFMatcher;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 public class CompareActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
-    private static final String TAG = CompareActivity.class.getSimpleName();
+//    private static final String TAG = CompareActivity.class.getSimpleName();
     private SharedPreferences infoData;
-    private TextView text;
     private int imgAddr;
     private int imgNum;
     private int exhibitionNum;
@@ -80,7 +73,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
             actionBar.hide();
         }
 
-        mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.surface_view);
+        mOpenCvCameraView = findViewById(R.id.surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setCameraIndex(0); // front-camera(1),  back-camera(0)
@@ -92,11 +85,8 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         imgAddr = intent.getIntExtra("ImgAddr", -1);
         exhibitionNum = intent.getIntExtra("exhibitionNum", -1);     //전시관 번호(0~5)
         imgNum = intent.getIntExtra("imgNum", -1);                   //몇번째 이미지인지(0~max-1)
-        Log.d(TAG, "imgAddr: " + imgAddr);
-        Log.d(TAG, "exhibitionNum: " + exhibitionNum);
-        Log.d(TAG, "imgNum: " + imgNum);
 
-        ImageButton shutter = (ImageButton) findViewById(R.id.button_capture1);
+        ImageButton shutter = findViewById(R.id.button_capture1);
         shutter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,10 +121,8 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         super.onResume();
 
         if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "onResume :: Internal OpenCV library not found.");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
         } else {
-            Log.d(TAG, "onResum :: OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
@@ -199,7 +187,6 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
         @Override
         protected void onPostExecute(Integer correctNum) {
             String resultMessage;
-            Log.d(TAG, "correctNum: " + correctNum);
             boolean isSuccess = false;
             if(correctNum < MIN_CORRECT_NUM) {
                 resultMessage = "사진이 일치하지 않습니다.";

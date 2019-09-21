@@ -123,7 +123,7 @@ public class ConfirmActivity extends AppCompatActivity {
     public boolean getUserData() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_AUDIENCE, s_id).get();
+            String result = dbConnect.execute(DdConnect.GET_AUDIENCE, s_id).get();
             Log.d("GET_AUDIENCE", result);
             if (!result.equals("-1")) {
                 JSONObject jResult = new JSONObject(result);
@@ -146,7 +146,7 @@ public class ConfirmActivity extends AppCompatActivity {
     public boolean getStartState() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+            String result = dbConnect.execute(DdConnect.GET_ISSTART, s_id).get();
             Log.d("GET_ISSTART", result);
             if (!result.equals("-1") && !result.equals("0")) {
                 Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).parse(result);
@@ -162,7 +162,7 @@ public class ConfirmActivity extends AppCompatActivity {
     public boolean getEndDate() {
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_ISEND, s_id).get();
+            String result = dbConnect.execute(DdConnect.GET_ISEND, s_id).get();
             Log.d("GET_ISEND", result);
             if (!result.equals("-1") && !result.equals("0")) {
                 return true;

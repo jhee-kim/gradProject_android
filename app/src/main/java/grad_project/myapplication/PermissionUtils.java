@@ -33,7 +33,6 @@ public class PermissionUtils {
             int permissionCheck = ContextCompat.checkSelfPermission(activity, s);
             boolean hasPermission = (permissionCheck == PackageManager.PERMISSION_GRANTED);
             granted &= hasPermission;
-            granted &= hasPermission;
             if (!hasPermission) {
                 permissionsNeeded.add(s);
             }
