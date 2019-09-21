@@ -449,8 +449,7 @@ public class NotiService extends Service {
                     }
                 }
                 Log.d("서비스-진행상태", "진행중");
-//                if (l_elapseTime > 7140000) {
-                if (l_elapseTime > 0) {
+                if (l_elapseTime > 7140000) {
                     if (isEnd()) {
                         // 관람 종료되었으면 관람 종료했다고 띄워줌
                         if (is_end) {
