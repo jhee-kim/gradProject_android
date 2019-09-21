@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBar;
@@ -111,9 +110,9 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     private int questNum;
     private  QuestAdapter adapter;
     ListView listView;
-    List<String> qTitle = new ArrayList<String>();
+    List<String> qTitle = new ArrayList<>();
     String Title[] = {"제1전시관 겨레의뿌리", "제2전시관 겨례의시련", "제3전시관 겨레의함성", "제4전시관 평화누리", "제5전시관 나라되찾기", "제6전시관 새나라세우기"};
-    List<String> qDescription = new ArrayList<String>();
+    List<String> qDescription = new ArrayList<>();
     String qrDescription = "해당 전시관 출입구에 있는 QR코드를 찍으세요.";
     String imgDescription[][] = {{"훈민정음 해례본", "승정원일기", "주먹도끼", "반달모양 돌칼"},      //images배열과 매칭
             {},
@@ -121,7 +120,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             {},
             {"만주 한국독립당의 호소문", "한국광복군 서명 태극기", "한국광복군총사령부 성립전례식", "신채호 친필 편지"},
             {"독립열사", "6.10만세운동 관련 보도 기사", "어린이날 포스터", "일제수탈에 항쟁하는 농민들"}};  //찍을 사진들 이름 적으면 될듯
-    List<Integer> qImages = new ArrayList<Integer>();
+    List<Integer> qImages = new ArrayList<>();
     int qrImages = R.drawable.qr_img;
     int smallImages[][] = {{R.drawable.simg1_1, R.drawable.simg1_2, R.drawable.simg1_3, R.drawable.simg1_4}, //전시관마다 사진 4개씩
                             {},         //2전시관 사진X
@@ -136,18 +135,18 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                         {},         //4전시관 사진X
                         {R.drawable.img5_1, R.drawable.img5_2, R.drawable.img5_3, R.drawable.img5_4},
                         {R.drawable.img6_1, R.drawable.img6_2, R.drawable.img6_3, R.drawable.img6_4}};   //찍을 이미지들
-    List<Integer> qExhibitionNum = new ArrayList<Integer>();
-    List<Integer> qType = new ArrayList<Integer>();     //0 - QR / 1 - Image
-    List<Integer> qNumOfImg = new ArrayList<Integer>();
+    List<Integer> qExhibitionNum = new ArrayList<>();
+    List<Integer> qType = new ArrayList<>();     //0 - QR / 1 - Image
+    List<Integer> qNumOfImg = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_normal);
-        mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
-        listCountTv = (TextView)findViewById(R.id.list_count_tv);
-        questView = (ListView) findViewById(R.id.questList);
-        but_gps = (ImageButton) findViewById(R.id.but_gps);
+        mapViewContainer = findViewById(R.id.map_view);
+        listCountTv = findViewById(R.id.list_count_tv);
+        questView = findViewById(R.id.questList);
+        but_gps = findViewById(R.id.but_gps);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar == null) {
@@ -188,7 +187,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
         /*리스트*/
         listView = findViewById(R.id.questList);
-        questItems = new ArrayList<questViewItems>();
+        questItems = new ArrayList<>();
 
         attributeSetting();
         QuestItemSet();
@@ -201,7 +200,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             listCountTv.setVisibility(View.GONE);
         }
         else {
-            listCountTv.setText(questItems.size() + "");
+            String temp = questItems.size() + "";
+            listCountTv.setText(temp);
             listCountTv.setVisibility(View.VISIBLE);
         }
 
@@ -211,7 +211,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
         mapView.setPOIItemEventListener(this);
         mapView.setMapViewEventListener(this);
         mapViewContainer.addView(mapView);
-        ImageButton imageButton = (ImageButton)findViewById(R.id.in_exhibition);
+        ImageButton imageButton = findViewById(R.id.in_exhibition);
         imageButton.performClick();
     }
 
@@ -247,10 +247,11 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                                 for(int j = 0 ; j < questItems.size() ; j++) { //Listview에서 해당 Qr 제거해줌
                                     questViewItems q = questItems.get(j);
                                     if(q.QTypeItem == 0 && q.QExhibitionNum == i) { //전시관 번호가 같고 QR이면
-                                        boolean b = questItems.remove(q);                   //해당 item 제거
+                                        questItems.remove(q);                   //해당 item 제거
                                         adapter = new QuestAdapter(NormalActivity.this, questItems);
                                         listView.setAdapter(adapter);
-                                        listCountTv.setText(questItems.size() + "");
+                                        String temp = questItems.size() + "";
+                                        listCountTv.setText(temp);
                                         if(questItems.size() == 0) {
                                             listCountTv.setVisibility(View.GONE);
                                         }
@@ -291,7 +292,8 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                         questItems.remove(nowPosition);
                         adapter = new QuestAdapter(NormalActivity.this, questItems);
                         listView.setAdapter(adapter);
-                        listCountTv.setText(questItems.size() + "");
+                        String temp = questItems.size() + "";
+                        listCountTv.setText(temp);
                         if(questItems.size() == 0) {
                             listCountTv.setVisibility(View.GONE);
                         }
@@ -355,7 +357,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void getExhibitionData() {
         DdConnect dbConnect1 = new DdConnect(this);
         try {
-            String result = dbConnect1.execute(dbConnect1.GET_EXHIBITION).get();
+            String result = dbConnect1.execute(DdConnect.GET_EXHIBITION).get();
             Log.d("GET_EXHIBITION", result);
             if(!result.equals("-1")) {
                 JSONObject jResult = new JSONObject(result);
@@ -375,7 +377,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
 
         DdConnect dbConnect2 = new DdConnect(this);
         try {
-            String result = dbConnect2.execute(dbConnect2.GET_QR).get();
+            String result = dbConnect2.execute(DdConnect.GET_QR).get();
             Log.d("GET_QR", result);
             if(!result.equals("-1")) {
                 JSONObject jResult = new JSONObject(result);
@@ -424,7 +426,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void setIn_exhibition() {
         mapView.removeAllPOIItems();
 
-        List<MapPoint> mapPointArr = new ArrayList<MapPoint>();
+        List<MapPoint> mapPointArr = new ArrayList<>();
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.783353, 127.221629));  //제 1전시관
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.783802, 127.220985));  //제 2전시관
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.784352, 127.220894));  //제 3전시관
@@ -471,7 +473,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void setOut_exhibition() {
         mapView.removeAllPOIItems();
 
-        List<MapPoint> mapPointArr = new ArrayList<MapPoint>();
+        List<MapPoint> mapPointArr = new ArrayList<>();
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.780575, 127.227633));  //겨례의 탑
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.782636, 127.224867));  //태극기한마당
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.783721, 127.223193));  //겨례의 집
@@ -505,7 +507,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void setFacilities() {
         mapView.removeAllPOIItems();
 
-        List<MapPoint> mapPointArr = new ArrayList<MapPoint>();
+        List<MapPoint> mapPointArr = new ArrayList<>();
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.779731, 127.228604));  //태극열차
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.783088, 127.223259));  //겨례쉼터
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.783011, 127.223018));  //의무실
@@ -539,7 +541,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     public void setStore() {
         mapView.removeAllPOIItems();
 
-        List<MapPoint> mapPointArr = new ArrayList<MapPoint>();
+        List<MapPoint> mapPointArr = new ArrayList<>();
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.779057, 127.229849));
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.779917, 127.229098));
         mapPointArr.add(MapPoint.mapPointWithGeoCoord(36.781910, 127.225719));
@@ -969,12 +971,12 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
     }
 
     class questViewItems {
-        public int QImageItem;
-        public String QTitleItem;
-        public String QSubTitleItem;
-        public int QExhibitionNum;          //전시관 번호
-        public int QTypeItem;               //Qr인지 사진인지
-        public int QNumOfImg;               //몇번째 사진인지
+        int QImageItem;
+        String QTitleItem;
+        String QSubTitleItem;
+        int QExhibitionNum;          //전시관 번호
+        int QTypeItem;               //Qr인지 사진인지
+        int QNumOfImg;               //몇번째 사진인지
     }
 
     public void attributeSetting() {
@@ -982,7 +984,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
             if(exhibitionState[i].equals("1")) {
                 for(int j = 0 ; j < ImgNumByExhibition ; j++) {
                     if(i == 3) break;    //4전시관은 사진 패스
-                    if(isCheckImgArr[i][j] == false) {
+                    if(!isCheckImgArr[i][j]) {
                         qTitle.add(Title[i]);
                         qDescription.add("해당 전시관의 전시물 \"" + imgDescription[i][(randomImgNumArr[i][j])] + "\"를 찾아 사진을 찍으세요.");
                         qImages.add(smallImages[i][(randomImgNumArr[i][j])]);     //찍을 이미지로 바꿔줘야함**
@@ -992,7 +994,7 @@ public class NormalActivity extends AppCompatActivity implements MapView.MapView
                     }
                 }
 
-                if (isCheckQrArr[i] == false) {
+                if (!isCheckQrArr[i]) {
                     qTitle.add(Title[i]);
                     qDescription.add(qrDescription);
                     qImages.add(qrImages);

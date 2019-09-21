@@ -1,6 +1,5 @@
 package grad_project.myapplication;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -26,13 +25,13 @@ public class HelpComActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
-        TextView tv1 = (TextView)findViewById(R.id.tv_red1);
+        TextView tv1 = findViewById(R.id.tv_red1);
         String str1 = "● 지참물 : 휴가증 필참\n                 (육군은 외박, 외출 제외)";
         SpannableStringBuilder ssb1 = new SpannableStringBuilder(str1);
         ssb1.setSpan(new ForegroundColorSpan(Color.parseColor("#FF0000")), 8, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tv1.setText(ssb1);
 
-        TextView tv2 = (TextView)findViewById(R.id.tv_red2);
+        TextView tv2 = findViewById(R.id.tv_red2);
         String str2 = "● 인원제한 : 선착순으로 등록이 진행됨";
         SpannableStringBuilder ssb2 = new SpannableStringBuilder(str2);
         ssb2.setSpan(new ForegroundColorSpan(Color.parseColor("#FF0000")), 9, 12, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

@@ -3,9 +3,7 @@ package grad_project.myapplication;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -39,8 +37,6 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -103,15 +99,15 @@ public class OcrActivity  extends AppCompatActivity implements CameraBridgeViewB
             actionBar.hide();
         }
 
-        imageVIewScene = (ImageView)findViewById(R.id.img);
+        imageVIewScene = findViewById(R.id.img);
 
-        mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
+        mOpenCvCameraView = findViewById(R.id.activity_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setCameraIndex(0); // froremoveVient-camera(1),  back-camera(0)
         mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
 
-        ImageButton shutter = (ImageButton) findViewById(R.id.button_capture);
+        ImageButton shutter = findViewById(R.id.button_capture);
         shutter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

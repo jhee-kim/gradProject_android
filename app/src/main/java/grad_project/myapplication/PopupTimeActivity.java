@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.Chronometer;
 
@@ -21,7 +20,7 @@ public class PopupTimeActivity extends Activity {
         startDate = intent.getLongExtra("Time", 0);
 
         setContentView(R.layout.popup_time);
-        mChronometer = (Chronometer)findViewById(R.id.chronometer);
+        mChronometer = findViewById(R.id.chronometer);
 
         //time 초기화
         mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener(){

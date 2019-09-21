@@ -20,7 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -51,7 +50,6 @@ public class RegistActivity extends AppCompatActivity {
     Spinner sp_number_0, sp_phone_0, sp_division, sp_participation, sp_expTime;
     CheckBox cb_check;
     boolean check_temp;
-    RadioGroup rg_participation, rg_division;
     LinearLayout ll_agreement, bt_partHelp;
 
     ArrayAdapter<String> timeAdapter;
@@ -186,7 +184,7 @@ public class RegistActivity extends AppCompatActivity {
 
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.GET_NARRATOR).get();
+            String result = dbConnect.execute(DdConnect.GET_NARRATOR).get();
             Log.d("GET_NARRATOR", result);
             if (result.equals("-1")) {
                 Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
@@ -211,7 +209,7 @@ public class RegistActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
         }
 
-        timeList = new ArrayList<String>();
+        timeList = new ArrayList<>();
         if (b_expTime[0]) {
             timeList.add("없음");
         }
@@ -224,7 +222,7 @@ public class RegistActivity extends AppCompatActivity {
                 timeList.add("13:00");
             }
         }
-        timeAdapter = new ArrayAdapter<String>(getApplicationContext(),
+        timeAdapter = new ArrayAdapter<>(getApplicationContext(),
                 R.layout.spinner_item, timeList);
         timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp_expTime.setAdapter(timeAdapter);
@@ -322,8 +320,6 @@ public class RegistActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
-//        int participation_selected = rg_participation.getCheckedRadioButtonId();
-
         s_name = et_name.getText().toString().trim();
         s_temper = et_temper.getText().toString().trim();
         s_number_1 = et_number_1.getText().toString().trim();
@@ -335,18 +331,6 @@ public class RegistActivity extends AppCompatActivity {
         boolean b_check = cb_check.isChecked();
         String temp_phone = s_phone_0 + "-" + s_phone_1 + "-" + s_phone_2;
         String temp_number = s_number_0 + "-" + s_number_1;
-
-//        switch (participation_selected) {
-//            case R.id.rb_normal:
-//                i_participation = 0;
-//                break;
-//            case R.id.rb_narr:
-//                i_participation = 1;
-//                break;
-//            default:
-//                i_participation = -1;
-//                break;
-//        }
 
         Log.i("NAME", s_name);
         Log.i("DIVISION", Integer.toString(i_division));
@@ -401,12 +385,12 @@ public class RegistActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = infoData.edit();
                 DdConnect dbConnect = new DdConnect(this);
                 try {
-                    String result = dbConnect.execute(dbConnect.ADD_AUDIENCE, "", s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination).get();
+                    String result = dbConnect.execute(DdConnect.ADD_AUDIENCE, "", s_number, s_name, Integer.toString(i_participation), Integer.toString(i_division), s_temper, s_phone, s_destination).get();
                     Log.d("ADD_AUDIENCE", result);
                     if (result.equals("0")) {
                         Toast.makeText(RegistActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     } else if (result.equals("-1")) {
-                        Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "등록에 실패하였습니다.", Toast.LENGTH_SHORT).show();
                     } else {
                         s_id = result;
                         Toast.makeText(RegistActivity.this, "등록 완료되었습니다.", Toast.LENGTH_SHORT).show();
@@ -473,14 +457,11 @@ public class RegistActivity extends AppCompatActivity {
                                         is_success_sp = true;
                                     }
                                 }
-                                if (!is_success_sp) {
-                                    Toast.makeText(getApplicationContext(), "텍스트 읽어오기 오류!", Toast.LENGTH_SHORT).show();
-                                }
                                 et_number_1.setText(temp_num[1]);
                                 break;
                             }
                             catch (Exception e) {
-
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -515,15 +496,10 @@ public class RegistActivity extends AppCompatActivity {
                             temp_phone[1] = PhoneNum.substring(3, 7);
                             temp_phone[2] = PhoneNum.substring(7);
                         }
-                        boolean is_success_sp = false;
                         for (int j = 0; j < sp_phone_0.getCount(); j++) {
                             if (sp_phone_0.getItemAtPosition(j).toString().equals(temp_phone[0])) {
                                 sp_phone_0.setSelection(j);
-                                is_success_sp = true;
                             }
-                        }
-                        if (!is_success_sp) {
-                            Toast.makeText(getApplicationContext(), "텍스트 읽어오기 오류!", Toast.LENGTH_SHORT).show();
                         }
                         et_phone_1.setText(temp_phone[1]);
                         et_phone_2.setText(temp_phone[2]);
@@ -548,7 +524,7 @@ public class RegistActivity extends AppCompatActivity {
                 0x3144, 0x3145, 0x3146, 0x3147, 0x3148, 0x314a,
                 0x314b, 0x314c, 0x314d, 0x314e };
 
-        public String hangulToJaso(String s) {
+        String hangulToJaso(String s) {
             int a, b, c; // 자소 버퍼: 초성/중성/종성 순
             String result = "";
             for (int i = 0; i < s.length(); i++) {
@@ -567,7 +543,7 @@ public class RegistActivity extends AppCompatActivity {
             }
             return result;
         }
-        public boolean jasoEqual(String s1, String s2) {
+        boolean jasoEqual(String s1, String s2) {
             int count = 0;
             int length = s1.length() > s2.length() ? s2.length() : s1.length();
             for(int i = 0; i < length; i++) {
@@ -575,10 +551,7 @@ public class RegistActivity extends AppCompatActivity {
                     count++;
                 }
             }
-            if(count < length/4) {
-                return true;
-            }
-            return false;
+            return count < length/4;
         }
     }
 }

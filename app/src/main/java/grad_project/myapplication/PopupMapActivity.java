@@ -20,9 +20,9 @@ public class PopupMapActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup_map);
-        MuseImage = (ImageView) findViewById(R.id.imageView);
-        MuseTitle = (TextView) findViewById(R.id.museumTitle);
-        MuseSub = (TextView) findViewById(R.id.museumSub);
+        MuseImage = findViewById(R.id.imageView);
+        MuseTitle = findViewById(R.id.museumTitle);
+        MuseSub = findViewById(R.id.museumSub);
 
         Intent intent = getIntent();
         int Mode = intent.getIntExtra("Mode", -1);

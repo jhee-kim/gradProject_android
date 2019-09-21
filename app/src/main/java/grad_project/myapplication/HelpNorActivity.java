@@ -41,7 +41,7 @@ public class HelpNorActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
-        TextView tv = (TextView)findViewById(R.id.tv_red);
+        TextView tv = findViewById(R.id.tv_red);
         String str = "● 지참물 : 휴가증 필참\n                 (육군은 외박, 외출 제외)";
         SpannableStringBuilder ssb = new SpannableStringBuilder(str);
         ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#FF0000")), 8, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -85,7 +85,7 @@ public class HelpNorActivity extends AppCompatActivity {
             if  (msg.what == MESSAGE_TIMER_START) {
                 DdConnect dbConnect = new DdConnect(context);
                 try {
-                    String result = dbConnect.execute(dbConnect.GET_ISSTART, s_id).get();
+                    String result = dbConnect.execute(DdConnect.GET_ISSTART, s_id).get();
                     Log.d("GET_ISSTART", result);
                     if(result.equals("-1")) {
                         Toast.makeText(getApplicationContext(), "네트워크 통신 오류", Toast.LENGTH_SHORT).show();

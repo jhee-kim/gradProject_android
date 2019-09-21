@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
 
         DdConnect dbConnect = new DdConnect(this);
         try {
-            String result = dbConnect.execute(dbConnect.LOGIN, "", input_number, input_name).get();
+            String result = dbConnect.execute(DdConnect.LOGIN, "", input_number, input_name).get();
             Log.d("LOGIN", result);
             if (!result.equals("-1")) {
                 if (result.equals("0")) {
