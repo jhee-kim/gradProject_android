@@ -14,7 +14,6 @@
 using namespace cv;
 using namespace std;
 
-const int LOOP_NUM = 5;
 const int GOOD_PTS_MAX = 50;
 const float GOOD_PORTION = 0.15f;
 const float RATIO = 0.65f;
@@ -125,14 +124,13 @@ Java_grad_1project_myapplication_CompareActivity_imageprocessing(JNIEnv *env, jo
     ORBDetector orb;
     ORBMatcher matcher;
 
-    for (int i = 0; i <= LOOP_NUM; i++){
-        orb(img1.getMat(ACCESS_READ), Mat(), keypoints1, descriptors1);
-        orb(img2.getMat(ACCESS_READ), Mat(), keypoints2, descriptors2);
-        if(keypoints1.size() == 0 || keypoints2.size() == 0) {
-            continue;
-        }
-        matcher(descriptors1, descriptors2, matches, 2);
+    orb(img1.getMat(ACCESS_READ), Mat(), keypoints1, descriptors1);
+    orb(img2.getMat(ACCESS_READ), Mat(), keypoints2, descriptors2);
+    if(keypoints1.size() == 0 || keypoints2.size() == 0) {
+        return -1;
     }
+    matcher(descriptors1, descriptors2, matches, 2);
+
     if(matches.size() == 0) {
         return -1;
     }

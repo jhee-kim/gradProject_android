@@ -157,7 +157,7 @@ public class CompareActivity extends AppCompatActivity implements CameraBridgeVi
     }
 
     private class FeatureComparingTask extends AsyncTask<Bitmap, Void, Integer> {
-        private final static int MIN_CORRECT_NUM = 100;
+        private final static int MIN_CORRECT_NUM = 18;
         private WeakReference<CompareActivity> mActivityWeakReference;
         private ProgressDialog asyncDialog = new ProgressDialog(CompareActivity.this);
 
